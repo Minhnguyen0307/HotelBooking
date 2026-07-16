@@ -1,0 +1,11 @@
+D:\PRN222\HoltelBooking\HotelBooking.Domain\bin\Debug\net8.0\HotelBooking.Domain.deps.json
+D:\PRN222\HoltelBooking\HotelBooking.Domain\bin\Debug\net8.0\HotelBooking.Domain.dll
+D:\PRN222\HoltelBooking\HotelBooking.Domain\bin\Debug\net8.0\HotelBooking.Domain.pdb
+D:\PRN222\HoltelBooking\HotelBooking.Domain\obj\Debug\net8.0\HotelBooking.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\PRN222\HoltelBooking\HotelBooking.Domain\obj\Debug\net8.0\HotelBooking.Domain.AssemblyInfoInputs.cache
+D:\PRN222\HoltelBooking\HotelBooking.Domain\obj\Debug\net8.0\HotelBooking.Domain.AssemblyInfo.cs
+D:\PRN222\HoltelBooking\HotelBooking.Domain\obj\Debug\net8.0\HotelBooking.Domain.csproj.CoreCompileInputs.cache
+D:\PRN222\HoltelBooking\HotelBooking.Domain\obj\Debug\net8.0\HotelBooking.Domain.dll
+D:\PRN222\HoltelBooking\HotelBooking.Domain\obj\Debug\net8.0\refint\HotelBooking.Domain.dll
+D:\PRN222\HoltelBooking\HotelBooking.Domain\obj\Debug\net8.0\HotelBooking.Domain.pdb
+D:\PRN222\HoltelBooking\HotelBooking.Domain\obj\Debug\net8.0\ref\HotelBooking.Domain.dll

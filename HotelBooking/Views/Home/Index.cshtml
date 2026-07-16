@@ -1,0 +1,91 @@
+﻿@model List<HotelBooking.Application.DTOs.RoomListItemDto>
+
+<div class="p-5 mb-4 bg-light rounded-3 text-center">
+    <h1 class="display-5 fw-bold">Chào mừng đến với HotelBooking</h1>
+    <p class="fs-4">Tìm và đặt phòng khách sạn dễ dàng, nhanh chóng</p>
+</div>
+
+<div class="card mb-5">
+    <div class="card-body">
+        <form asp-controller="Room" asp-action="Search" method="post" class="row g-3">
+            <div class="col-md-3">
+                <label>Ngày nhận phòng</label>
+                <input id="checkInInput" name="CheckInDate" type="date" class="form-control"
+                       min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                       value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-3">
+                <label>Ngày trả phòng</label>
+                <input id="checkOutInput" name="CheckOutDate" type="date" class="form-control"
+                       min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
+                       value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-2">
+                <label>Số khách</label>
+                <input name="Guests" type="number" min="1" value="1" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label>Loại phòng</label>
+                <select name="RoomTypeId" class="form-control">
+                    <option value="">-- Tất cả --</option>
+                    @foreach (var rt in (List<(int RoomTypeId, string TypeName)>)ViewBag.RoomTypes)
+                    {
+                        <option value="@rt.RoomTypeId">@rt.TypeName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Tìm phòng</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<h2 class="mb-4">Phòng nổi bật</h2>
+
+<div class="row">
+    @foreach (var room in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="@(room.PrimaryImageUrl ?? "/images/no-image.png")" class="card-img-top" style="height:200px; object-fit:cover;" />
+                <div class="card-body">
+                    <h5 class="card-title">Phòng @room.RoomNumber - @room.TypeName</h5>
+                    <p class="card-text">Sức chứa tối đa: @room.MaxGuests khách</p>
+                    <p class="card-text fw-bold">@room.BasePrice.ToString("N0") đ / đêm</p>
+                    <a asp-controller="Room" asp-action="Details" asp-route-id="@room.RoomId" class="btn btn-outline-primary">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <p class="text-muted">Chưa có phòng nào trong hệ thống.</p>
+    }
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkIn = document.getElementById('checkInInput');
+        const checkOut = document.getElementById('checkOutInput');
+
+        function updateCheckOutMin() {
+            if (!checkIn.value) return;
+
+            const checkInDate = new Date(checkIn.value);
+            const minCheckOut = new Date(checkInDate);
+            minCheckOut.setDate(minCheckOut.getDate() + 1);
+
+            const minStr = minCheckOut.toISOString().split('T')[0];
+            checkOut.min = minStr;
+
+  
+            if (!checkOut.value || new Date(checkOut.value) <= checkInDate) {
+                checkOut.value = minStr;
+            }
+        }
+
+        checkIn.addEventListener('change', updateCheckOutMin);
+        updateCheckOutMin();
+    });
+</script>

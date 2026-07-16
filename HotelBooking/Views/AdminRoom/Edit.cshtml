@@ -1,0 +1,33 @@
+﻿@model HotelBooking.Application.DTOs.RoomUpsertDto
+
+<h2>@(Model.RoomId.HasValue ? "Sửa phòng" : "Thêm phòng mới")</h2>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form asp-action="@(Model.RoomId.HasValue ? "Edit" : "Create")" method="post">
+    <input type="hidden" asp-for="RoomId" />
+
+    <div class="mb-3">
+        <label>Số phòng</label>
+        <input asp-for="RoomNumber" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label>Loại phòng</label>
+        <select asp-for="RoomTypeId" class="form-control">
+            @foreach (var rt in (List<(int RoomTypeId, string TypeName)>)ViewBag.RoomTypes)
+            {
+                <option value="@rt.RoomTypeId">@rt.TypeName</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>Tầng</label>
+        <input asp-for="Floor" type="number" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Mô tả</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lưu</button>
+</form>

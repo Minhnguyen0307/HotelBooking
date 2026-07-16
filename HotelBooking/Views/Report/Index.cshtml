@@ -1,0 +1,26 @@
+﻿@{
+    var revenue = (List<HotelBooking.Application.DTOs.MonthlyRevenueDto>)ViewBag.Revenue;
+    var occupancy = (List<HotelBooking.Application.DTOs.RoomOccupancyDto>)ViewBag.Occupancy;
+}
+
+<h2>Báo cáo doanh thu theo tháng</h2>
+<table class="table">
+    <thead><tr><th>Năm</th><th>Tháng</th><th>Doanh thu</th><th>Số đơn</th></tr></thead>
+    <tbody>
+        @foreach (var r in revenue)
+        {
+            <tr><td>@r.Year</td><td>@r.Month</td><td>@r.TotalRevenue.ToString("N0") đ</td><td>@r.TotalBookingsPaid</td></tr>
+        }
+    </tbody>
+</table>
+
+<h2>Tỷ lệ lấp phòng</h2>
+<table class="table">
+    <thead><tr><th>Phòng</th><th>Số lượt đặt</th><th>Tổng số đêm</th></tr></thead>
+    <tbody>
+        @foreach (var o in occupancy)
+        {
+            <tr><td>@o.RoomNumber</td><td>@o.TotalBookings</td><td>@o.TotalNightsBooked</td></tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,22 @@
+﻿@model HotelBooking.Application.DTOs.RoomDetailDto
+
+<h2>Phòng @Model.RoomNumber - @Model.TypeName</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        @foreach (var img in Model.ImageUrls)
+        {
+            <img src="@img" class="img-fluid mb-2" />
+        }
+    </div>
+    <div class="col-md-6">
+        <p>@Model.Description</p>
+        <p><strong>Sức chứa:</strong> @Model.MaxGuests khách</p>
+        <p><strong>Giá:</strong> @Model.BasePrice.ToString("N0") đ / đêm</p>
+        <p><strong>Tiện nghi:</strong> @string.Join(", ", Model.Amenities)</p>
+
+        <a asp-controller="Booking" asp-action="Create"
+           asp-route-roomId="@Model.RoomId"
+           class="btn btn-success">Đặt phòng này</a>
+    </div>
+</div>

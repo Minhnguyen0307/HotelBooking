@@ -1,0 +1,85 @@
+## WORKSPACE EXECUTIVE SUMMARY (YAML)
+# Generated: 2026-07-15T16:23:22.0506980+07:00
+# Root: D:\PRN222\HoltelBooking
+Architecture:
+  Type: Backend (C#/.NET)
+  Scale: 37 relevant source files
+  Components: 0
+  Controllers: 2
+  Models: 1
+  Services: 2
+---
+- File: HotelBooking.sln
+  Preview: " Microsoft Visual Studio Solution File, Format Version 12.00 # Visual Studio Version 17 VisualStudioVersion = 17.14.36408.4 MinimumVisualStudioVersion..."
+- File: HoltelBooking\HoltelBooking.csproj
+  Preview: "<Project Sdk='Microsoft.NET.Sdk.Web'>  <PropertyGroup>   <TargetFramework>net8.0</TargetFramework>   <Nullable>enable</Nullable>   <ImplicitUsings>ena..."
+- File: HotelBooking\HotelBooking.csproj
+  Preview: "<Project Sdk='Microsoft.NET.Sdk.Web'>  <PropertyGroup>   <TargetFramework>net8.0</TargetFramework>   <Nullable>enable</Nullable>   <ImplicitUsings>ena..."
+- File: HotelBooking.Application\HotelBooking.Application.csproj
+  Preview: "<Project Sdk='Microsoft.NET.Sdk'>  <PropertyGroup>   <TargetFramework>net8.0</TargetFramework>   <ImplicitUsings>enable</ImplicitUsings>   <Nullable>e..."
+- File: HotelBooking.Domain\HotelBooking.Domain.csproj
+  Preview: "<Project Sdk='Microsoft.NET.Sdk'>  <PropertyGroup>   <TargetFramework>net8.0</TargetFramework>   <ImplicitUsings>enable</ImplicitUsings>   <Nullable>e..."
+- File: HotelBooking.Infrastructure\HotelBooking.Infrastructure.csproj
+  Preview: "<Project Sdk='Microsoft.NET.Sdk'>  <PropertyGroup>   <TargetFramework>net8.0</TargetFramework>   <ImplicitUsings>enable</ImplicitUsings>   <Nullable>e..."
+- File: HoltelBooking\appsettings.Development.json
+  Preview: "{  'Logging': {   'LogLevel': {    'Default': 'Information',    'Microsoft.AspNetCore': 'Warning'   }  } } "
+- File: HoltelBooking\appsettings.json
+  Preview: "{  'Logging': {   'LogLevel': {    'Default': 'Information',    'Microsoft.AspNetCore': 'Warning'   }  },  'AllowedHosts': '*' } "
+- File: HoltelBooking\Program.cs
+  Preview: "using HoltelBooking.Components; var builder = WebApplication.CreateBuilder(args); // Add services to the container. builder.Services.AddRazorComponent..."
+- File: HotelBooking\appsettings.Development.json
+  Preview: "{  'Logging': {   'LogLevel': {    'Default': 'Information',    'Microsoft.AspNetCore': 'Warning'   }  } } "
+- File: HotelBooking\appsettings.json
+  Preview: "{  'ConnectionStrings': {   'DefaultConnection': 'Server=LAPTOP-PJCV33QV\\SQLEXPRESS;Database=FUMiniHotelManagement;Uid=sa;Pwd=123;TrustServerCertific..."
+- File: HotelBooking\Program.cs
+  Preview: "using HotelBooking.Infrastructure; using HotelBooking.Infrastructure; using Microsoft.EntityFrameworkCore; var builder = WebApplication.CreateBuilder(..."
+- File: HotelBooking.Application\Class1.cs
+  Preview: "namespace HotelBooking.Application {   public class Class1   {   } } "
+- File: HotelBooking.Domain\Class1.cs
+  Preview: "namespace HotelBooking.Domain {   public class Class1   {   } } "
+- File: HotelBooking.Infrastructure\Amenity.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class Amenity {   public int AmenityId { get; se..."
+- File: HotelBooking.Infrastructure\AuditLog.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class AuditLog {   public int LogId { get; set; ..."
+- File: HotelBooking.Infrastructure\Booking.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class Booking {   public int BookingId { get; se..."
+- File: HotelBooking.Infrastructure\BookingRoom.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class BookingRoom {   public int BookingRoomId {..."
+- File: HotelBooking.Infrastructure\HotelBookingDbContext.cs
+  Preview: "using System; using System.Collections.Generic; using Microsoft.EntityFrameworkCore; namespace HotelBooking.Infrastructure; public partial class Hotel..."
+- File: HotelBooking.Infrastructure\PasswordResetToken.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class PasswordResetToken {   public int TokenId ..."
+- File: HotelBooking.Infrastructure\Payment.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class Payment {   public int PaymentId { get; se..."
+- File: HotelBooking.Infrastructure\Refund.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class Refund {   public int RefundId { get; set;..."
+- File: HotelBooking.Infrastructure\Role.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class Role {   public int RoleId { get; set; }  ..."
+- File: HotelBooking.Infrastructure\Room.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class Room {   public int RoomId { get; set; }  ..."
+- File: HotelBooking.Infrastructure\RoomImage.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class RoomImage {   public int ImageId { get; se..."
+- File: HotelBooking.Infrastructure\RoomType.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class RoomType {   public int RoomTypeId { get; ..."
+- File: HotelBooking.Infrastructure\User.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class User {   public int UserId { get; set; }  ..."
+- File: HotelBooking.Infrastructure\VwMonthlyRevenue.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class VwMonthlyRevenue {   public int? RevenueYe..."
+- File: HotelBooking.Infrastructure\VwRoomOccupancy.cs
+  Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class VwRoomOccupancy {   public int RoomId { ge..."
+- File: HoltelBooking\Properties\launchSettings.json
+  Preview: "{  '$schema': 'http://json.schemastore.org/launchsettings.json',   'iisSettings': {    'windowsAuthentication': false,    'anonymousAuthentication': t..."
+- File: HotelBooking\Controllers\HomeController.cs
+  Preview: "using System.Diagnostics; using HotelBooking.Models; using Microsoft.AspNetCore.Mvc; namespace HotelBooking.Controllers {   public class HomeControlle..."
+- File: HotelBooking\Controllers\TestController.cs
+  Preview: "using HotelBooking.Infrastructure; using HotelBooking.Infrastructure; using Microsoft.AspNetCore.Mvc; public class TestController : Controller {   pri..."
+- File: HotelBooking\Models\ErrorViewModel.cs
+  Preview: "namespace HotelBooking.Models {   public class ErrorViewModel   {     public string? RequestId { get; set; }     public bool ShowRequestId => !string...."
+- File: HotelBooking\Properties\launchSettings.json
+  Preview: "{  '$schema': 'http://json.schemastore.org/launchsettings.json',  'iisSettings': {   'windowsAuthentication': false,   'anonymousAuthentication': true..."
+- File: HotelBooking.Application\DTOs\AuthDtos.cs
+  Preview: "namespace HotelBooking.Application.DTOs {   public class RegisterDto   {     public string FullName { get; set; } = string.Empty;     public string Em..."
+- File: HotelBooking.Application\Interfaces\IAuthService.cs
+  Preview: "using HotelBooking.Application.DTOs; namespace HotelBooking.Application.Interfaces {   public interface IAuthService   {     Task<AuthResult> Register..."
+- File: HotelBooking.Application\Services\AuthService.cs
+  Preview: "using HotelBooking.Application.DTOs; using HotelBooking.Application.Interfaces; using HotelBooking.Infrastructure.Data; using HotelBooking.Infrastruct..."

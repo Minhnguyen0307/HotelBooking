@@ -1,0 +1,31 @@
+﻿@model List<HotelBooking.Application.DTOs.RoomManageListItemDto>
+<h2>Quản lý phòng</h2>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+<a asp-action="Create" class="btn btn-primary mb-3">+ Thêm phòng mới</a>
+<table class="table">
+    <thead><tr><th>Số phòng</th><th>Loại</th><th>Tầng</th><th>Trạng thái</th><th></th></tr></thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.RoomNumber</td>
+                <td>@r.TypeName</td>
+                <td>@r.Floor</td>
+                <td>
+                    <form asp-action="UpdateStatus" method="post" class="d-flex gap-2">
+                        <input type="hidden" name="roomId" value="@r.RoomId" />
+                        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="Available" selected='@(r.Status == "Available")'>Available</option>
+                            <option value="Booked" selected='@(r.Status == "Booked")'>Booked</option>
+                            <option value="Maintenance" selected='@(r.Status == "Maintenance")'>Maintenance</option>
+                        </select>
+                    </form>
+                </td>
+                <td><a asp-action="Edit" asp-route-id="@r.RoomId" class="btn btn-sm btn-outline-secondary">Sửa</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

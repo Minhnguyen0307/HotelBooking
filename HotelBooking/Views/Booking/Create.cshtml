@@ -1,0 +1,27 @@
+﻿@model HotelBooking.Application.DTOs.BookingConfirmDto
+
+<h2>Xác nhận đặt phòng</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <h5>Phòng @Model.RoomNumber - @Model.TypeName</h5>
+        <p>Nhận phòng: @Model.CheckInDate.ToString("dd/MM/yyyy")</p>
+        <p>Trả phòng: @Model.CheckOutDate.ToString("dd/MM/yyyy")</p>
+        <p>Số đêm: @Model.Nights</p>
+        <p>Giá mỗi đêm: @Model.PricePerNight.ToString("N0") đ</p>
+        <p class="fw-bold fs-5">Tổng tiền: @Model.TotalPrice.ToString("N0") đ</p>
+
+        <form asp-action="Confirm" method="post">
+            <input type="hidden" name="RoomId" value="@Model.RoomId" />
+            <input type="hidden" name="CheckInDate" value="@Model.CheckInDate" />
+            <input type="hidden" name="CheckOutDate" value="@Model.CheckOutDate" />
+            <input type="hidden" name="NumberOfGuests" value="@Model.NumberOfGuests" />
+            <button type="submit" class="btn btn-success">Xác nhận đặt phòng</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,57 @@
+﻿@{
+    var arrivals = (List<HotelBooking.Application.DTOs.BookingListItemDto>)ViewBag.Arrivals;
+    var departures = (List<HotelBooking.Application.DTOs.BookingListItemDto>)ViewBag.Departures;
+}
+
+<h2>Quầy lễ tân</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<h4>Khách nhận phòng hôm nay (@arrivals.Count)</h4>
+<table class="table">
+    <thead><tr><th>Mã đơn</th><th>Phòng</th><th>Trạng thái</th><th></th></tr></thead>
+    <tbody>
+        @foreach (var b in arrivals)
+        {
+            <tr>
+                <td>#@b.BookingId</td>
+                <td>@b.RoomNumber (@b.TypeName)</td>
+                <td>@b.Status</td>
+                <td>
+                    <form asp-action="CheckIn" method="post">
+                        <input type="hidden" name="bookingId" value="@b.BookingId" />
+                        <button type="submit" class="btn btn-sm btn-success">Check-in</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4>Khách trả phòng hôm nay (@departures.Count)</h4>
+<table class="table">
+    <thead><tr><th>Mã đơn</th><th>Phòng</th><th>Trạng thái</th><th></th></tr></thead>
+    <tbody>
+        @foreach (var b in departures)
+        {
+            <tr>
+                <td>#@b.BookingId</td>
+                <td>@b.RoomNumber (@b.TypeName)</td>
+                <td>@b.Status</td>
+                <td>
+                    <form asp-action="CheckOut" method="post">
+                        <input type="hidden" name="bookingId" value="@b.BookingId" />
+                        <button type="submit" class="btn btn-sm btn-warning">Check-out</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>}

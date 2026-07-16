@@ -1,0 +1,25 @@
+﻿@model List<HotelBooking.Application.DTOs.RoomListItemDto>
+
+<h2>Kết quả tìm kiếm (@Model.Count phòng trống)</h2>
+
+<div class="row">
+    @foreach (var room in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="@(room.PrimaryImageUrl ?? "/images/no-image.png")" class="card-img-top" style="height:200px; object-fit:cover;" />
+                <div class="card-body">
+                    <h5 class="card-title">Phòng @room.RoomNumber - @room.TypeName</h5>
+                    <p class="card-text">Sức chứa tối đa: @room.MaxGuests khách</p>
+                    <p class="card-text fw-bold">@room.BasePrice.ToString("N0") đ / đêm</p>
+                    <a asp-action="Details" asp-route-id="@room.RoomId" class="btn btn-outline-primary">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">Không tìm thấy phòng trống phù hợp với tiêu chí của bạn.</p>
+}

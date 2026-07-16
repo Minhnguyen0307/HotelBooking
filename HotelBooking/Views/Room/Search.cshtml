@@ -1,0 +1,61 @@
+﻿@model HotelBooking.Application.DTOs.RoomSearchDto
+
+<h2>Tìm phòng trống</h2>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form asp-action="Search" method="post" class="row g-3">
+    <div class="col-md-3">
+        <label>Ngày nhận phòng</label>
+        <input id="checkInInput" name="CheckInDate" type="date" class="form-control"
+               min="@DateTime.Today.ToString("yyyy-MM-dd")"
+               value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-3">
+        <label>Ngày trả phòng</label>
+        <input id="checkOutInput" name="CheckOutDate" type="date" class="form-control"
+               min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
+               value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-2">
+        <label>Số khách</label>
+        <input asp-for="Guests" type="number" min="1" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label>Loại phòng</label>
+        <select asp-for="RoomTypeId" class="form-control">
+            <option value="">-- Tất cả --</option>
+            @foreach (var rt in (List<(int RoomTypeId, string TypeName)>)ViewBag.RoomTypes)
+            {
+                <option value="@rt.RoomTypeId">@rt.TypeName</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+    </div>
+</form>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkIn = document.getElementById('checkInInput');
+        const checkOut = document.getElementById('checkOutInput');
+
+        function updateCheckOutMin() {
+            if (!checkIn.value) return;
+
+            const checkInDate = new Date(checkIn.value);
+            const minCheckOut = new Date(checkInDate);
+            minCheckOut.setDate(minCheckOut.getDate() + 1);
+
+            const minStr = minCheckOut.toISOString().split('T')[0];
+            checkOut.min = minStr;
+
+            if (!checkOut.value || new Date(checkOut.value) <= checkInDate) {
+                checkOut.value = minStr;
+            }
+        }
+
+        checkIn.addEventListener('change', updateCheckOutMin);
+        updateCheckOutMin(); 
+    });
+</script>
