@@ -18,6 +18,9 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IRoomManageService, RoomManageService>();
 builder.Services.AddScoped<IFrontDeskService, FrontDeskService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

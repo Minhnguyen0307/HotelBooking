@@ -1,4 +1,4 @@
-﻿using HotelBooking.Application.DTOs;
+using HotelBooking.Application.DTOs;
 using HotelBooking.Application.Interfaces;
 using HotelBooking.Infrastructure;
 using HotelBooking.Infrastructure;
@@ -93,6 +93,93 @@ namespace HotelBooking.Application.Services
             user.LockoutUntil = null;
             await _context.SaveChangesAsync();
 
+            return new AuthResult { Success = true };
+        }
+
+        public async Task<ProfileDto?> GetProfileAsync(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return null;
+
+            return new ProfileDto
+            {
+                FullName = user.FullName,
+                PhoneNumber = user.PhoneNumber,
+                Email = user.Email
+            };
+        }
+
+        public async Task<AuthResult> UpdateProfileAsync(int userId, ProfileDto dto)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return new AuthResult { Success = false, ErrorMessage = "Tài khoản không tồn tại." };
+
+            user.FullName = dto.FullName;
+            user.PhoneNumber = dto.PhoneNumber;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return new AuthResult { Success = true };
+        }
+
+        public async Task<AuthResult> ChangePasswordAsync(int userId, ChangePasswordDto dto)
+        {
+            if (dto.NewPassword != dto.ConfirmNewPassword)
+                return new AuthResult { Success = false, ErrorMessage = "Mật khẩu mới và mật khẩu xác nhận không khớp." };
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return new AuthResult { Success = false, ErrorMessage = "Tài khoản không tồn tại." };
+
+            var verifyResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, dto.OldPassword);
+            if (verifyResult == PasswordVerificationResult.Failed)
+                return new AuthResult { Success = false, ErrorMessage = "Mật khẩu cũ không chính xác." };
+
+            user.PasswordHash = _passwordHasher.HashPassword(user, dto.NewPassword);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return new AuthResult { Success = true };
+        }
+
+        public async Task<string?> GeneratePasswordResetTokenAsync(string email)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null) return null;
+
+            var token = Guid.NewGuid().ToString("N");
+            var prt = new PasswordResetToken
+            {
+                UserId = user.UserId,
+                Token = token,
+                ExpiresAt = DateTime.UtcNow.AddHours(24),
+                IsUsed = false,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.PasswordResetTokens.Add(prt);
+            await _context.SaveChangesAsync();
+            return token;
+        }
+
+        public async Task<AuthResult> ResetPasswordAsync(ResetPasswordDto dto)
+        {
+            if (dto.NewPassword != dto.ConfirmNewPassword)
+                return new AuthResult { Success = false, ErrorMessage = "Mật khẩu xác nhận không khớp." };
+
+            var tokenRecord = await _context.PasswordResetTokens
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(t => t.Token == dto.Token && t.User.Email == dto.Email);
+
+            if (tokenRecord == null || tokenRecord.IsUsed || tokenRecord.ExpiresAt < DateTime.UtcNow)
+                return new AuthResult { Success = false, ErrorMessage = "Mã xác thực không hợp lệ hoặc đã hết hạn." };
+
+            var user = tokenRecord.User;
+            user.PasswordHash = _passwordHasher.HashPassword(user, dto.NewPassword);
+            user.UpdatedAt = DateTime.UtcNow;
+            tokenRecord.IsUsed = true;
+
+            await _context.SaveChangesAsync();
             return new AuthResult { Success = true };
         }
     }

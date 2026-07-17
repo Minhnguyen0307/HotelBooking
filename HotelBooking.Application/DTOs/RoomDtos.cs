@@ -1,4 +1,4 @@
-﻿namespace HotelBooking.Application.DTOs
+namespace HotelBooking.Application.DTOs
 {
     public class RoomSearchDto
     {
@@ -16,6 +16,7 @@
         public decimal BasePrice { get; set; }
         public int MaxGuests { get; set; }
         public string? PrimaryImageUrl { get; set; }
+        public string? Address { get; set; }
     }
 
     public class RoomDetailDto
@@ -28,5 +29,6 @@
         public int MaxGuests { get; set; }
         public List<string> ImageUrls { get; set; } = new();
         public List<string> Amenities { get; set; } = new();
+        public string? Address { get; set; }
     }
 }

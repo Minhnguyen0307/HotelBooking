@@ -1,4 +1,4 @@
-﻿using HotelBooking.Application.DTOs;
+using HotelBooking.Application.DTOs;
 using HotelBooking.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -44,8 +44,8 @@ public class BookingController : Controller
             return RedirectToAction("Create", new { roomId = dto.RoomId, checkIn = dto.CheckInDate, checkOut = dto.CheckOutDate });
         }
 
-        TempData["SuccessMessage"] = "Đặt phòng thành công! Vui lòng chờ xác nhận.";
-        return RedirectToAction("Index");
+        TempData["SuccessMessage"] = "Đơn đặt phòng đã khởi tạo thành công! Vui lòng hoàn tất thanh toán.";
+        return RedirectToAction("Pay", "Payment", new { bookingId = result.BookingId });
     }
 
     public async Task<IActionResult> Index()

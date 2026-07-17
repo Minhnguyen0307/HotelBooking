@@ -1,57 +1,117 @@
-﻿@{
+@{
     var arrivals = (List<HotelBooking.Application.DTOs.BookingListItemDto>)ViewBag.Arrivals;
     var departures = (List<HotelBooking.Application.DTOs.BookingListItemDto>)ViewBag.Departures;
+    ViewData["Title"] = "Quầy lễ tân";
 }
 
-<h2>Quầy lễ tân</h2>
+<div class="container my-5">
+    <div class="mb-5 border-bottom pb-4">
+        <h2 style="font-family: 'Playfair Display'; font-weight: 700; font-size: 2.2rem;"><i class="fa-solid fa-concierge-bell me-2 text-primary"></i> Quầy Lễ Tân (Front Desk)</h2>
+        <p class="text-muted mb-0">Quản lý nhận phòng và trả phòng trong ngày cho khách hàng.</p>
+    </div>
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-}
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-}
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-<h4>Khách nhận phòng hôm nay (@arrivals.Count)</h4>
-<table class="table">
-    <thead><tr><th>Mã đơn</th><th>Phòng</th><th>Trạng thái</th><th></th></tr></thead>
-    <tbody>
-        @foreach (var b in arrivals)
-        {
-            <tr>
-                <td>#@b.BookingId</td>
-                <td>@b.RoomNumber (@b.TypeName)</td>
-                <td>@b.Status</td>
-                <td>
-                    <form asp-action="CheckIn" method="post">
-                        <input type="hidden" name="bookingId" value="@b.BookingId" />
-                        <button type="submit" class="btn btn-sm btn-success">Check-in</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="row g-5">
+        <!-- Check-in column -->
+        <div class="col-lg-6">
+            <div class="p-4 bg-white rounded-4 shadow-sm border" style="border-radius: 16px;">
+                <h4 class="mb-4 text-success" style="font-family: 'Playfair Display'; font-weight: 700;"><i class="fa-solid fa-circle-arrow-down me-2"></i> Khách Nhận Phòng Hôm Nay (@arrivals.Count)</h4>
+                
+                <div class="table-responsive">
+                    <table class="table-luxury">
+                        <thead>
+                            <tr>
+                                <th>Đơn Đặt</th>
+                                <th>Thông Tin Phòng</th>
+                                <th class="text-end">Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var b in arrivals)
+                            {
+                                <tr>
+                                    <td class="fw-bold">#@b.BookingId</td>
+                                    <td>
+                                        <span class="d-block fw-bold text-dark">Phòng @b.RoomNumber</span>
+                                        <span class="small text-muted">@b.TypeName</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <form asp-action="CheckIn" method="post" class="d-inline">
+                                            <input type="hidden" name="bookingId" value="@b.BookingId" />
+                                            <button type="submit" class="btn btn-sm btn-success px-3" style="border-radius: 6px;"><i class="fa-solid fa-key me-1"></i> Check-in</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
 
-<h4>Khách trả phòng hôm nay (@departures.Count)</h4>
-<table class="table">
-    <thead><tr><th>Mã đơn</th><th>Phòng</th><th>Trạng thái</th><th></th></tr></thead>
-    <tbody>
-        @foreach (var b in departures)
-        {
-            <tr>
-                <td>#@b.BookingId</td>
-                <td>@b.RoomNumber (@b.TypeName)</td>
-                <td>@b.Status</td>
-                <td>
-                    <form asp-action="CheckOut" method="post">
-                        <input type="hidden" name="bookingId" value="@b.BookingId" />
-                        <button type="submit" class="btn btn-sm btn-warning">Check-out</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>}
+                            @if (!arrivals.Any())
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center py-4 text-muted small">Không có lượt check-in nào dự kiến hôm nay.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Check-out column -->
+        <div class="col-lg-6">
+            <div class="p-4 bg-white rounded-4 shadow-sm border" style="border-radius: 16px;">
+                <h4 class="mb-4 text-warning" style="font-family: 'Playfair Display'; font-weight: 700;"><i class="fa-solid fa-circle-arrow-up me-2"></i> Khách Trả Phòng Hôm Nay (@departures.Count)</h4>
+                
+                <div class="table-responsive">
+                    <table class="table-luxury">
+                        <thead>
+                            <tr>
+                                <th>Đơn Đặt</th>
+                                <th>Thông Tin Phòng</th>
+                                <th class="text-end">Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var b in departures)
+                            {
+                                <tr>
+                                    <td class="fw-bold">#@b.BookingId</td>
+                                    <td>
+                                        <span class="d-block fw-bold text-dark">Phòng @b.RoomNumber</span>
+                                        <span class="small text-muted">@b.TypeName</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <form asp-action="CheckOut" method="post" class="d-inline">
+                                            <input type="hidden" name="bookingId" value="@b.BookingId" />
+                                            <button type="submit" class="btn btn-sm btn-warning text-white px-3" style="border-radius: 6px;"><i class="fa-solid fa-door-closed me-1"></i> Check-out</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+
+                            @if (!departures.Any())
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center py-4 text-muted small">Không có lượt check-out nào dự kiến hôm nay.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

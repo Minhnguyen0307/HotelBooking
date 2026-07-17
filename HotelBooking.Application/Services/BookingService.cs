@@ -1,4 +1,4 @@
-﻿using HotelBooking.Application.DTOs;
+using HotelBooking.Application.DTOs;
 using HotelBooking.Application.Interfaces;
 using HotelBooking.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -138,6 +138,24 @@ namespace HotelBooking.Application.Services
             booking.Status = "Cancelled";
             booking.CancelledAt = DateTime.UtcNow;
             booking.CancelReason = reason;
+
+            // Check if booking is paid and initiate a refund (UC-22)
+            var payment = await _context.Payments
+                .FirstOrDefaultAsync(p => p.BookingId == bookingId && p.PaymentStatus == "Success");
+            if (payment != null)
+            {
+                var refund = new Refund
+                {
+                    PaymentId = payment.PaymentId,
+                    Amount = payment.Amount,
+                    Reason = reason ?? "Khách hàng hủy phòng",
+                    Status = "Processed",
+                    RequestedAt = DateTime.UtcNow,
+                    ProcessedAt = DateTime.UtcNow
+                };
+                _context.Refunds.Add(refund);
+                payment.PaymentStatus = "Refunded";
+            }
 
             await _context.SaveChangesAsync();
             return new BookingResult { Success = true };

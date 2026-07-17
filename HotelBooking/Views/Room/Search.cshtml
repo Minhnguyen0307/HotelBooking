@@ -1,40 +1,57 @@
-﻿@model HotelBooking.Application.DTOs.RoomSearchDto
+@model HotelBooking.Application.DTOs.RoomSearchDto
 
-<h2>Tìm phòng trống</h2>
+@{
+    ViewData["Title"] = "Tìm phòng trống";
+}
 
-<div asp-validation-summary="All" class="text-danger"></div>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg" style="border-radius: 16px; background-color: #fff; overflow: hidden;">
+                <div class="p-5 text-center text-white" style="background-color: var(--primary-dark);">
+                    <h2 class="text-white mb-2" style="font-family: 'Playfair Display'; font-weight: 700;">Lên Kế Hoạch Cho Kỳ Nghỉ Của Bạn</h2>
+                    <p class="mb-0 text-white-50">Nhập ngày để tìm kiếm các phòng còn trống và phù hợp nhất.</p>
+                </div>
+                <div class="card-body p-5">
+                    <div asp-validation-summary="All" class="alert alert-danger d-none"></div>
 
-<form asp-action="Search" method="post" class="row g-3">
-    <div class="col-md-3">
-        <label>Ngày nhận phòng</label>
-        <input id="checkInInput" name="CheckInDate" type="date" class="form-control"
-               min="@DateTime.Today.ToString("yyyy-MM-dd")"
-               value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    <form asp-action="Search" method="post" class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-uppercase tracking-wider text-muted"><i class="fa-solid fa-calendar-days me-1 text-primary"></i> Ngày nhận phòng</label>
+                            <input id="checkInInput" name="CheckInDate" type="date" class="form-control form-control-lg"
+                                   min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                   value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-uppercase tracking-wider text-muted"><i class="fa-solid fa-calendar-days me-1 text-primary"></i> Ngày trả phòng</label>
+                            <input id="checkOutInput" name="CheckOutDate" type="date" class="form-control form-control-lg"
+                                   min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
+                                   value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-uppercase tracking-wider text-muted"><i class="fa-solid fa-user-group me-1 text-primary"></i> Số lượng khách</label>
+                            <input asp-for="Guests" type="number" min="1" class="form-control form-control-lg" value="1" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-uppercase tracking-wider text-muted"><i class="fa-solid fa-hotel me-1 text-primary"></i> Loại phòng mong muốn</label>
+                            <select asp-for="RoomTypeId" class="form-select form-select-lg">
+                                <option value="">Tất cả loại phòng</option>
+                                @foreach (var rt in (List<(int RoomTypeId, string TypeName)>)ViewBag.RoomTypes)
+                                {
+                                    <option value="@rt.RoomTypeId">@rt.TypeName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg w-100 py-3"><i class="fa-solid fa-magnifying-glass me-2"></i> Tìm Kiếm Phòng Trống</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-3">
-        <label>Ngày trả phòng</label>
-        <input id="checkOutInput" name="CheckOutDate" type="date" class="form-control"
-               min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
-               value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
-    </div>
-    <div class="col-md-2">
-        <label>Số khách</label>
-        <input asp-for="Guests" type="number" min="1" class="form-control" />
-    </div>
-    <div class="col-md-2">
-        <label>Loại phòng</label>
-        <select asp-for="RoomTypeId" class="form-control">
-            <option value="">-- Tất cả --</option>
-            @foreach (var rt in (List<(int RoomTypeId, string TypeName)>)ViewBag.RoomTypes)
-            {
-                <option value="@rt.RoomTypeId">@rt.TypeName</option>
-            }
-        </select>
-    </div>
-    <div class="col-md-2 d-flex align-items-end">
-        <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
-    </div>
-</form>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const checkIn = document.getElementById('checkInInput');

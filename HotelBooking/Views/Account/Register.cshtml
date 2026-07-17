@@ -1,29 +1,45 @@
-﻿@model HotelBooking.Application.DTOs.RegisterDto
+@model HotelBooking.Application.DTOs.RegisterDto
 
-<h2>Đăng ký tài khoản</h2>
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+}
 
-<div asp-validation-summary="All" class="text-danger"></div>
+<div class="auth-container">
+    <div class="auth-card">
+        <h3 class="auth-card-title" style="font-family: 'Playfair Display'; font-weight: 700; color: var(--primary-dark);">Tạo Tài Khoản Mới</h3>
+        <p class="text-center text-muted small mb-4">Đăng ký ngay để nhận các đặc quyền và ưu đãi đặt phòng</p>
+        
+        <div asp-validation-summary="All" class="text-danger small mb-3"></div>
 
-<form asp-action="Register" method="post">
-    <div class="mb-3">
-        <label>Họ và tên</label>
-        <input asp-for="FullName" class="form-control" required />
+        <form asp-action="Register" method="post" class="row g-3">
+            <div class="col-12">
+                <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-user me-1 text-primary"></i> Họ và tên</label>
+                <input asp-for="FullName" class="form-control" type="text" placeholder="Nguyễn Văn A" required />
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-envelope me-1 text-primary"></i> Địa chỉ Email</label>
+                <input asp-for="Email" class="form-control" type="email" placeholder="example@hotel.com" required />
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-phone me-1 text-primary"></i> Số điện thoại</label>
+                <input asp-for="PhoneNumber" class="form-control" type="tel" placeholder="0901234567" />
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-lock me-1 text-primary"></i> Mật khẩu</label>
+                <input asp-for="Password" class="form-control" type="password" placeholder="••••••••" required />
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-circle-check me-1 text-primary"></i> Xác nhận</label>
+                <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="••••••••" required />
+            </div>
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary w-100 py-2"><i class="fa-solid fa-user-plus me-2"></i> Đăng Ký Tài Khoản</button>
+            </div>
+        </form>
+
+        <div class="text-center mt-4 border-top pt-3">
+            <span class="small text-muted">Đã có tài khoản?</span>
+            <a asp-action="Login" class="small fw-bold text-decoration-none text-primary ms-1">Đăng nhập</a>
+        </div>
     </div>
-    <div class="mb-3">
-        <label>Email</label>
-        <input asp-for="Email" class="form-control" type="email" required />
-    </div>
-    <div class="mb-3">
-        <label>Số điện thoại</label>
-        <input asp-for="PhoneNumber" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label>Mật khẩu</label>
-        <input asp-for="Password" class="form-control" type="password" required />
-    </div>
-    <div class="mb-3">
-        <label>Xác nhận mật khẩu</label>
-        <input asp-for="ConfirmPassword" class="form-control" type="password" required />
-    </div>
-    <button type="submit" class="btn btn-primary">Đăng ký</button>
-</form>
+</div>

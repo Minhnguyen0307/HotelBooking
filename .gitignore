@@ -1,0 +1,43 @@
+# User-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Re]leases/
+x64/
+x86/
+[Aa]rch/
+Build/
+bld/
+[Bb]in/
+[Oo]bj/
+libs/
+Generated/
+
+# Visual Studio files
+.vs/
+$Recycle.Bin/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider/Resharper
+.idea/
+*.sln.iml
+
+# VS Code
+.vscode/
+
+# Publish output
+publish/
+**/bin/
+**/obj/

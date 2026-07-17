@@ -1,25 +1,63 @@
-﻿@model List<HotelBooking.Application.DTOs.RoomListItemDto>
+@model List<HotelBooking.Application.DTOs.RoomListItemDto>
 
-<h2>Kết quả tìm kiếm (@Model.Count phòng trống)</h2>
+@{
+    ViewData["Title"] = "Kết quả tìm kiếm";
+    var criteria = (HotelBooking.Application.DTOs.RoomSearchDto)ViewBag.SearchCriteria;
+}
 
-<div class="row">
-    @foreach (var room in Model)
-    {
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <img src="@(room.PrimaryImageUrl ?? "/images/no-image.png")" class="card-img-top" style="height:200px; object-fit:cover;" />
-                <div class="card-body">
-                    <h5 class="card-title">Phòng @room.RoomNumber - @room.TypeName</h5>
-                    <p class="card-text">Sức chứa tối đa: @room.MaxGuests khách</p>
-                    <p class="card-text fw-bold">@room.BasePrice.ToString("N0") đ / đêm</p>
-                    <a asp-action="Details" asp-route-id="@room.RoomId" class="btn btn-outline-primary">Xem chi tiết</a>
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-3">
+        <div>
+            <h2 class="mb-1" style="font-family: 'Playfair Display'; font-weight: 700;">Kết Quả Tìm Kiếm</h2>
+            <p class="text-muted mb-0">Tìm thấy <span class="fw-bold text-dark">@Model.Count</span> phòng trống phù hợp</p>
+        </div>
+        <div class="d-none d-md-block text-end">
+            <span class="badge bg-light text-dark p-2 me-2 border"><i class="fa-solid fa-calendar me-1"></i> @criteria.CheckInDate.ToString("dd/MM/yyyy") - @criteria.CheckOutDate.ToString("dd/MM/yyyy")</span>
+            <span class="badge bg-light text-dark p-2 border"><i class="fa-solid fa-user me-1"></i> @criteria.Guests khách</span>
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var room in Model)
+        {
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card-hotel">
+                    <div class="card-hotel-img-wrapper">
+                        <img src="@(string.IsNullOrEmpty(room.PrimaryImageUrl) ? "/images/no-image.png" : room.PrimaryImageUrl)" class="card-hotel-img" alt="Hình ảnh phòng @room.RoomNumber" />
+                        <span class="card-hotel-badge">Available</span>
+                    </div>
+                    <div class="card-hotel-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-uppercase small fw-bold" style="color: var(--gold-accent); letter-spacing: 1px;">@room.TypeName</span>
+                            <span class="small text-muted"><i class="fa-solid fa-user-group me-1"></i> Tối đa: @room.MaxGuests khách</span>
+                        </div>
+                        <h4 class="card-hotel-title">Phòng @room.RoomNumber</h4>
+                        <p class="small text-muted mb-2" style="font-size: 0.85rem;"><i class="fa-solid fa-location-dot me-1 text-danger"></i> @room.Address</p>
+                        <p class="card-hotel-text">Không gian nghỉ dưỡng tuyệt vời kết hợp hài hòa nét kiến trúc hiện đại và sự tiện nghi tối tân.</p>
+                        
+                        <hr class="text-muted opacity-25" />
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="card-hotel-price">
+                                @room.BasePrice.ToString("N0") đ <span>/ đêm</span>
+                            </div>
+                            <a asp-action="Details" asp-route-id="@room.RoomId" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-circle-info me-1"></i> Chi tiết</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    }
-</div>
+        }
 
-@if (!Model.Any())
-{
-    <p class="text-muted">Không tìm thấy phòng trống phù hợp với tiêu chí của bạn.</p>
-}
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <div class="mb-4">
+                    <i class="fa-solid fa-calendar-xmark fa-4x text-muted opacity-50"></i>
+                </div>
+                <h4 class="text-dark">Rất tiếc, không tìm thấy phòng!</h4>
+                <p class="text-muted">Không tìm thấy phòng trống nào phù hợp với khoảng thời gian và số khách bạn yêu cầu.</p>
+                <a asp-action="Search" class="btn btn-primary mt-3"><i class="fa-solid fa-arrow-left me-1"></i> Quay lại tìm kiếm</a>
+            </div>
+        }
+    </div>
+</div>

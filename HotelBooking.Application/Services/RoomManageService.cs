@@ -1,4 +1,4 @@
-﻿using HotelBooking.Application.DTOs;
+using HotelBooking.Application.DTOs;
 using HotelBooking.Application.Interfaces;
 using HotelBooking.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -42,7 +42,8 @@ namespace HotelBooking.Application.Services
                 RoomTypeId = room.RoomTypeId,
                 Floor = room.Floor,
                 Status = room.Status,
-                Description = room.Description
+                Description = room.Description,
+                Address = room.Address
             };
         }
 
@@ -64,6 +65,7 @@ namespace HotelBooking.Application.Services
                 room.Floor = dto.Floor;
                 room.Status = dto.Status;
                 room.Description = dto.Description;
+                room.Address = dto.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng";
                 room.UpdatedAt = DateTime.UtcNow;
             }
             else
@@ -75,6 +77,7 @@ namespace HotelBooking.Application.Services
                     Floor = dto.Floor,
                     Status = dto.Status,
                     Description = dto.Description,
+                    Address = dto.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng",
                     CreatedAt = DateTime.UtcNow
                 };
                 _context.Rooms.Add(room);
@@ -95,6 +98,35 @@ namespace HotelBooking.Application.Services
 
             room.Status = status;
             room.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return (true, null);
+        }
+
+        public async Task<(bool Success, string? Error)> DeleteRoomAsync(int roomId)
+        {
+            var room = await _context.Rooms
+                .Include(r => r.BookingRooms)
+                .ThenInclude(br => br.Booking)
+                .FirstOrDefaultAsync(r => r.RoomId == roomId);
+
+            if (room == null) return (false, "Phòng không tồn tại.");
+
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            bool hasActiveBookings = room.BookingRooms
+                .Any(br => (br.Booking.Status == "Pending" || br.Booking.Status == "Confirmed" || br.Booking.Status == "CheckedIn")
+                           && br.Booking.CheckOutDate >= today);
+
+            if (hasActiveBookings)
+                return (false, "Không thể xóa phòng này vì đang có đơn đặt phòng hoạt động hoặc trong tương lai.");
+
+            var roomImages = _context.RoomImages.Where(ri => ri.RoomId == roomId);
+            _context.RoomImages.RemoveRange(roomImages);
+
+            var bookingRooms = _context.BookingRooms.Where(br => br.RoomId == roomId);
+            _context.BookingRooms.RemoveRange(bookingRooms);
+
+            _context.Rooms.Remove(room);
             await _context.SaveChangesAsync();
 
             return (true, null);

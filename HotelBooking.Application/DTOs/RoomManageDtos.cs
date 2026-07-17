@@ -1,4 +1,4 @@
-﻿namespace HotelBooking.Application.DTOs
+namespace HotelBooking.Application.DTOs
 {
     public class RoomManageListItemDto
     {
@@ -17,5 +17,6 @@
         public int? Floor { get; set; }
         public string Status { get; set; } = "Available";
         public string? Description { get; set; }
+        public string? Address { get; set; }
     }
 }
