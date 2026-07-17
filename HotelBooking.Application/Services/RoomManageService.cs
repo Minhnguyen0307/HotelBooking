@@ -65,7 +65,7 @@ namespace HotelBooking.Application.Services
                 room.Floor = dto.Floor;
                 room.Status = dto.Status;
                 room.Description = dto.Description;
-                room.Address = dto.Address ?? "123 Võ Nguyên Giáp, Quận Sơn Trà, Đà Nẵng";
+                room.Address = dto.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng";
                 room.UpdatedAt = DateTime.UtcNow;
             }
             else
@@ -77,7 +77,7 @@ namespace HotelBooking.Application.Services
                     Floor = dto.Floor,
                     Status = dto.Status,
                     Description = dto.Description,
-                    Address = dto.Address ?? "123 Võ Nguyên Giáp, Quận Sơn Trà, Đà Nẵng",
+                    Address = dto.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng",
                     CreatedAt = DateTime.UtcNow
                 };
                 _context.Rooms.Add(room);

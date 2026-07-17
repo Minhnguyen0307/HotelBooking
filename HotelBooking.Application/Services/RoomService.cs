@@ -60,7 +60,7 @@ namespace HotelBooking.Application.Services
                         .Where(i => i.IsPrimary)
                         .Select(i => i.ImageUrl)
                         .FirstOrDefault(),
-                    Address = r.Address ?? "123 Võ Nguyên Giáp, Quận Sơn Trà, Đà Nẵng"
+                    Address = r.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng"
                 })
                 .ToListAsync();
 
@@ -87,7 +87,7 @@ namespace HotelBooking.Application.Services
                 MaxGuests = room.RoomType.MaxGuests,
                 ImageUrls = room.RoomImages.Select(i => i.ImageUrl).ToList(),
                 Amenities = room.Amenities.Select(a => a.Name).ToList(),
-                Address = room.Address ?? "123 Võ Nguyên Giáp, Quận Sơn Trà, Đà Nẵng"
+                Address = room.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng"
             };
         }
         public async Task<List<(int RoomTypeId, string TypeName)>> GetAllRoomTypesAsync()
