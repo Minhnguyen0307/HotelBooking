@@ -1,54 +1,89 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HotelBooking</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HotelBooking.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top d-flex flex-column py-1 shadow-sm">
+            <!-- Top premium info bar -->
+            <div class="w-100 border-bottom mb-2 pb-1 no-print" style="border-color: rgba(0,0,0,0.05) !important;">
+                <div class="container d-flex justify-content-between align-items-center small text-muted" style="font-size: 0.85rem;">
+                    <div>
+                        <span class="me-3"><i class="fa-solid fa-hotel me-1 text-primary"></i> <strong>HBS Luxury Hotel Da Nang</strong></span>
+                        <span><i class="fa-solid fa-location-dot me-1 text-danger"></i> 123 Võ Nguyên Giáp, Sơn Trà, Đà Nẵng</span>
+                    </div>
+                    <div class="d-none d-md-block">
+                        <span class="me-3"><i class="fa-solid fa-phone me-1 text-success"></i> Hotline: 0941.478.346</span>
+                        <span><i class="fa-solid fa-clock me-1 text-warning"></i> Check-in: 14:00 \| Out: 12:00</span>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HotelBooking</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse justify-content-between">
+                    <ul class="navbar-nav mr-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="/">Trang chủ</a>
+                            <a class="nav-link" href="/"><i class="fa-solid fa-house me-1"></i> Trang chủ</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Room" asp-action="Search">Tìm phòng</a>
+                            <a class="nav-link" asp-controller="Room" asp-action="Search"><i class="fa-solid fa-magnifying-glass me-1"></i> Tìm phòng</a>
                         </li>
                     </ul>
 
                     <ul class="navbar-nav">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
+                            @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="AdminRoom" asp-action="Index"><i class="fa-solid fa-bed me-1"></i> Quản lý phòng</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="AdminRoomType" asp-action="Index"><i class="fa-solid fa-layer-group me-1"></i> Loại phòng</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="AdminCustomer" asp-action="Index"><i class="fa-solid fa-users me-1"></i> Khách hàng</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Report" asp-action="Index"><i class="fa-solid fa-chart-line me-1"></i> Báo cáo</a>
+                                </li>
+                            }
+                            @if (User.IsInRole("Receptionist") || User.IsInRole("Manager") || User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="FrontDesk" asp-action="Index"><i class="fa-solid fa-concierge-bell me-1"></i> Lễ tân</a>
+                                </li>
+                            }
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Booking" asp-action="Index">Đơn của tôi</a>
+                                <a class="nav-link" asp-controller="Booking" asp-action="Index"><i class="fa-solid fa-receipt me-1"></i> Đơn của tôi</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center">
+                                <a class="nav-link text-dark fw-bold me-2" asp-controller="Account" asp-action="Profile"><i class="fa-solid fa-user me-1 text-primary"></i> @User.Identity.Name</a>
                             </li>
                             <li class="nav-item">
-                                <span class="nav-link text-dark">Xin chào, @User.Identity.Name</span>
-                            </li>
-                            <li class="nav-item">
-                                <form asp-controller="Account" asp-action="Logout" method="post">
-                                    <button type="submit" class="btn btn-link nav-link text-dark">Đăng xuất</button>
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger ms-2" style="border-radius: 6px;"><i class="fa-solid fa-right-from-bracket me-1"></i> Đăng xuất</button>
                                 </form>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                                <a class="nav-link" asp-controller="Account" asp-action="Login"><i class="fa-solid fa-key me-1"></i> Đăng nhập</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Đăng ký</a>
+                                <a class="btn btn-sm btn-primary ms-2" asp-controller="Account" asp-action="Register" style="padding: 0.5rem 1rem;"><i class="fa-solid fa-user-plus me-1"></i> Đăng ký</a>
                             </li>
                         }
                     </ul>
@@ -56,17 +91,28 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <div class="container" style="margin-top: 130px; min-height: calc(100vh - 220px);">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - HotelBooking - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="footer mt-auto py-4">
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-md-6 text-md-start mb-3 mb-md-0">
+                    <h5 class="text-white mb-2" style="font-family: 'Playfair Display'; font-weight: 700;">HotelBooking</h5>
+                    <p class="text-white-50 small mb-0">Hệ thống quản lý khách sạn và đặt phòng trực tuyến cao cấp, an toàn và nhanh chóng.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0 small text-white-50">&copy; 2026 - HotelBooking. All rights reserved.</p>
+                    <p class="mb-0 small"><a asp-area="" asp-controller="Home" asp-action="Privacy">Chính sách bảo mật</a> | <a href="#">Điều khoản sử dụng</a></p>
+                </div>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

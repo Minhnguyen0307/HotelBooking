@@ -1,0 +1,117 @@
+@model HotelBooking.Infrastructure.Booking
+
+@{
+    ViewData["Title"] = "Thanh toán đặt phòng";
+    var room = Model.BookingRooms.FirstOrDefault()?.Room;
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+                <!-- Header -->
+                <div class="p-4 text-center text-white" style="background-color: var(--primary-dark);">
+                    <h3 class="mb-1 text-white" style="font-family: 'Playfair Display'; font-weight: 700;">Thanh Toán Đặt Phòng</h3>
+                    <p class="mb-0 text-white-50 small">Vui lòng chọn phương thức thanh toán để hoàn tất giao dịch</p>
+                </div>
+                
+                <div class="card-body p-4">
+                    <!-- Summary Card -->
+                    <div class="p-3 mb-4 bg-light rounded border border-warning" style="background-color: #fff9f0 !important;">
+                        <div class="row align-items-center">
+                            <div class="col-md-7 mb-3 mb-md-0">
+                                <span class="text-uppercase small fw-bold text-primary">Mã đơn đặt: #@Model.BookingId</span>
+                                <h4 class="mb-1" style="font-family: 'Playfair Display'; font-weight: 700;">Phòng @(room?.RoomNumber ?? "Chưa xác định")</h4>
+                                <span class="small text-muted"><i class="fa-solid fa-calendar me-1"></i> Lưu trú: @Model.CheckInDate.ToString("dd/MM/yyyy") - @Model.CheckOutDate.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <div class="col-md-5 text-md-end">
+                                <span class="small text-muted d-block">Tổng số tiền cần thanh toán</span>
+                                <span class="fw-bold text-danger fs-3">@Model.TotalPrice.ToString("N0") đ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="mb-4 fw-bold" style="font-family: 'Playfair Display'; font-weight: 700;">Chọn phương thức thanh toán</h5>
+                    
+                    <form asp-action="MockGateway" method="get">
+                        <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                        
+                        <div class="row g-3 mb-4">
+                            <!-- MoMo -->
+                            <div class="col-md-6">
+                                <label class="payment-method-card d-block p-3 border rounded text-center cursor-pointer position-relative h-100 transition-all">
+                                    <input type="radio" name="paymentMethod" value="MoMo" class="payment-radio position-absolute top-3 end-3" checked />
+                                    <div class="py-2">
+                                        <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.svg" alt="MoMo Logo" style="height: 50px;" class="mb-3" />
+                                        <h6 class="fw-bold mb-1">Ví điện tử MoMo</h6>
+                                        <p class="text-muted small mb-0">Thanh toán nhanh chóng bằng mã QR MoMo</p>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <!-- VNPAY -->
+                            <div class="col-md-6">
+                                <label class="payment-method-card d-block p-3 border rounded text-center cursor-pointer position-relative h-100 transition-all">
+                                    <input type="radio" name="paymentMethod" value="VNPAY" class="payment-radio position-absolute top-3 end-3" />
+                                    <div class="py-2">
+                                        <img src="https://vnpay.vn/wp-content/uploads/2020/07/Logo-VNPAY.png" alt="VNPAY Logo" style="height: 50px; object-fit: contain;" class="mb-3" />
+                                        <h6 class="fw-bold mb-1">Cổng thanh toán VNPAY</h6>
+                                        <p class="text-muted small mb-0">Hỗ trợ thẻ ATM nội địa và các ứng dụng ngân hàng</p>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <!-- Credit Card -->
+                            <div class="col-md-6">
+                                <label class="payment-method-card d-block p-3 border rounded text-center cursor-pointer position-relative h-100 transition-all">
+                                    <input type="radio" name="paymentMethod" value="CreditCard" class="payment-radio position-absolute top-3 end-3" />
+                                    <div class="py-2">
+                                        <div class="fs-1 text-primary mb-3"><i class="fa-solid fa-credit-card"></i></div>
+                                        <h6 class="fw-bold mb-1">Thẻ quốc tế (Visa, Mastercard)</h6>
+                                        <p class="text-muted small mb-0">Thanh toán trực tiếp bằng thẻ Visa hoặc Mastercard</p>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <!-- PayPal -->
+                            <div class="col-md-6">
+                                <label class="payment-method-card d-block p-3 border rounded text-center cursor-pointer position-relative h-100 transition-all">
+                                    <input type="radio" name="paymentMethod" value="PayPal" class="payment-radio position-absolute top-3 end-3" />
+                                    <div class="py-2">
+                                        <div class="fs-1 text-info mb-3"><i class="fa-brands fa-paypal"></i></div>
+                                        <h6 class="fw-bold mb-1">Ví điện tử PayPal</h6>
+                                        <p class="text-muted small mb-0">Thanh toán quốc tế an toàn qua ví điện tử PayPal</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold" style="border-radius: 8px;"><i class="fa-solid fa-lock me-2"></i> Tiến Hành Thanh Toán</button>
+                            <a asp-controller="Booking" asp-action="Index" class="btn btn-link text-muted mt-2">Thanh toán sau</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .payment-method-card {
+        border-width: 2px !important;
+        cursor: pointer;
+    }
+    .payment-method-card:hover {
+        border-color: var(--primary-color) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .payment-radio:checked + div, .payment-radio:checked {
+        border-color: var(--primary-color);
+    }
+    .payment-method-card:has(.payment-radio:checked) {
+        border-color: var(--primary-color) !important;
+        background-color: rgba(220, 180, 100, 0.05) !important;
+    }
+</style>

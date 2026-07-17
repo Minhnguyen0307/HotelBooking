@@ -1,0 +1,69 @@
+@{
+    ViewData["Title"] = "Kết quả thanh toán";
+    var status = ViewBag.Status as string;
+    var bookingId = ViewBag.BookingId;
+    var transactionId = ViewBag.TransactionId;
+    var paymentMethod = ViewBag.PaymentMethod;
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg text-center" style="border-radius: 16px; overflow: hidden;">
+                @if (status == "Success")
+                {
+                    <div class="p-5 text-white" style="background-color: #28a745;">
+                        <div class="display-1 mb-3"><i class="fa-solid fa-circle-check"></i></div>
+                        <h2 style="font-family: 'Playfair Display'; font-weight: 700;">Thanh Toán Thành Công!</h2>
+                        <p class="mb-0 opacity-75">Đơn đặt phòng của bạn đã được xác nhận</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-5 text-white" style="background-color: #dc3545;">
+                        <div class="display-1 mb-3"><i class="fa-solid fa-circle-xmark"></i></div>
+                        <h2 style="font-family: 'Playfair Display'; font-weight: 700;">Thanh Toán Thất Bại!</h2>
+                        <p class="mb-0 opacity-75">Đã xảy ra lỗi trong quá trình xử lý giao dịch</p>
+                    </div>
+                }
+                
+                <div class="card-body p-4">
+                    <table class="table table-borderless text-start mx-auto mb-4" style="max-width: 400px;">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted small">Mã Đơn Đặt:</th>
+                                <td class="fw-bold text-dark text-end">#@bookingId</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted small">Mã Giao Dịch:</th>
+                                <td class="fw-bold text-dark text-end">@transactionId</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted small">Phương Thức:</th>
+                                <td class="fw-bold text-dark text-end">@paymentMethod</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted small">Trạng Thái:</th>
+                                <td class="text-end">
+                                    @if (status == "Success")
+                                    {
+                                        <span class="badge bg-success">Đã hoàn tất</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Thất bại</span>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Booking" asp-action="Index" class="btn btn-primary py-2.5" style="border-radius: 8px;"><i class="fa-solid fa-receipt me-1"></i> Xem lịch sử đặt phòng</a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary py-2.5" style="border-radius: 8px;"><i class="fa-solid fa-house me-1"></i> Về trang chủ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

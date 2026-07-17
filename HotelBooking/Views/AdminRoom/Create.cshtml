@@ -1,4 +1,4 @@
-﻿@model HotelBooking.Application.DTOs.RoomUpsertDto
+@model HotelBooking.Application.DTOs.RoomUpsertDto
 
 <h2>@(Model.RoomId.HasValue ? "Sửa phòng" : "Thêm phòng mới")</h2>
 
@@ -27,6 +27,10 @@
     <div class="mb-3">
         <label>Mô tả</label>
         <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+    <div class="mb-3">
+        <label>Địa chỉ</label>
+        <input asp-for="Address" class="form-control" value="@(Model.Address ?? "123 Võ Nguyên Giáp, Quận Sơn Trà, Đà Nẵng")" required />
     </div>
 
     <button type="submit" class="btn btn-primary">Lưu</button>

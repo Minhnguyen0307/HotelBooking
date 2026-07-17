@@ -1,22 +1,94 @@
-﻿@model HotelBooking.Application.DTOs.RoomDetailDto
+@model HotelBooking.Application.DTOs.RoomDetailDto
 
-<h2>Phòng @Model.RoomNumber - @Model.TypeName</h2>
+@{
+    ViewData["Title"] = $"Phòng {Model.RoomNumber}";
+}
 
-<div class="row">
-    <div class="col-md-6">
-        @foreach (var img in Model.ImageUrls)
-        {
-            <img src="@img" class="img-fluid mb-2" />
-        }
+<div class="container my-5 animate__animated animate__fadeIn">
+    <!-- Header -->
+    <div class="detail-room-header d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <span class="text-uppercase small fw-bold" style="color: var(--gold-accent); letter-spacing: 2px;">@Model.TypeName</span>
+            <h1 class="display-5 mb-1" style="font-family: 'Playfair Display'; font-weight: 700; color: var(--primary-dark);">Phòng @Model.RoomNumber</h1>
+            <p class="small text-muted mb-0"><i class="fa-solid fa-location-dot me-1 text-danger"></i> @Model.Address</p>
+        </div>
+        <div class="text-end">
+            <span class="text-muted small">Giá thuê từ</span>
+            <h2 class="fw-bold mb-0 text-primary" style="font-family: 'Outfit';">@Model.BasePrice.ToString("N0") đ <span class="fs-6 text-muted font-weight-normal">/ đêm</span></h2>
+        </div>
     </div>
-    <div class="col-md-6">
-        <p>@Model.Description</p>
-        <p><strong>Sức chứa:</strong> @Model.MaxGuests khách</p>
-        <p><strong>Giá:</strong> @Model.BasePrice.ToString("N0") đ / đêm</p>
-        <p><strong>Tiện nghi:</strong> @string.Join(", ", Model.Amenities)</p>
 
-        <a asp-controller="Booking" asp-action="Create"
-           asp-route-roomId="@Model.RoomId"
-           class="btn btn-success">Đặt phòng này</a>
+    <div class="row g-5">
+        <!-- Room Images Column -->
+        <div class="col-lg-7">
+            @if (Model.ImageUrls != null && Model.ImageUrls.Any())
+            {
+                <div class="position-relative">
+                    <img src="@Model.ImageUrls.First()" class="detail-room-img mb-3" alt="Ảnh phòng @Model.RoomNumber" />
+                    @if (Model.ImageUrls.Count > 1)
+                    {
+                        <div class="row g-2">
+                            @foreach (var img in Model.ImageUrls.Skip(1))
+                            {
+                                <div class="col-3">
+                                    <img src="@img" class="img-fluid rounded border hover-shadow" style="cursor: pointer; height: 70px; object-fit: cover;" />
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <img src="/images/no-image.png" class="detail-room-img" alt="Chưa có ảnh phòng" />
+            }
+        </div>
+
+        <!-- Room Details & Booking Action Column -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 16px;">
+                <h4 class="mb-4" style="font-family: 'Playfair Display'; font-weight: 700;">Thông Tin Chi Tiết</h4>
+                
+                <p class="text-muted mb-4 fs-6" style="line-height: 1.8;">@Model.Description</p>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="p-3 bg-light rounded text-center border">
+                            <span class="text-muted d-block small text-uppercase fw-bold mb-1"><i class="fa-solid fa-users text-primary"></i> Sức chứa</span>
+                            <span class="fw-bold text-dark fs-5">@Model.MaxGuests khách</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-light rounded text-center border">
+                            <span class="text-muted d-block small text-uppercase fw-bold mb-1"><i class="fa-solid fa-door-open text-primary"></i> Loại giường</span>
+                            <span class="fw-bold text-dark fs-5">King Size</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="mb-3" style="font-family: 'Playfair Display'; font-weight: 700;">Tiện Nghi Đi Kèm</h5>
+                <div class="mb-5">
+                    @if (Model.Amenities != null && Model.Amenities.Any())
+                    {
+                        @foreach (var amenity in Model.Amenities)
+                        {
+                            <span class="amenity-tag">
+                                <i class="fa-solid fa-circle-check"></i> @amenity
+                            </span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted small">Không có tiện nghi đặc biệt nào.</span>
+                    }
+                </div>
+
+                <div class="d-grid mt-4">
+                    <a asp-controller="Booking" asp-action="Create"
+                       asp-route-roomId="@Model.RoomId"
+                       class="btn btn-success btn-lg py-3"><i class="fa-solid fa-calendar-check me-2"></i> Đặt Phòng Ngay</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

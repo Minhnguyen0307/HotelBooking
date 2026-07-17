@@ -1,69 +1,100 @@
-﻿@model List<HotelBooking.Application.DTOs.RoomListItemDto>
+@model List<HotelBooking.Application.DTOs.RoomListItemDto>
 
-<div class="p-5 mb-4 bg-light rounded-3 text-center">
-    <h1 class="display-5 fw-bold">Chào mừng đến với HotelBooking</h1>
-    <p class="fs-4">Tìm và đặt phòng khách sạn dễ dàng, nhanh chóng</p>
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<!-- Hero Banner Section -->
+<div class="hero-section text-center mb-5">
+    <h1 class="display-4 fw-bold text-white">Trải Nghiệm Kỳ Nghỉ Thượng Lưu</h1>
+    <p class="fs-5 text-white-50">Khám phá chuỗi phòng khách sạn sang trọng, tinh tế và đầy đủ tiện nghi đẳng cấp bậc nhất.</p>
 </div>
 
-<div class="card mb-5">
-    <div class="card-body">
-        <form asp-controller="Room" asp-action="Search" method="post" class="row g-3">
-            <div class="col-md-3">
-                <label>Ngày nhận phòng</label>
-                <input id="checkInInput" name="CheckInDate" type="date" class="form-control"
-                       min="@DateTime.Today.ToString("yyyy-MM-dd")"
-                       value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+<!-- Floating Search Bar -->
+<div class="search-card">
+    <h4 class="mb-4 text-center" style="font-family: 'Playfair Display'; font-weight: 700; color: var(--primary-dark);">Tìm Kiếm Phòng Trống</h4>
+    <form asp-controller="Room" asp-action="Search" method="post" class="row g-3">
+        <div class="col-md-3 col-sm-6">
+            <label class="form-label"><i class="fa-solid fa-calendar-import me-1"></i> Ngày nhận phòng</label>
+            <input id="checkInInput" name="CheckInDate" type="date" class="form-control"
+                   min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                   value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <label class="form-label"><i class="fa-solid fa-calendar-export me-1"></i> Ngày trả phòng</label>
+            <input id="checkOutInput" name="CheckOutDate" type="date" class="form-control"
+                   min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
+                   value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-2 col-sm-6">
+            <label class="form-label"><i class="fa-solid fa-users me-1"></i> Số khách</label>
+            <input name="Guests" type="number" min="1" value="1" class="form-control" />
+        </div>
+        <div class="col-md-2 col-sm-6">
+            <label class="form-label"><i class="fa-solid fa-bed me-1"></i> Loại phòng</label>
+            <select name="RoomTypeId" class="form-select">
+                <option value="">Tất cả loại phòng</option>
+                @foreach (var rt in (List<(int RoomTypeId, string TypeName)>)ViewBag.RoomTypes)
+                {
+                    <option value="@rt.RoomTypeId">@rt.TypeName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100 py-2"><i class="fa-solid fa-magnifying-glass me-1"></i> Tìm phòng</button>
+        </div>
+    </form>
+</div>
+
+<!-- Featured Rooms Section -->
+<div class="container mb-5">
+    <div class="text-center mb-5">
+        <h2 style="font-family: 'Playfair Display'; font-weight: 700; font-size: 2.2rem;">Phòng Nổi Bật</h2>
+        <div style="width: 60px; height: 3px; background-color: var(--gold-accent); margin: 15px auto;"></div>
+        <p class="text-muted">Các phòng được khách hàng đánh giá cao nhất và đặt nhiều nhất tại hệ thống của chúng tôi.</p>
+    </div>
+
+    <div class="row">
+        @foreach (var room in Model)
+        {
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card-hotel">
+                    <div class="card-hotel-img-wrapper">
+                        <img src="@(string.IsNullOrEmpty(room.PrimaryImageUrl) ? "/images/no-image.png" : room.PrimaryImageUrl)" class="card-hotel-img" alt="Hình ảnh phòng @room.RoomNumber" />
+                        <span class="card-hotel-badge">Available</span>
+                    </div>
+                    <div class="card-hotel-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-uppercase small fw-bold tracking-wider" style="color: var(--gold-accent); letter-spacing: 1px;">@room.TypeName</span>
+                            <span class="small text-muted"><i class="fa-solid fa-user-group me-1"></i> Tối đa: @room.MaxGuests khách</span>
+                        </div>
+                        <h4 class="card-hotel-title">Phòng @room.RoomNumber</h4>
+                        <p class="small text-muted mb-2" style="font-size: 0.85rem;"><i class="fa-solid fa-location-dot me-1 text-danger"></i> @room.Address</p>
+                        <p class="card-hotel-text">Tận hưởng không gian sống tinh tế cùng các trang thiết bị hiện đại hàng đầu phục vụ nhu cầu nghỉ ngơi.</p>
+                        
+                        <hr class="text-muted opacity-25" />
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="card-hotel-price">
+                                @room.BasePrice.ToString("N0") đ <span>/ đêm</span>
+                            </div>
+                            <a asp-controller="Room" asp-action="Details" asp-route-id="@room.RoomId" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-circle-info me-1"></i> Chi tiết</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-3">
-                <label>Ngày trả phòng</label>
-                <input id="checkOutInput" name="CheckOutDate" type="date" class="form-control"
-                       min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
-                       value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <i class="fa-solid fa-hotel fa-3x text-muted mb-3"></i>
+                <p class="text-muted fs-5">Hiện tại chưa có phòng nào trống trong hệ thống.</p>
             </div>
-            <div class="col-md-2">
-                <label>Số khách</label>
-                <input name="Guests" type="number" min="1" value="1" class="form-control" />
-            </div>
-            <div class="col-md-2">
-                <label>Loại phòng</label>
-                <select name="RoomTypeId" class="form-control">
-                    <option value="">-- Tất cả --</option>
-                    @foreach (var rt in (List<(int RoomTypeId, string TypeName)>)ViewBag.RoomTypes)
-                    {
-                        <option value="@rt.RoomTypeId">@rt.TypeName</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">Tìm phòng</button>
-            </div>
-        </form>
+        }
     </div>
 </div>
 
-<h2 class="mb-4">Phòng nổi bật</h2>
-
-<div class="row">
-    @foreach (var room in Model)
-    {
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <img src="@(room.PrimaryImageUrl ?? "/images/no-image.png")" class="card-img-top" style="height:200px; object-fit:cover;" />
-                <div class="card-body">
-                    <h5 class="card-title">Phòng @room.RoomNumber - @room.TypeName</h5>
-                    <p class="card-text">Sức chứa tối đa: @room.MaxGuests khách</p>
-                    <p class="card-text fw-bold">@room.BasePrice.ToString("N0") đ / đêm</p>
-                    <a asp-controller="Room" asp-action="Details" asp-route-id="@room.RoomId" class="btn btn-outline-primary">Xem chi tiết</a>
-                </div>
-            </div>
-        </div>
-    }
-
-    @if (!Model.Any())
-    {
-        <p class="text-muted">Chưa có phòng nào trong hệ thống.</p>
-    }
-</div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const checkIn = document.getElementById('checkInInput');
@@ -79,7 +110,6 @@
             const minStr = minCheckOut.toISOString().split('T')[0];
             checkOut.min = minStr;
 
-  
             if (!checkOut.value || new Date(checkOut.value) <= checkInDate) {
                 checkOut.value = minStr;
             }

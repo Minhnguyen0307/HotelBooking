@@ -1,27 +1,80 @@
-﻿@model HotelBooking.Application.DTOs.BookingConfirmDto
+@model HotelBooking.Application.DTOs.BookingConfirmDto
 
-<h2>Xác nhận đặt phòng</h2>
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+@{
+    ViewData["Title"] = "Xác nhận đặt phòng";
 }
 
-<div class="card">
-    <div class="card-body">
-        <h5>Phòng @Model.RoomNumber - @Model.TypeName</h5>
-        <p>Nhận phòng: @Model.CheckInDate.ToString("dd/MM/yyyy")</p>
-        <p>Trả phòng: @Model.CheckOutDate.ToString("dd/MM/yyyy")</p>
-        <p>Số đêm: @Model.Nights</p>
-        <p>Giá mỗi đêm: @Model.PricePerNight.ToString("N0") đ</p>
-        <p class="fw-bold fs-5">Tổng tiền: @Model.TotalPrice.ToString("N0") đ</p>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+                <div class="p-4 text-center text-white" style="background-color: var(--primary-dark);">
+                    <h3 class="mb-1 text-white" style="font-family: 'Playfair Display'; font-weight: 700;">Xác Nhận Đặt Phòng</h3>
+                    <p class="mb-0 text-white-50 small">Vui lòng kiểm tra lại thông tin đơn đặt phòng của bạn</p>
+                </div>
+                <div class="card-body p-4">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mb-4"><i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]</div>
+                    }
 
-        <form asp-action="Confirm" method="post">
-            <input type="hidden" name="RoomId" value="@Model.RoomId" />
-            <input type="hidden" name="CheckInDate" value="@Model.CheckInDate" />
-            <input type="hidden" name="CheckOutDate" value="@Model.CheckOutDate" />
-            <input type="hidden" name="NumberOfGuests" value="@Model.NumberOfGuests" />
-            <button type="submit" class="btn btn-success">Xác nhận đặt phòng</button>
-        </form>
+                    <!-- Room Mini Summary -->
+                    <div class="d-flex align-items-center mb-4 p-3 bg-light rounded border">
+                        <div class="flex-grow-1">
+                            <span class="text-uppercase small fw-bold text-primary">@Model.TypeName</span>
+                            <h4 class="mb-0" style="font-family: 'Playfair Display'; font-weight: 700;">Phòng @Model.RoomNumber</h4>
+                        </div>
+                        <div class="text-end">
+                            <span class="small text-muted d-block">Giá mỗi đêm</span>
+                            <span class="fw-bold text-dark">@Model.PricePerNight.ToString("N0") đ</span>
+                        </div>
+                    </div>
+
+                    <!-- Stay Details -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2 mb-3" style="font-family: 'Playfair Display'; font-weight: 700;">Chi Tiết Thời Gian Lưu Trú</h5>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <span class="text-muted d-block small text-uppercase fw-bold"><i class="fa-solid fa-calendar-check text-primary me-1"></i> Nhận phòng</span>
+                                <span class="fw-bold text-dark fs-6">@Model.CheckInDate.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted d-block small text-uppercase fw-bold"><i class="fa-solid fa-calendar-xmark text-primary me-1"></i> Trả phòng</span>
+                                <span class="fw-bold text-dark fs-6">@Model.CheckOutDate.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted d-block small text-uppercase fw-bold"><i class="fa-solid fa-moon text-primary me-1"></i> Số đêm lưu trú</span>
+                                <span class="fw-bold text-dark fs-6">@Model.Nights đêm</span>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted d-block small text-uppercase fw-bold"><i class="fa-solid fa-user-group text-primary me-1"></i> Số người lớn</span>
+                                <span class="fw-bold text-dark fs-6">@Model.NumberOfGuests người</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Summary -->
+                    <div class="p-3 mb-5 bg-light rounded border border-warning" style="background-color: #fff9f0 !important;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-dark text-uppercase fs-6">Tổng chi phí dự kiến</span>
+                            <span class="fw-bold text-danger fs-3">@Model.TotalPrice.ToString("N0") đ</span>
+                        </div>
+                        <span class="small text-muted d-block mt-1 text-end">* Giá đã bao gồm thuế phí và các tiện ích đi kèm</span>
+                    </div>
+
+                    <form asp-action="Confirm" method="post">
+                        <input type="hidden" name="RoomId" value="@Model.RoomId" />
+                        <input type="hidden" name="CheckInDate" value="@Model.CheckInDate" />
+                        <input type="hidden" name="CheckOutDate" value="@Model.CheckOutDate" />
+                        <input type="hidden" name="NumberOfGuests" value="@Model.NumberOfGuests" />
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg py-3"><i class="fa-solid fa-circle-check me-2"></i> Xác Nhận & Đặt Ngay</button>
+                            <a asp-controller="Room" asp-action="Details" asp-route-id="@Model.RoomId" class="btn btn-link text-muted mt-2">Hủy bỏ giao dịch</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

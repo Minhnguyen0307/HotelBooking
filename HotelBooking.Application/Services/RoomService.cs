@@ -1,4 +1,4 @@
-﻿using HotelBooking.Application.DTOs;
+using HotelBooking.Application.DTOs;
 using HotelBooking.Application.Interfaces;
 using HotelBooking.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -59,7 +59,8 @@ namespace HotelBooking.Application.Services
                     PrimaryImageUrl = r.RoomImages
                         .Where(i => i.IsPrimary)
                         .Select(i => i.ImageUrl)
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+                    Address = r.Address ?? "123 Võ Nguyên Giáp, Quận Sơn Trà, Đà Nẵng"
                 })
                 .ToListAsync();
 
@@ -85,7 +86,8 @@ namespace HotelBooking.Application.Services
                 BasePrice = room.RoomType.BasePrice,
                 MaxGuests = room.RoomType.MaxGuests,
                 ImageUrls = room.RoomImages.Select(i => i.ImageUrl).ToList(),
-                Amenities = room.Amenities.Select(a => a.Name).ToList()   
+                Amenities = room.Amenities.Select(a => a.Name).ToList(),
+                Address = room.Address ?? "123 Võ Nguyên Giáp, Quận Sơn Trà, Đà Nẵng"
             };
         }
         public async Task<List<(int RoomTypeId, string TypeName)>> GetAllRoomTypesAsync()

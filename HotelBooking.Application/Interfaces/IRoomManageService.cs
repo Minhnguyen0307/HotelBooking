@@ -1,4 +1,4 @@
-﻿using HotelBooking.Application.DTOs;
+using HotelBooking.Application.DTOs;
 
 namespace HotelBooking.Application.Interfaces
 {
@@ -8,5 +8,6 @@ namespace HotelBooking.Application.Interfaces
         Task<RoomUpsertDto?> GetRoomForEditAsync(int roomId);
         Task<(bool Success, string? Error)> SaveRoomAsync(RoomUpsertDto dto);
         Task<(bool Success, string? Error)> UpdateStatusAsync(int roomId, string status);
+        Task<(bool Success, string? Error)> DeleteRoomAsync(int roomId);
     }
 }

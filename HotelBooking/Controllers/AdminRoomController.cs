@@ -1,4 +1,4 @@
-﻿using HotelBooking.Application.DTOs;
+using HotelBooking.Application.DTOs;
 using HotelBooking.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -71,6 +71,14 @@ public class AdminRoomController : Controller
     {
         var (success, error) = await _roomManageService.UpdateStatusAsync(roomId, status);
         TempData[success ? "SuccessMessage" : "ErrorMessage"] = success ? "Đã cập nhật trạng thái." : error;
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var (success, error) = await _roomManageService.DeleteRoomAsync(id);
+        TempData[success ? "SuccessMessage" : "ErrorMessage"] = success ? "Đã xóa phòng thành công." : error;
         return RedirectToAction("Index");
     }
 }

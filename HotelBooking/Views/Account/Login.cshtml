@@ -1,21 +1,40 @@
-﻿@model HotelBooking.Application.DTOs.LoginDto
+@model HotelBooking.Application.DTOs.LoginDto
 
-<h2>Đăng nhập</h2>
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
 
-<div asp-validation-summary="All" class="text-danger"></div>
+<div class="auth-container">
+    <div class="auth-card">
+        <h3 class="auth-card-title" style="font-family: 'Playfair Display'; font-weight: 700; color: var(--primary-dark);">Chào Mừng Trở Lại</h3>
+        <p class="text-center text-muted small mb-4">Đăng nhập tài khoản của bạn để đặt phòng và xem đơn đặt</p>
+        
+        <div asp-validation-summary="All" class="text-danger small mb-3"></div>
 
-<form asp-action="Login" method="post" asp-route-returnUrl="@ViewBag.ReturnUrl">
-    <div class="mb-3">
-        <label>Email</label>
-        <input asp-for="Email" class="form-control" type="email" required />
+        <form asp-action="Login" method="post" asp-route-returnUrl="@ViewBag.ReturnUrl" class="row g-3">
+            <div class="col-12">
+                <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-envelope me-1 text-primary"></i> Địa chỉ Email</label>
+                <input asp-for="Email" class="form-control" type="email" placeholder="example@hotel.com" required />
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-lock me-1 text-primary"></i> Mật khẩu</label>
+                <input asp-for="Password" class="form-control" type="password" placeholder="••••••••" required />
+            </div>
+            <div class="col-12 d-flex justify-content-between align-items-center my-2">
+                <div class="form-check">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label class="form-check-label small text-muted">Ghi nhớ đăng nhập</label>
+                </div>
+                <a asp-action="ForgotPassword" class="small fw-bold text-decoration-none text-primary">Quên mật khẩu?</a>
+            </div>
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary w-100 py-2"><i class="fa-solid fa-right-to-bracket me-2"></i> Đăng Nhập</button>
+            </div>
+        </form>
+
+        <div class="text-center mt-4 border-top pt-3">
+            <span class="small text-muted">Chưa có tài khoản?</span>
+            <a asp-action="Register" class="small fw-bold text-decoration-none text-primary ms-1">Đăng ký ngay</a>
+        </div>
     </div>
-    <div class="mb-3">
-        <label>Mật khẩu</label>
-        <input asp-for="Password" class="form-control" type="password" required />
-    </div>
-    <div class="mb-3 form-check">
-        <input asp-for="RememberMe" class="form-check-input" />
-        <label class="form-check-label">Ghi nhớ đăng nhập</label>
-    </div>
-    <button type="submit" class="btn btn-primary">Đăng nhập</button>
-</form>
+</div>

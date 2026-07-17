@@ -1,4 +1,4 @@
-﻿using HotelBooking.Application.DTOs;
+using HotelBooking.Application.DTOs;
 using HotelBooking.Application.Interfaces;
 using HotelBooking.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
@@ -90,4 +90,103 @@ public class AccountController : Controller
     }
 
     public IActionResult AccessDenied() => View();
+
+    private int? CurrentUserId =>
+        User.Identity != null && User.Identity.IsAuthenticated
+        ? int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!)
+        : null;
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> Profile()
+    {
+        var userId = CurrentUserId;
+        if (!userId.HasValue) return RedirectToAction("Login");
+        var profile = await _authService.GetProfileAsync(userId.Value);
+        if (profile == null) return NotFound();
+        return View(profile);
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> Profile(ProfileDto dto)
+    {
+        var userId = CurrentUserId;
+        if (!userId.HasValue) return RedirectToAction("Login");
+        if (!ModelState.IsValid) return View(dto);
+
+        var result = await _authService.UpdateProfileAsync(userId.Value, dto);
+        if (!result.Success)
+        {
+            ModelState.AddModelError("", result.ErrorMessage!);
+            return View(dto);
+        }
+
+        TempData["SuccessMessage"] = "Cập nhật thông tin thành công!";
+        return RedirectToAction("Profile");
+    }
+
+    [HttpGet]
+    [Authorize]
+    public IActionResult ChangePassword() => View();
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword(ChangePasswordDto dto)
+    {
+        var userId = CurrentUserId;
+        if (!userId.HasValue) return RedirectToAction("Login");
+        if (!ModelState.IsValid) return View(dto);
+
+        var result = await _authService.ChangePasswordAsync(userId.Value, dto);
+        if (!result.Success)
+        {
+            ModelState.AddModelError("", result.ErrorMessage!);
+            return View(dto);
+        }
+
+        TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
+        return RedirectToAction("Profile");
+    }
+
+    [HttpGet]
+    public IActionResult ForgotPassword() => View();
+
+    [HttpPost]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
+    {
+        if (!ModelState.IsValid) return View(dto);
+
+        var token = await _authService.GeneratePasswordResetTokenAsync(dto.Email);
+        if (token != null)
+        {
+            var resetLink = Url.Action("ResetPassword", "Account", new { email = dto.Email, token = token }, Request.Scheme);
+            TempData["ResetLink"] = resetLink;
+        }
+
+        TempData["SuccessMessage"] = "Nếu địa chỉ email chính xác, một liên kết khôi phục mật khẩu đã được tạo.";
+        return RedirectToAction("ForgotPassword");
+    }
+
+    [HttpGet]
+    public IActionResult ResetPassword(string email, string token)
+    {
+        return View(new ResetPasswordDto { Email = email, Token = token });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
+    {
+        if (!ModelState.IsValid) return View(dto);
+
+        var result = await _authService.ResetPasswordAsync(dto);
+        if (!result.Success)
+        {
+            ModelState.AddModelError("", result.ErrorMessage!);
+            return View(dto);
+        }
+
+        TempData["SuccessMessage"] = "Mật khẩu của bạn đã được đặt lại thành công. Vui lòng đăng nhập.";
+        return RedirectToAction("Login");
+    }
 }

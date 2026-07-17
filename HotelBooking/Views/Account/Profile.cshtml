@@ -1,0 +1,53 @@
+@model HotelBooking.Application.DTOs.ProfileDto
+
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+                <div class="p-4 text-center text-white" style="background-color: var(--primary-dark);">
+                    <div class="profile-avatar mb-3 mx-auto d-flex align-items-center justify-content-center bg-light text-primary rounded-circle" style="width: 80px; height: 80px; font-size: 2.2rem; font-weight: bold; border: 3px solid var(--gold-accent); line-height: 80px;">
+                        @(!string.IsNullOrEmpty(Model.FullName) ? Model.FullName[0].ToString().ToUpper() : "?")
+                    </div>
+                    <h3 class="mb-1 text-white" style="font-family: 'Playfair Display'; font-weight: 700;">Hồ Sơ Của Bạn</h3>
+                    <p class="mb-0 text-white-50 small">Quản lý và cập nhật thông tin cá nhân của bạn</p>
+                </div>
+                <div class="card-body p-4">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <div asp-validation-summary="All" class="text-danger small mb-3"></div>
+
+                    <form asp-action="Profile" method="post" class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-envelope me-1 text-primary"></i> Địa chỉ Email</label>
+                            <input asp-for="Email" class="form-control" type="email" readonly style="background-color: #f8f9fa;" />
+                            <span class="form-text text-muted small">Email đăng nhập không thể thay đổi.</span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-user me-1 text-primary"></i> Họ và tên</label>
+                            <input asp-for="FullName" class="form-control" type="text" placeholder="Nguyễn Văn A" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted"><i class="fa-solid fa-phone me-1 text-primary"></i> Số điện thoại</label>
+                            <input asp-for="PhoneNumber" class="form-control" type="tel" placeholder="0901234567" />
+                        </div>
+
+                        <div class="col-12 mt-4 border-top pt-4 d-flex justify-content-between align-items-center">
+                            <a asp-action="ChangePassword" class="btn btn-outline-warning" style="border-radius: 6px;"><i class="fa-solid fa-key me-1"></i> Đổi Mật Khẩu</a>
+                            <button type="submit" class="btn btn-primary px-4 py-2" style="border-radius: 6px;"><i class="fa-solid fa-floppy-disk me-1"></i> Lưu Thay Đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
