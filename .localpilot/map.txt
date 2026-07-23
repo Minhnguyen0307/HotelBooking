@@ -1,13 +1,13 @@
 ## WORKSPACE EXECUTIVE SUMMARY (YAML)
-# Generated: 2026-07-15T16:23:22.0506980+07:00
+# Generated: 2026-07-23T14:27:36.1572960+07:00
 # Root: D:\PRN222\HoltelBooking
 Architecture:
   Type: Backend (C#/.NET)
-  Scale: 37 relevant source files
+  Scale: 64 relevant source files
   Components: 0
-  Controllers: 2
+  Controllers: 10
   Models: 1
-  Services: 2
+  Services: 18
 ---
 - File: HotelBooking.sln
   Preview: " Microsoft Visual Studio Solution File, Format Version 12.00 # Visual Studio Version 17 VisualStudioVersion = 17.14.36408.4 MinimumVisualStudioVersion..."
@@ -30,56 +30,152 @@ Architecture:
 - File: HotelBooking\appsettings.Development.json
   Preview: "{  'Logging': {   'LogLevel': {    'Default': 'Information',    'Microsoft.AspNetCore': 'Warning'   }  } } "
 - File: HotelBooking\appsettings.json
-  Preview: "{  'ConnectionStrings': {   'DefaultConnection': 'Server=LAPTOP-PJCV33QV\\SQLEXPRESS;Database=FUMiniHotelManagement;Uid=sa;Pwd=123;TrustServerCertific..."
+  Preview: "{  'ConnectionStrings': {   'DefaultConnection': 'Server=.\\SQLEXPRESS;Database=HotelBookingDB;Trusted_Connection=True;TrustServerCertificate=True;'  ..."
 - File: HotelBooking\Program.cs
-  Preview: "using HotelBooking.Infrastructure; using HotelBooking.Infrastructure; using Microsoft.EntityFrameworkCore; var builder = WebApplication.CreateBuilder(..."
-- File: HotelBooking.Application\Class1.cs
-  Preview: "namespace HotelBooking.Application {   public class Class1   {   } } "
-- File: HotelBooking.Domain\Class1.cs
-  Preview: "namespace HotelBooking.Domain {   public class Class1   {   } } "
+  Preview: "using HotelBooking.Application.Data; using HotelBooking.Application.Interfaces; using HotelBooking.Application.Services; using HotelBooking.Infrastruc..."
 - File: HotelBooking.Infrastructure\Amenity.cs
+  Symbols: [Amenity]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class Amenity {   public int AmenityId { get; se..."
 - File: HotelBooking.Infrastructure\AuditLog.cs
+  Symbols: [AuditLog]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class AuditLog {   public int LogId { get; set; ..."
 - File: HotelBooking.Infrastructure\Booking.cs
+  Symbols: [Booking]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class Booking {   public int BookingId { get; se..."
 - File: HotelBooking.Infrastructure\BookingRoom.cs
+  Symbols: [BookingRoom]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class BookingRoom {   public int BookingRoomId {..."
 - File: HotelBooking.Infrastructure\HotelBookingDbContext.cs
+  Symbols: [HotelBookingDbContext, HotelBookingDbContext]
   Preview: "using System; using System.Collections.Generic; using Microsoft.EntityFrameworkCore; namespace HotelBooking.Infrastructure; public partial class Hotel..."
 - File: HotelBooking.Infrastructure\PasswordResetToken.cs
+  Symbols: [PasswordResetToken]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class PasswordResetToken {   public int TokenId ..."
 - File: HotelBooking.Infrastructure\Payment.cs
+  Symbols: [Payment]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class Payment {   public int PaymentId { get; se..."
 - File: HotelBooking.Infrastructure\Refund.cs
+  Symbols: [Refund]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class Refund {   public int RefundId { get; set;..."
 - File: HotelBooking.Infrastructure\Role.cs
+  Symbols: [Role]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class Role {   public int RoleId { get; set; }  ..."
 - File: HotelBooking.Infrastructure\Room.cs
+  Symbols: [Room]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class Room {   public int RoomId { get; set; }  ..."
 - File: HotelBooking.Infrastructure\RoomImage.cs
+  Symbols: [RoomImage]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class RoomImage {   public int ImageId { get; se..."
 - File: HotelBooking.Infrastructure\RoomType.cs
+  Symbols: [RoomType]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class RoomType {   public int RoomTypeId { get; ..."
 - File: HotelBooking.Infrastructure\User.cs
+  Symbols: [User]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class User {   public int UserId { get; set; }  ..."
 - File: HotelBooking.Infrastructure\VwMonthlyRevenue.cs
+  Symbols: [VwMonthlyRevenue]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class VwMonthlyRevenue {   public int? RevenueYe..."
 - File: HotelBooking.Infrastructure\VwRoomOccupancy.cs
+  Symbols: [VwRoomOccupancy]
   Preview: "using System; using System.Collections.Generic; namespace HotelBooking.Infrastructure; public partial class VwRoomOccupancy {   public int RoomId { ge..."
 - File: HoltelBooking\Properties\launchSettings.json
   Preview: "{  '$schema': 'http://json.schemastore.org/launchsettings.json',   'iisSettings': {    'windowsAuthentication': false,    'anonymousAuthentication': t..."
+- File: HotelBooking\Controllers\AccountController.cs
+  Preview: "using HotelBooking.Application.DTOs; using HotelBooking.Application.Interfaces; using HotelBooking.Infrastructure; using Microsoft.AspNetCore.Authenti..."
+- File: HotelBooking\Controllers\AdminCustomerController.cs
+  Preview: "using System.Threading.Tasks; using HotelBooking.Application.Interfaces; using Microsoft.AspNetCore.Authorization; using Microsoft.AspNetCore.Mvc; nam..."
+- File: HotelBooking\Controllers\AdminRoomController.cs
+  Symbols: [AdminRoomController]
+  Preview: "using HotelBooking.Application.DTOs; using HotelBooking.Application.Interfaces; using Microsoft.AspNetCore.Authorization; using Microsoft.AspNetCore.M..."
+- File: HotelBooking\Controllers\AdminRoomTypeController.cs
+  Preview: "using System.Threading.Tasks; using HotelBooking.Application.Interfaces; using HotelBooking.Infrastructure; using Microsoft.AspNetCore.Authorization; ..."
+- File: HotelBooking\Controllers\BookingController.cs
+  Symbols: [BookingController]
+  Preview: "using HotelBooking.Application.DTOs; using HotelBooking.Application.Interfaces; using Microsoft.AspNetCore.Authorization; using Microsoft.AspNetCore.M..."
+- File: HotelBooking\Controllers\FrontDeskController.cs
+  Symbols: [FrontDeskController]
+  Preview: "using HotelBooking.Application.Interfaces; using Microsoft.AspNetCore.Authorization; using Microsoft.AspNetCore.Mvc; [Authorize(Roles = 'Receptionist,..."
 - File: HotelBooking\Controllers\HomeController.cs
-  Preview: "using System.Diagnostics; using HotelBooking.Models; using Microsoft.AspNetCore.Mvc; namespace HotelBooking.Controllers {   public class HomeControlle..."
-- File: HotelBooking\Controllers\TestController.cs
-  Preview: "using HotelBooking.Infrastructure; using HotelBooking.Infrastructure; using Microsoft.AspNetCore.Mvc; public class TestController : Controller {   pri..."
+  Symbols: [HomeController, HomeController]
+  Preview: "using HotelBooking.Application.Interfaces; using Microsoft.AspNetCore.Mvc; public class HomeController : Controller {   private readonly IRoomService ..."
+- File: HotelBooking\Controllers\PaymentController.cs
+  Preview: "using System; using System.Security.Claims; using System.Threading.Tasks; using HotelBooking.Application.Interfaces; using HotelBooking.Infrastructure..."
+- File: HotelBooking\Controllers\ReportController.cs
+  Symbols: [ReportController]
+  Preview: "using HotelBooking.Application.Interfaces; using Microsoft.AspNetCore.Authorization; using Microsoft.AspNetCore.Mvc; [Authorize(Roles = 'Manager,Admin..."
+- File: HotelBooking\Controllers\RoomController.cs
+  Symbols: [RoomController]
+  Preview: "using HotelBooking.Application.DTOs; using HotelBooking.Application.Interfaces; using Microsoft.AspNetCore.Mvc; public class RoomController : Controll..."
 - File: HotelBooking\Models\ErrorViewModel.cs
+  Symbols: [ErrorViewModel]
   Preview: "namespace HotelBooking.Models {   public class ErrorViewModel   {     public string? RequestId { get; set; }     public bool ShowRequestId => !string...."
 - File: HotelBooking\Properties\launchSettings.json
   Preview: "{  '$schema': 'http://json.schemastore.org/launchsettings.json',  'iisSettings': {   'windowsAuthentication': false,   'anonymousAuthentication': true..."
+- File: HotelBooking.Application\Data\DbSeeder.cs
+  Symbols: [DbSeeder]
+  Preview: "using HotelBooking.Infrastructure; using Microsoft.AspNetCore.Identity; using Microsoft.EntityFrameworkCore; namespace HotelBooking.Application.Data {..."
 - File: HotelBooking.Application\DTOs\AuthDtos.cs
+  Symbols: [RegisterDto]
   Preview: "namespace HotelBooking.Application.DTOs {   public class RegisterDto   {     public string FullName { get; set; } = string.Empty;     public string Em..."
+- File: HotelBooking.Application\DTOs\BookingDtos.cs
+  Symbols: [BookingCreateDto]
+  Preview: "namespace HotelBooking.Application.DTOs {   public class BookingCreateDto   {     public int RoomId { get; set; }     public DateOnly CheckInDate { ge..."
+- File: HotelBooking.Application\DTOs\ReportDtos.cs
+  Symbols: [MonthlyRevenueDto]
+  Preview: "namespace HotelBooking.Application.DTOs {   public class MonthlyRevenueDto   {     public int Year { get; set; }     public int Month { get; set; }   ..."
+- File: HotelBooking.Application\DTOs\RoomDtos.cs
+  Symbols: [RoomSearchDto]
+  Preview: "namespace HotelBooking.Application.DTOs {   public class RoomSearchDto   {     public DateOnly CheckInDate { get; set; } = DateOnly.FromDateTime(DateT..."
+- File: HotelBooking.Application\DTOs\RoomManageDtos.cs
+  Symbols: [RoomManageListItemDto]
+  Preview: "using Microsoft.AspNetCore.Http; namespace HotelBooking.Application.DTOs {   public class RoomManageListItemDto   {     public int RoomId { get; set; ..."
 - File: HotelBooking.Application\Interfaces\IAuthService.cs
+  Symbols: [IAuthService]
   Preview: "using HotelBooking.Application.DTOs; namespace HotelBooking.Application.Interfaces {   public interface IAuthService   {     Task<AuthResult> Register..."
+- File: HotelBooking.Application\Interfaces\IBookingService.cs
+  Symbols: [IBookingService]
+  Preview: "using HotelBooking.Application.DTOs; namespace HotelBooking.Application.Interfaces {   public interface IBookingService   {     Task<BookingConfirmDto..."
+- File: HotelBooking.Application\Interfaces\ICustomerService.cs
+  Symbols: [ICustomerService]
+  Preview: "using System.Collections.Generic; using System.Threading.Tasks; using HotelBooking.Infrastructure; namespace HotelBooking.Application.Interfaces {   p..."
+- File: HotelBooking.Application\Interfaces\IFrontDeskService.cs
+  Symbols: [IFrontDeskService]
+  Preview: "using HotelBooking.Application.DTOs; namespace HotelBooking.Application.Interfaces {   public interface IFrontDeskService   {     Task<List<BookingLis..."
+- File: HotelBooking.Application\Interfaces\IPaymentService.cs
+  Symbols: [IPaymentService]
+  Preview: "using System.Collections.Generic; using System.Threading.Tasks; using HotelBooking.Infrastructure; namespace HotelBooking.Application.Interfaces {   p..."
+- File: HotelBooking.Application\Interfaces\IReportService.cs
+  Symbols: [IReportService]
+  Preview: "using HotelBooking.Application.DTOs; namespace HotelBooking.Application.Interfaces {   public interface IReportService   {     Task<List<MonthlyRevenu..."
+- File: HotelBooking.Application\Interfaces\IRoomManageService.cs
+  Symbols: [IRoomManageService]
+  Preview: "using HotelBooking.Application.DTOs; namespace HotelBooking.Application.Interfaces {   public interface IRoomManageService   {     Task<List<RoomManag..."
+- File: HotelBooking.Application\Interfaces\IRoomService.cs
+  Symbols: [IRoomService]
+  Preview: "using HotelBooking.Application.DTOs; namespace HotelBooking.Application.Interfaces {   public interface IRoomService   {     Task<List<RoomListItemDto..."
+- File: HotelBooking.Application\Interfaces\IRoomTypeService.cs
+  Symbols: [IRoomTypeService]
+  Preview: "using System.Collections.Generic; using System.Threading.Tasks; using HotelBooking.Infrastructure; namespace HotelBooking.Application.Interfaces {   p..."
 - File: HotelBooking.Application\Services\AuthService.cs
-  Preview: "using HotelBooking.Application.DTOs; using HotelBooking.Application.Interfaces; using HotelBooking.Infrastructure.Data; using HotelBooking.Infrastruct..."
+  Preview: "using HotelBooking.Application.DTOs; using HotelBooking.Application.Interfaces; using HotelBooking.Infrastructure; using HotelBooking.Infrastructure; ..."
+- File: HotelBooking.Application\Services\BookingService.cs
+  Symbols: [BookingService]
+  Preview: "using HotelBooking.Application.DTOs; using HotelBooking.Application.Interfaces; using HotelBooking.Infrastructure; using Microsoft.EntityFrameworkCore..."
+- File: HotelBooking.Application\Services\CustomerService.cs
+  Preview: "using System.Collections.Generic; using System.Linq; using System.Threading.Tasks; using HotelBooking.Application.Interfaces; using HotelBooking.Infra..."
+- File: HotelBooking.Application\Services\FrontDeskService.cs
+  Symbols: [FrontDeskService]
+  Preview: "using HotelBooking.Application.DTOs; using HotelBooking.Application.Interfaces; using HotelBooking.Infrastructure; using Microsoft.EntityFrameworkCore..."
+- File: HotelBooking.Application\Services\PaymentService.cs
+  Preview: "using System; using System.Collections.Generic; using System.Linq; using System.Threading.Tasks; using HotelBooking.Application.Interfaces; using Hote..."
+- File: HotelBooking.Application\Services\ReportService.cs
+  Symbols: [ReportService]
+  Preview: "using HotelBooking.Application.DTOs; using HotelBooking.Application.Interfaces; using HotelBooking.Infrastructure; using Microsoft.EntityFrameworkCore..."
+- File: HotelBooking.Application\Services\RoomManageService.cs
+  Symbols: [RoomManageService]
+  Preview: "using HotelBooking.Application.DTOs; using HotelBooking.Application.Interfaces; using HotelBooking.Infrastructure; using Microsoft.EntityFrameworkCore..."
+- File: HotelBooking.Application\Services\RoomService.cs
+  Symbols: [RoomService]
+  Preview: "using HotelBooking.Application.DTOs; using HotelBooking.Application.Interfaces; using HotelBooking.Infrastructure; using Microsoft.EntityFrameworkCore..."
+- File: HotelBooking.Application\Services\RoomTypeService.cs
+  Preview: "using System.Collections.Generic; using System.Linq; using System.Threading.Tasks; using HotelBooking.Application.Interfaces; using HotelBooking.Infra..."

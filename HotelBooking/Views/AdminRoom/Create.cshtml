@@ -4,7 +4,7 @@
 
 <div asp-validation-summary="All" class="text-danger"></div>
 
-<form asp-action="@(Model.RoomId.HasValue ? "Edit" : "Create")" method="post">
+<form asp-action="@(Model.RoomId.HasValue ? "Edit" : "Create")" method="post" enctype="multipart/form-data">
     <input type="hidden" asp-for="RoomId" />
 
     <div class="mb-3">
@@ -29,9 +29,13 @@
         <textarea asp-for="Description" class="form-control"></textarea>
     </div>
     <div class="mb-3">
-         <label>Địa chỉ</label>
-         <input asp-for="Address" class="form-control" value="@(Model.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng")" required />
-     </div>
+        <label>Địa chỉ</label>
+        <input asp-for="Address" class="form-control" value="@(Model.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng")" />
+    </div>
+    <div class="mb-3">
+        <label>Ảnh phòng</label>
+        <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
+    </div>
 
     <button type="submit" class="btn btn-primary">Lưu</button>
 </form>

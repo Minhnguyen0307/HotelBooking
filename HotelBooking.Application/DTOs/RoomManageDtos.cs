@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 namespace HotelBooking.Application.DTOs
 {
     public class RoomManageListItemDto
@@ -18,5 +19,6 @@ namespace HotelBooking.Application.DTOs
         public string Status { get; set; } = "Available";
         public string? Description { get; set; }
         public string? Address { get; set; }
+        public IFormFile? ImageFile { get; set; }
     }
 }

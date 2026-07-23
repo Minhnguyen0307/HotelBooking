@@ -38,7 +38,6 @@ namespace HotelBooking.Application.Services
             if (criteria.Guests.HasValue)
                 query = query.Where(r => r.RoomType.MaxGuests >= criteria.Guests.Value);
 
-            // Loại các phòng đã bị đặt trùng khoảng ngày (overlap logic giống sp_SearchAvailableRooms)
             var bookedRoomIds = _context.BookingRooms
                 .Where(br => br.Booking.Status == "Pending"
                           || br.Booking.Status == "Confirmed"

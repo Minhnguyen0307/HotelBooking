@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Application.Services
 {
-    public class RoomManageService : IRoomManageService
+    public class RoomManageService :  IRoomManageService
     {
         private readonly HotelBookingDbContext _context;
 
@@ -47,30 +47,41 @@ namespace HotelBooking.Application.Services
             };
         }
 
-        public async Task<(bool Success, string? Error)> SaveRoomAsync(RoomUpsertDto dto)
+        public async Task<(bool Success, string? Error)> SaveRoomAsync(RoomUpsertDto dto, string? imagePath)
         {
-            // Kiểm tra trùng số phòng
             bool duplicate = await _context.Rooms
                 .AnyAsync(r => r.RoomNumber == dto.RoomNumber && r.RoomId != dto.RoomId);
             if (duplicate)
                 return (false, "Số phòng này đã tồn tại.");
 
+            Room room;
+
             if (dto.RoomId.HasValue)
             {
-                var room = await _context.Rooms.FindAsync(dto.RoomId.Value);
-                if (room == null) return (false, "Phòng không tồn tại.");
+                var existingRoom = await _context.Rooms
+                    .Include(r => r.RoomImages)
+                    .FirstOrDefaultAsync(r => r.RoomId == dto.RoomId.Value);
+                if (existingRoom == null) return (false, "Phòng không tồn tại.");
 
-                room.RoomNumber = dto.RoomNumber;
-                room.RoomTypeId = dto.RoomTypeId;
-                room.Floor = dto.Floor;
-                room.Status = dto.Status;
-                room.Description = dto.Description;
-                room.Address = dto.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng";
-                room.UpdatedAt = DateTime.UtcNow;
+                existingRoom.RoomNumber = dto.RoomNumber;
+                existingRoom.RoomTypeId = dto.RoomTypeId;
+                existingRoom.Floor = dto.Floor;
+                existingRoom.Status = dto.Status;
+                existingRoom.Description = dto.Description;
+                existingRoom.Address = dto.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng";
+                existingRoom.UpdatedAt = DateTime.UtcNow;
+
+                room = existingRoom;
+
+                if (imagePath != null)
+                {
+                    foreach (var img in room.RoomImages) img.IsPrimary = false;
+                    room.RoomImages.Add(new RoomImage { ImageUrl = imagePath, IsPrimary = true });
+                }
             }
             else
             {
-                var room = new Room
+                var newRoom = new Room
                 {
                     RoomNumber = dto.RoomNumber,
                     RoomTypeId = dto.RoomTypeId,
@@ -80,7 +91,14 @@ namespace HotelBooking.Application.Services
                     Address = dto.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng",
                     CreatedAt = DateTime.UtcNow
                 };
-                _context.Rooms.Add(room);
+
+                if (imagePath != null)
+                {
+                    newRoom.RoomImages.Add(new RoomImage { ImageUrl = imagePath, IsPrimary = true });
+                }
+
+                _context.Rooms.Add(newRoom);
+                room = newRoom;
             }
 
             await _context.SaveChangesAsync();

@@ -6,7 +6,7 @@ namespace HotelBooking.Application.Interfaces
     {
         Task<List<RoomManageListItemDto>> GetAllRoomsAsync();
         Task<RoomUpsertDto?> GetRoomForEditAsync(int roomId);
-        Task<(bool Success, string? Error)> SaveRoomAsync(RoomUpsertDto dto);
+        Task<(bool Success, string? Error)> SaveRoomAsync(RoomUpsertDto dto, string? imagePath);
         Task<(bool Success, string? Error)> UpdateStatusAsync(int roomId, string status);
         Task<(bool Success, string? Error)> DeleteRoomAsync(int roomId);
     }

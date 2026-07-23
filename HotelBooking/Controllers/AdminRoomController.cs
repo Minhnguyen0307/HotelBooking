@@ -8,11 +8,13 @@ public class AdminRoomController : Controller
 {
     private readonly IRoomManageService _roomManageService;
     private readonly IRoomService _roomService;
+    private readonly IWebHostEnvironment _env; 
 
-    public AdminRoomController(IRoomManageService roomManageService, IRoomService roomService)
+    public AdminRoomController(IRoomManageService roomManageService, IRoomService roomService, IWebHostEnvironment env)
     {
         _roomManageService = roomManageService;
         _roomService = roomService;
+        _env = env; 
     }
 
     public async Task<IActionResult> Index()
@@ -30,14 +32,19 @@ public class AdminRoomController : Controller
     [HttpPost]
     public async Task<IActionResult> Create(RoomUpsertDto dto)
     {
-        var (success, error) = await _roomManageService.SaveRoomAsync(dto);
+        string? imagePath = null;
+        if (dto.ImageFile != null && dto.ImageFile.Length > 0)
+        {
+            imagePath = await SaveRoomImageAsync(dto.ImageFile);
+        }
+
+        var (success, error) = await _roomManageService.SaveRoomAsync(dto, imagePath);
         if (!success)
         {
             ModelState.AddModelError("", error!);
             ViewBag.RoomTypes = await _roomService.GetAllRoomTypesAsync();
             return View(dto);
         }
-
         TempData["SuccessMessage"] = "Đã thêm phòng mới.";
         return RedirectToAction("Index");
     }
@@ -46,7 +53,6 @@ public class AdminRoomController : Controller
     {
         var dto = await _roomManageService.GetRoomForEditAsync(id);
         if (dto == null) return NotFound();
-
         ViewBag.RoomTypes = await _roomService.GetAllRoomTypesAsync();
         return View(dto);
     }
@@ -54,14 +60,19 @@ public class AdminRoomController : Controller
     [HttpPost]
     public async Task<IActionResult> Edit(RoomUpsertDto dto)
     {
-        var (success, error) = await _roomManageService.SaveRoomAsync(dto);
+        string? imagePath = null;
+        if (dto.ImageFile != null && dto.ImageFile.Length > 0)
+        {
+            imagePath = await SaveRoomImageAsync(dto.ImageFile);
+        }
+
+        var (success, error) = await _roomManageService.SaveRoomAsync(dto, imagePath);
         if (!success)
         {
             ModelState.AddModelError("", error!);
             ViewBag.RoomTypes = await _roomService.GetAllRoomTypesAsync();
             return View(dto);
         }
-
         TempData["SuccessMessage"] = "Đã cập nhật phòng.";
         return RedirectToAction("Index");
     }
@@ -80,5 +91,23 @@ public class AdminRoomController : Controller
         var (success, error) = await _roomManageService.DeleteRoomAsync(id);
         TempData[success ? "SuccessMessage" : "ErrorMessage"] = success ? "Đã xóa phòng thành công." : error;
         return RedirectToAction("Index");
+    }
+
+    // Hàm mới — lưu file ảnh vật lý vào wwwroot/images/rooms
+    private async Task<string> SaveRoomImageAsync(IFormFile file)
+    {
+        var uploadsFolder = Path.Combine(_env.WebRootPath, "images", "rooms");
+        if (!Directory.Exists(uploadsFolder))
+            Directory.CreateDirectory(uploadsFolder);
+
+        var uniqueFileName = $"{Guid.NewGuid()}_{file.FileName}";
+        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        return $"/images/rooms/{uniqueFileName}";
     }
 }
