@@ -6,6 +6,7 @@ using HotelBooking.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace HotelBooking.Controllers
 {
@@ -13,11 +14,13 @@ namespace HotelBooking.Controllers
     public class PaymentController : Controller
     {
         private readonly IPaymentService _paymentService;
+        private readonly IVnPayService _vnPayService;
         private readonly HotelBookingDbContext _context;
 
-        public PaymentController(IPaymentService paymentService, HotelBookingDbContext context)
+        public PaymentController(IPaymentService paymentService, IVnPayService vnPayService, HotelBookingDbContext context)
         {
             _paymentService = paymentService;
+            _vnPayService = vnPayService;
             _context = context;
         }
 
@@ -64,6 +67,29 @@ namespace HotelBooking.Controllers
             return View(booking);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> CreateVnPayPayment(int bookingId)
+        {
+            var booking = await _context.Bookings
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId && b.CustomerId == CurrentUserId);
+
+            if (booking == null) return NotFound();
+
+            var transactionRef = $"{bookingId}{DateTime.UtcNow.AddHours(7):yyyyMMddHHmmss}";
+            var returnUrl = "https://localhost:7023/Payment/VnPayReturn?bookingId=" + bookingId;
+            var clientIp = Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+            Console.WriteLine($"VNPAY returnUrl generated: {returnUrl}");
+            var paymentUrl = _vnPayService.CreatePaymentUrl(
+                bookingId,
+                booking.TotalPrice,
+                $"Thanh toan don hang {booking.BookingId}",
+                returnUrl,
+                transactionRef,
+                clientIp);
+
+            return Redirect(paymentUrl);
+        }
+
         [HttpPost]
         public async Task<IActionResult> ProcessPayment(int bookingId, string paymentMethod, string cardNumber)
         {
@@ -72,7 +98,11 @@ namespace HotelBooking.Controllers
 
             if (booking == null) return NotFound();
 
-            // Simulate card validation
+            if (paymentMethod == "VNPAY")
+            {
+                return RedirectToAction(nameof(CreateVnPayPayment), new { bookingId });
+            }
+
             if (string.IsNullOrWhiteSpace(cardNumber))
             {
                 TempData["ErrorMessage"] = "Vui lòng nhập thông tin thẻ hoặc tài khoản hợp lệ.";
@@ -81,18 +111,67 @@ namespace HotelBooking.Controllers
 
             var transactionId = "TXN-" + Guid.NewGuid().ToString("N").Substring(0, 12).ToUpper();
             var payment = await _paymentService.CreatePaymentRecordAsync(
-                bookingId, 
-                paymentMethod, 
-                booking.TotalPrice, 
-                transactionId, 
+                bookingId,
+                paymentMethod,
+                booking.TotalPrice,
+                transactionId,
                 "Success"
             );
 
-            return RedirectToAction("Callback", new { 
-                bookingId, 
-                status = "Success", 
-                transactionId = payment.TransactionId, 
-                paymentMethod = payment.PaymentMethod 
+            return RedirectToAction("Callback", new {
+                bookingId,
+                status = "Success",
+                transactionId = payment.TransactionId,
+                paymentMethod = payment.PaymentMethod
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> VnPayReturn(int bookingId, string? vnp_ResponseCode, string? vnp_TransactionStatus, string? vnp_TxnRef, string? vnp_Amount, string? vnp_TransactionNo, string? vnp_SecureHash)
+        {
+            var booking = await _context.Bookings
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId && b.CustomerId == CurrentUserId);
+
+            if (booking == null) return NotFound();
+
+            var query = Request.Query;
+            Console.WriteLine("VNPAY callback query string: " + Request.QueryString.Value);
+            foreach (var item in query)
+            {
+                Console.WriteLine($"VNPAY callback param: {item.Key}={item.Value}");
+            }
+            var isValid = _vnPayService.ValidateSignature(query, out _);
+
+            if (!isValid)
+            {
+                TempData["ErrorMessage"] = "Chữ ký VNPAY không hợp lệ.";
+                return RedirectToAction(nameof(Callback), new { bookingId, status = "Failed", transactionId = vnp_TxnRef, paymentMethod = "VNPAY" });
+            }
+
+            if (vnp_ResponseCode == "00" && vnp_TransactionStatus == "00")
+            {
+                var transactionId = vnp_TransactionNo ?? vnp_TxnRef ?? $"TXN-{Guid.NewGuid():N}";
+                await _paymentService.CreatePaymentRecordAsync(
+                    bookingId,
+                    "VNPAY",
+                    booking.TotalPrice,
+                    transactionId,
+                    "Success"
+                );
+
+                return RedirectToAction(nameof(Callback), new {
+                    bookingId,
+                    status = "Success",
+                    transactionId,
+                    paymentMethod = "VNPAY"
+                });
+            }
+
+            return RedirectToAction(nameof(Callback), new {
+                bookingId,
+                status = "Failed",
+                transactionId = vnp_TxnRef,
+                paymentMethod = "VNPAY"
             });
         }
 

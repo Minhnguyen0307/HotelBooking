@@ -9,8 +9,12 @@ using static System.Formats.Asn1.AsnWriter;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = Environment.GetEnvironmentVariable("HOTELBOOKING_DB_CONNECTION")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Server=localhost;Database=HotelBookingDB;Trusted_Connection=True;TrustServerCertificate=True;";
+
 builder.Services.AddDbContext<HotelBookingDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -19,6 +23,7 @@ builder.Services.AddScoped<IRoomManageService, RoomManageService>();
 builder.Services.AddScoped<IFrontDeskService, FrontDeskService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
