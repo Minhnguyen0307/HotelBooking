@@ -1,5 +1,6 @@
 using HotelBooking.Application.DTOs;
 using HotelBooking.Application.Interfaces;
+using HotelBooking.Application.Services;
 using HotelBooking.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -13,11 +14,12 @@ public class AccountController : Controller
 {
     private readonly IAuthService _authService;
     private readonly HotelBookingDbContext _context;
-
-    public AccountController(IAuthService authService, HotelBookingDbContext context)
+    private readonly IEmailService _emailService;
+    public AccountController(IAuthService authService, HotelBookingDbContext context, IEmailService emailService)
     {
         _authService = authService;
         _context = context;
+        _emailService = emailService;
     }
 
     [HttpGet]
@@ -161,10 +163,10 @@ public class AccountController : Controller
         if (token != null)
         {
             var resetLink = Url.Action("ResetPassword", "Account", new { email = dto.Email, token = token }, Request.Scheme);
-            TempData["ResetLink"] = resetLink;
+            await _emailService.SendPasswordResetEmailAsync(dto.Email, resetLink!);
         }
 
-        TempData["SuccessMessage"] = "Nếu địa chỉ email chính xác, một liên kết khôi phục mật khẩu đã được tạo.";
+        TempData["SuccessMessage"] = "Nếu địa chỉ email chính xác, một liên kết khôi phục mật khẩu đã được gửi đến email của bạn.";
         return RedirectToAction("ForgotPassword");
     }
 

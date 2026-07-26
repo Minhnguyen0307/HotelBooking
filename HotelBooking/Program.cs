@@ -1,18 +1,19 @@
 using HotelBooking.Application.Data;
 using HotelBooking.Application.Interfaces;
 using HotelBooking.Application.Services;
+using HotelBooking.Application.Settings;
 using HotelBooking.Infrastructure;
-
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using static System.Formats.Asn1.AsnWriter;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<HotelBookingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddControllersWithViews();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IRoomManageService, RoomManageService>();
