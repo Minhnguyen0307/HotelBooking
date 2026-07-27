@@ -114,4 +114,62 @@
             </div>
         </div>
     </div>
+
+    <!-- Cancellation requests row -->
+    <div class="row g-5 mt-4">
+        <div class="col-12">
+            <div class="p-4 bg-white rounded-4 shadow-sm border" style="border-radius: 16px;">
+                <h4 class="mb-4 text-danger" style="font-family: 'Playfair Display'; font-weight: 700;"><i class="fa-solid fa-ban me-2"></i> Yêu Cầu Hủy Phòng Chờ Duyệt (@(((List<HotelBooking.Application.DTOs.BookingListItemDto>)ViewBag.CancelRequests).Count))</h4>
+                
+                <div class="table-responsive">
+                    <table class="table-luxury">
+                        <thead>
+                            <tr>
+                                <th>Đơn Đặt</th>
+                                <th>Thông Tin Phòng</th>
+                                <th>Khách Hàng</th>
+                                <th>Thời Gian Đặt</th>
+                                <th>Lý Do Hủy</th>
+                                <th>Giá Trị</th>
+                                <th class="text-end">Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var b in (List<HotelBooking.Application.DTOs.BookingListItemDto>)ViewBag.CancelRequests)
+                            {
+                                <tr>
+                                    <td class="fw-bold">#@b.BookingId</td>
+                                    <td>
+                                        <span class="d-block fw-bold text-dark">Phòng @b.RoomNumber</span>
+                                        <span class="small text-muted">@b.TypeName</span>
+                                    </td>
+                                    <td>
+                                        <span class="d-block fw-bold text-dark">@b.CustomerName</span>
+                                    </td>
+                                    <td>
+                                        <span class="d-block text-dark">@b.CheckInDate.ToString("dd/MM/yyyy") - @b.CheckOutDate.ToString("dd/MM/yyyy")</span>
+                                    </td>
+                                    <td class="text-muted small">@b.CancelReason</td>
+                                    <td class="fw-bold text-dark">@b.TotalPrice.ToString("N0") đ</td>
+                                    <td class="text-end">
+                                        <form asp-action="ConfirmCancel" method="post" onsubmit="return confirm('Bạn chắc chắn muốn duyệt yêu cầu hủy phòng cho đơn #@b.BookingId?');" class="d-inline">
+                                            <input type="hidden" name="bookingId" value="@b.BookingId" />
+                                            <button type="submit" class="btn btn-sm btn-danger px-3" style="border-radius: 6px;"><i class="fa-solid fa-check me-1"></i> Xác nhận hủy</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+
+                            @if (!((List<HotelBooking.Application.DTOs.BookingListItemDto>)ViewBag.CancelRequests).Any())
+                            {
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted small">Không có yêu cầu hủy phòng nào đang chờ duyệt.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

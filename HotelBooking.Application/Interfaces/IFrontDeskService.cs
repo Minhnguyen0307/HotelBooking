@@ -1,4 +1,4 @@
-﻿using HotelBooking.Application.DTOs;
+using HotelBooking.Application.DTOs;
 
 namespace HotelBooking.Application.Interfaces
 {
@@ -8,5 +8,7 @@ namespace HotelBooking.Application.Interfaces
         Task<List<BookingListItemDto>> GetTodayDeparturesAsync();
         Task<(bool Success, string? Error)> CheckInAsync(int bookingId);
         Task<(bool Success, string? Error)> CheckOutAsync(int bookingId);
+        Task<List<BookingListItemDto>> GetCancelRequestsAsync();
+        Task<(bool Success, string? Error)> ConfirmCancelAsync(int bookingId);
     }
 }

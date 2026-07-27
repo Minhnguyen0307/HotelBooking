@@ -21,7 +21,8 @@ namespace HotelBooking.Application.Services
                 .Where(br => br.RoomId == roomId)
                 .Where(br => br.Booking.Status == "Pending"
                           || br.Booking.Status == "Confirmed"
-                          || br.Booking.Status == "CheckedIn")
+                          || br.Booking.Status == "CheckedIn"
+                          || br.Booking.Status == "CancelRequested")
                 .AnyAsync(br => br.Booking.CheckInDate < checkOut && br.Booking.CheckOutDate > checkIn);
 
             return !isOverlapping;
@@ -132,30 +133,12 @@ namespace HotelBooking.Application.Services
             if (booking == null)
                 return new BookingResult { Success = false, ErrorMessage = "Không tìm thấy đơn đặt phòng." };
 
-            if (booking.Status is "CheckedIn" or "CheckedOut" or "Cancelled")
-                return new BookingResult { Success = false, ErrorMessage = $"Không thể hủy đơn ở trạng thái '{booking.Status}'." };
+            if (booking.Status is "CheckedIn" or "CheckedOut" or "Cancelled" or "CancelRequested")
+                return new BookingResult { Success = false, ErrorMessage = $"Không thể yêu cầu hủy đơn ở trạng thái '{booking.Status}'." };
 
-            booking.Status = "Cancelled";
+            booking.Status = "CancelRequested";
             booking.CancelledAt = DateTime.UtcNow;
             booking.CancelReason = reason;
-
-            // Check if booking is paid and initiate a refund (UC-22)
-            var payment = await _context.Payments
-                .FirstOrDefaultAsync(p => p.BookingId == bookingId && p.PaymentStatus == "Success");
-            if (payment != null)
-            {
-                var refund = new Refund
-                {
-                    PaymentId = payment.PaymentId,
-                    Amount = payment.Amount,
-                    Reason = reason ?? "Khách hàng hủy phòng",
-                    Status = "Processed",
-                    RequestedAt = DateTime.UtcNow,
-                    ProcessedAt = DateTime.UtcNow
-                };
-                _context.Refunds.Add(refund);
-                payment.PaymentStatus = "Refunded";
-            }
 
             await _context.SaveChangesAsync();
             return new BookingResult { Success = true };

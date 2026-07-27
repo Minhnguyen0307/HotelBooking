@@ -41,7 +41,8 @@ namespace HotelBooking.Application.Services
             var bookedRoomIds = _context.BookingRooms
                 .Where(br => br.Booking.Status == "Pending"
                           || br.Booking.Status == "Confirmed"
-                          || br.Booking.Status == "CheckedIn")
+                          || br.Booking.Status == "CheckedIn"
+                          || br.Booking.Status == "CancelRequested")
                 .Where(br => br.Booking.CheckInDate < checkOut && br.Booking.CheckOutDate > checkIn)
                 .Select(br => br.RoomId);
 

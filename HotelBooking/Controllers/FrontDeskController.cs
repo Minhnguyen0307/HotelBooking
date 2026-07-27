@@ -1,4 +1,4 @@
-﻿using HotelBooking.Application.Interfaces;
+using HotelBooking.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +16,7 @@ public class FrontDeskController : Controller
     {
         ViewBag.Arrivals = await _frontDeskService.GetTodayArrivalsAsync();
         ViewBag.Departures = await _frontDeskService.GetTodayDeparturesAsync();
+        ViewBag.CancelRequests = await _frontDeskService.GetCancelRequestsAsync();
         return View();
     }
 
@@ -32,6 +33,14 @@ public class FrontDeskController : Controller
     {
         var (success, error) = await _frontDeskService.CheckOutAsync(bookingId);
         TempData[success ? "SuccessMessage" : "ErrorMessage"] = success ? "Check-out thành công." : error;
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ConfirmCancel(int bookingId)
+    {
+        var (success, error) = await _frontDeskService.ConfirmCancelAsync(bookingId);
+        TempData[success ? "SuccessMessage" : "ErrorMessage"] = success ? "Xác nhận hủy đơn đặt phòng thành công." : error;
         return RedirectToAction("Index");
     }
 }
