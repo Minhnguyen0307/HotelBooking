@@ -1,11 +1,22 @@
+﻿using System.ComponentModel.DataAnnotations;
+
 namespace HotelBooking.Application.DTOs
 {
     public class RegisterDto
     {
+        [Required(ErrorMessage = "Họ tên không được để trống.")]
         public string FullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email không được để trống.")]
+        [RegularExpression(
+            @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|edu|gov|com\.vn|edu\.vn|gov\.vn|org\.vn)$",
+            ErrorMessage = "Email không đúng định dạng (ví dụ: name@gmail.com hoặc name@company.com.vn).")]
         public string Email { get; set; } = string.Empty;
+
         public string Password { get; set; } = string.Empty;
         public string ConfirmPassword { get; set; } = string.Empty;
+
+        [RegularExpression(@"^0\d{9}$", ErrorMessage = "Số điện thoại phải bắt đầu bằng số 0 và đủ 10 chữ số.")]
         public string? PhoneNumber { get; set; }
     }
 
@@ -31,6 +42,10 @@ namespace HotelBooking.Application.DTOs
 
     public class ForgotPasswordDto
     {
+        [Required(ErrorMessage = "Email không được để trống.")]
+        [RegularExpression(
+            @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|edu|gov|com\.vn|edu\.vn|gov\.vn|org\.vn)$",
+            ErrorMessage = "Email không đúng định dạng.")]
         public string Email { get; set; } = string.Empty;
     }
 
@@ -44,8 +59,12 @@ namespace HotelBooking.Application.DTOs
 
     public class ProfileDto
     {
+        [Required(ErrorMessage = "Họ tên không được để trống.")]
         public string FullName { get; set; } = string.Empty;
+
+        [RegularExpression(@"^0\d{9}$", ErrorMessage = "Số điện thoại phải bắt đầu bằng số 0 và đủ 10 chữ số.")]
         public string? PhoneNumber { get; set; }
+
         public string Email { get; set; } = string.Empty;
     }
 }

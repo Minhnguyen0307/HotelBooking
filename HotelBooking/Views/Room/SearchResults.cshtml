@@ -1,26 +1,23 @@
 @model List<HotelBooking.Application.DTOs.RoomListItemDto>
-
 @{
     ViewData["Title"] = "Kết quả tìm kiếm";
     var criteria = (HotelBooking.Application.DTOs.RoomSearchDto)ViewBag.SearchCriteria;
 }
-
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-3">
         <div>
             <h2 class="mb-1" style="font-family: 'Playfair Display'; font-weight: 700;">Kết Quả Tìm Kiếm</h2>
-            <p class="text-muted mb-0">Tìm thấy <span class="fw-bold text-dark">@Model.Count</span> phòng trống phù hợp</p>
+            <p class="text-muted mb-0">Tìm thấy <span class="fw-bold text-dark" id="roomCountText">@Model.Count</span> phòng trống phù hợp</p>
         </div>
         <div class="d-none d-md-block text-end">
             <span class="badge bg-light text-dark p-2 me-2 border"><i class="fa-solid fa-calendar me-1"></i> @criteria.CheckInDate.ToString("dd/MM/yyyy") - @criteria.CheckOutDate.ToString("dd/MM/yyyy")</span>
             <span class="badge bg-light text-dark p-2 border"><i class="fa-solid fa-user me-1"></i> @criteria.Guests khách</span>
         </div>
     </div>
-
-    <div class="row">
+    <div class="row" id="roomResultsContainer">
         @foreach (var room in Model)
         {
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-lg-4 col-md-6 mb-4" data-room-id="@room.RoomId" id="room-card-@room.RoomId">
                 <div class="card-hotel">
                     <div class="card-hotel-img-wrapper">
                         <img src="@(string.IsNullOrEmpty(room.PrimaryImageUrl) ? "/images/no-image.png" : room.PrimaryImageUrl)" class="card-hotel-img" alt="Hình ảnh phòng @room.RoomNumber" />
@@ -34,9 +31,9 @@
                         <h4 class="card-hotel-title">Phòng @room.RoomNumber</h4>
                         <p class="small text-muted mb-2" style="font-size: 0.85rem;"><i class="fa-solid fa-location-dot me-1 text-danger"></i> @room.Address</p>
                         <p class="card-hotel-text">Không gian nghỉ dưỡng tuyệt vời kết hợp hài hòa nét kiến trúc hiện đại và sự tiện nghi tối tân.</p>
-                        
+
                         <hr class="text-muted opacity-25" />
-                        
+
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="card-hotel-price">
                                 @room.BasePrice.ToString("N0") đ <span>/ đêm</span>
@@ -47,10 +44,9 @@
                 </div>
             </div>
         }
-
         @if (!Model.Any())
         {
-            <div class="col-12 text-center py-5">
+            <div class="col-12 text-center py-5" id="noRoomMessage">
                 <div class="mb-4">
                     <i class="fa-solid fa-calendar-xmark fa-4x text-muted opacity-50"></i>
                 </div>
@@ -61,3 +57,64 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Ngày người dùng đang tìm kiếm (dùng để so sánh overlap)
+            const myCheckIn = new Date('@criteria.CheckInDate.ToString("yyyy-MM-dd")');
+            const myCheckOut = new Date('@criteria.CheckOutDate.ToString("yyyy-MM-dd")');
+
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/roomHub")
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on("RoomBooked", function (data) {
+                const bookedCheckIn = new Date(data.checkInDate);
+                const bookedCheckOut = new Date(data.checkOutDate);
+
+                // Kiểm tra overlap: có giao nhau giữa khoảng ngày vừa bị đặt và khoảng ngày mình đang xem không
+                const isOverlap = bookedCheckIn < myCheckOut && bookedCheckOut > myCheckIn;
+
+                if (isOverlap) {
+                    const card = document.getElementById('room-card-' + data.roomId);
+                    if (card) {
+                        // Hiệu ứng mờ dần trước khi xóa, tránh giật giao diện
+                        card.style.transition = 'opacity 0.5s ease';
+                        card.style.opacity = '0';
+                        setTimeout(function () {
+                            card.remove();
+                            updateRoomCount();
+                        }, 500);
+                    }
+                }
+            });
+
+            function updateRoomCount() {
+                const remainingCards = document.querySelectorAll('#roomResultsContainer [data-room-id]').length;
+                const countText = document.getElementById('roomCountText');
+                if (countText) countText.textContent = remainingCards;
+
+                if (remainingCards === 0 && !document.getElementById('noRoomMessage')) {
+                    const container = document.getElementById('roomResultsContainer');
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'col-12 text-center py-5';
+                    emptyDiv.id = 'noRoomMessage';
+                    emptyDiv.innerHTML = `
+                        <div class="mb-4"><i class="fa-solid fa-calendar-xmark fa-4x text-muted opacity-50"></i></div>
+                        <h4 class="text-dark">Rất tiếc, không còn phòng!</h4>
+                        <p class="text-muted">Tất cả phòng phù hợp vừa được đặt bởi khách khác. Vui lòng thử tìm kiếm lại.</p>
+                        <a href="/Room/Search" class="btn btn-primary mt-3"><i class="fa-solid fa-arrow-left me-1"></i> Quay lại tìm kiếm</a>
+                    `;
+                    container.appendChild(emptyDiv);
+                }
+            }
+
+            connection.start().catch(function (err) {
+                console.error("SignalR connection error: ", err);
+            });
+        });
+    </script>
+}

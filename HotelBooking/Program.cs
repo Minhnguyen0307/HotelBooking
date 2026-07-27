@@ -1,18 +1,20 @@
 using HotelBooking.Application.Data;
 using HotelBooking.Application.Interfaces;
 using HotelBooking.Application.Services;
+using HotelBooking.Application.Settings;
 using HotelBooking.Infrastructure;
-
+using HotelBooking.Application.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using static System.Formats.Asn1.AsnWriter;
-
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddSignalR();
 builder.Services.AddDbContext<HotelBookingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddControllersWithViews();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IRoomManageService, RoomManageService>();
@@ -22,6 +24,7 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+
     .AddCookie(options =>
     {
         options.LoginPath = "/Account/Login";
@@ -42,10 +45,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHub<RoomHub>("/roomHub");
 
 app.MapControllerRoute(
     name: "default",

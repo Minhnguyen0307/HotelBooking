@@ -1,20 +1,21 @@
 using HotelBooking.Application.DTOs;
 using HotelBooking.Application.Interfaces;
 using HotelBooking.Infrastructure;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-
+using HotelBooking.Application.Hubs;
 namespace HotelBooking.Application.Services
+
 {
     public class BookingService : IBookingService
     {
         private readonly HotelBookingDbContext _context;
-
-        public BookingService(HotelBookingDbContext context)
+        private readonly IHubContext<RoomHub> _hubContext;
+        public BookingService(HotelBookingDbContext context , IHubContext<RoomHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
-
-        // Kiểm tra phòng còn trống trong khoảng ngày (dùng lại logic giống RoomService)
         private async Task<bool> IsRoomAvailableAsync(int roomId, DateOnly checkIn, DateOnly checkOut)
         {
             bool isOverlapping = await _context.BookingRooms
@@ -102,7 +103,12 @@ namespace HotelBooking.Application.Services
 
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
-
+            await _hubContext.Clients.All.SendAsync("RoomBooked", new
+            {
+                RoomId = dto.RoomId,
+                CheckInDate = dto.CheckInDate.ToString("yyyy-MM-dd"),
+                CheckOutDate = dto.CheckOutDate.ToString("yyyy-MM-dd")
+            });
             return new BookingResult { Success = true, BookingId = booking.BookingId };
         }
 
