@@ -3,20 +3,80 @@
   "WorkspaceRootPath": "D:\\PRN222\\HoltelBooking\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\views\\frontdesk\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\frontdesk\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\controllers\\frontdeskcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\controllers\\frontdeskcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\services\\frontdeskservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\services\\frontdeskservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\interfaces\\ifrontdeskservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\interfaces\\ifrontdeskservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\services\\customerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\services\\customerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\services\\bookingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\services\\bookingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\views\\account\\forgotpassword.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\account\\forgotpassword.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\views\\room\\searchresults.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\room\\searchresults.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\hubs\\roomhub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\hubs\\roomhub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0541450F-CD71-40DB-B960-09C14ABAD747}|HotelBooking.Infrastructure\\HotelBooking.Infrastructure.csproj|d:\\prn222\\holtelbooking\\hotelbooking.infrastructure\\booking.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0541450F-CD71-40DB-B960-09C14ABAD747}|HotelBooking.Infrastructure\\HotelBooking.Infrastructure.csproj|solutionrelative:hotelbooking.infrastructure\\booking.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\dtos\\authdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\dtos\\authdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\data\\dbseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\data\\dbseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\interfaces\\ireportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\interfaces\\ireportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\controllers\\admincustomercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\controllers\\admincustomercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\views\\account\\forgotpassword.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\account\\forgotpassword.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\services\\emailservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -63,20 +123,12 @@
       "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\controllers\\frontdeskcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\controllers\\frontdeskcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\controllers\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\controllers\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\controllers\\adminroomtypecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\controllers\\adminroomtypecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\controllers\\admincustomercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\controllers\\admincustomercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\controllers\\adminroomcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -111,10 +163,6 @@
       "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\dtos\\roommanagedtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0541450F-CD71-40DB-B960-09C14ABAD747}|HotelBooking.Infrastructure\\HotelBooking.Infrastructure.csproj|d:\\prn222\\holtelbooking\\hotelbooking.infrastructure\\booking.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0541450F-CD71-40DB-B960-09C14ABAD747}|HotelBooking.Infrastructure\\HotelBooking.Infrastructure.csproj|solutionrelative:hotelbooking.infrastructure\\booking.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{0541450F-CD71-40DB-B960-09C14ABAD747}|HotelBooking.Infrastructure\\HotelBooking.Infrastructure.csproj|d:\\prn222\\holtelbooking\\hotelbooking.infrastructure\\passwordresettoken.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0541450F-CD71-40DB-B960-09C14ABAD747}|HotelBooking.Infrastructure\\HotelBooking.Infrastructure.csproj|solutionrelative:hotelbooking.infrastructure\\passwordresettoken.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -135,10 +183,6 @@
       "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\interfaces\\iroomservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\interfaces\\ireportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\interfaces\\ireportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\services\\paymentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\services\\paymentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -151,14 +195,6 @@
       "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\dtos\\reportdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\data\\dbseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\data\\dbseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\dtos\\authdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\dtos\\authdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\interfaces\\icustomerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\interfaces\\icustomerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -169,22 +205,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\interfaces\\ibookingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\interfaces\\ibookingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\interfaces\\ifrontdeskservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\interfaces\\ifrontdeskservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\services\\bookingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\services\\bookingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\services\\customerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\services\\customerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\services\\frontdeskservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|solutionrelative:hotelbooking.application\\services\\frontdeskservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{8ECAD8D4-7D53-4718-9932-3E77A77A92AB}|HotelBooking.Application\\HotelBooking.Application.csproj|d:\\prn222\\holtelbooking\\hotelbooking.application\\services\\reportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -243,14 +263,6 @@
       "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\report\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\views\\frontdesk\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\frontdesk\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\views\\account\\accessdenied.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\account\\accessdenied.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
@@ -271,16 +283,8 @@
       "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\booking\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\views\\room\\searchresults.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\room\\searchresults.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|solutionrelative:hotelbooking\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6EE7B881-9183-44C3-90AD-3C76A1D0AB19}|HotelBooking\\HotelBooking.csproj|d:\\prn222\\holtelbooking\\hotelbooking\\hotelbooking.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
@@ -294,7 +298,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 76,
+          "SelectedChildIndex": 40,
           "Children": [
             {
               "$type": "Bookmark",
@@ -342,7 +346,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 8,
+              "Title": "RoomHub.cs",
+              "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Hubs\\RoomHub.cs",
+              "RelativeDocumentMoniker": "HotelBooking.Application\\Hubs\\RoomHub.cs",
+              "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Hubs\\RoomHub.cs",
+              "RelativeToolTip": "HotelBooking.Application\\Hubs\\RoomHub.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-27T00:55:59.792Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
               "Title": "ForgotPassword.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Account\\ForgotPassword.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\Account\\ForgotPassword.cshtml",
@@ -350,12 +367,11 @@
               "RelativeToolTip": "HotelBooking\\Views\\Account\\ForgotPassword.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAA+AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-07-24T07:13:25.661Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-24T07:13:25.661Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 19,
               "Title": "EmailService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\EmailService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Services\\EmailService.cs",
@@ -363,12 +379,11 @@
               "RelativeToolTip": "HotelBooking.Application\\Services\\EmailService.cs",
               "ViewState": "AgIAABgAAAAAAAAAAAAxwDQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-24T07:06:27.409Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-24T07:06:27.409Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 20,
               "Title": "IEmailService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Interfaces\\IEmailService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Interfaces\\IEmailService.cs",
@@ -376,12 +391,11 @@
               "RelativeToolTip": "HotelBooking.Application\\Interfaces\\IEmailService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-24T07:05:56.184Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-24T07:05:56.184Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 21,
               "Title": "EmailSettings.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Settings\\EmailSettings.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Settings\\EmailSettings.cs",
@@ -389,12 +403,11 @@
               "RelativeToolTip": "HotelBooking.Application\\Settings\\EmailSettings.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-24T07:05:09.83Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-24T07:05:09.83Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 28,
               "Title": "PaymentController.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\PaymentController.cs",
               "RelativeDocumentMoniker": "HotelBooking\\Controllers\\PaymentController.cs",
@@ -406,19 +419,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 16,
               "Title": "AdminCustomerController.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\AdminCustomerController.cs",
               "RelativeDocumentMoniker": "HotelBooking\\Controllers\\AdminCustomerController.cs",
               "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\AdminCustomerController.cs",
               "RelativeToolTip": "HotelBooking\\Controllers\\AdminCustomerController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAABIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-07-23T09:16:32.357Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 35,
               "Title": "Create.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\AdminRoomType\\Create.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\AdminRoomType\\Create.cshtml",
@@ -430,7 +443,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 31,
               "Title": "AdminRoomTypeController.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\AdminRoomTypeController.cs",
               "RelativeDocumentMoniker": "HotelBooking\\Controllers\\AdminRoomTypeController.cs",
@@ -442,7 +455,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 11,
               "Title": "Booking.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Infrastructure\\Booking.cs",
               "RelativeDocumentMoniker": "HotelBooking.Infrastructure\\Booking.cs",
@@ -450,11 +463,12 @@
               "RelativeToolTip": "HotelBooking.Infrastructure\\Booking.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-23T07:26:03.125Z"
+              "WhenOpened": "2026-07-23T07:26:03.125Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 40,
               "Title": "PasswordResetToken.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Infrastructure\\PasswordResetToken.cs",
               "RelativeDocumentMoniker": "HotelBooking.Infrastructure\\PasswordResetToken.cs",
@@ -466,7 +480,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 24,
               "Title": "HotelBooking.Application.csproj",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\HotelBooking.Application.csproj",
               "RelativeDocumentMoniker": "HotelBooking.Application\\HotelBooking.Application.csproj",
@@ -478,7 +492,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 39,
+              "DocumentIndex": 48,
               "Title": "ICustomerService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Interfaces\\ICustomerService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Interfaces\\ICustomerService.cs",
@@ -490,7 +504,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 36,
               "Title": "IPaymentService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Interfaces\\IPaymentService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Interfaces\\IPaymentService.cs",
@@ -502,7 +516,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 43,
               "Title": "IRoomTypeService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Interfaces\\IRoomTypeService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Interfaces\\IRoomTypeService.cs",
@@ -514,7 +528,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 45,
               "Title": "PaymentService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\PaymentService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Services\\PaymentService.cs",
@@ -526,7 +540,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 47,
+              "DocumentIndex": 52,
               "Title": "RoomTypeService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\RoomTypeService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Services\\RoomTypeService.cs",
@@ -538,7 +552,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 44,
+              "DocumentIndex": 4,
               "Title": "CustomerService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\CustomerService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Services\\CustomerService.cs",
@@ -546,11 +560,12 @@
               "RelativeToolTip": "HotelBooking.Application\\Services\\CustomerService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-23T06:07:58.262Z"
+              "WhenOpened": "2026-07-23T06:07:58.262Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 38,
               "Title": "HotelBookingDbContext.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Infrastructure\\HotelBookingDbContext.cs",
               "RelativeDocumentMoniker": "HotelBooking.Infrastructure\\HotelBookingDbContext.cs",
@@ -562,7 +577,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 25,
               "Title": "ErrorViewModel.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Models\\ErrorViewModel.cs",
               "RelativeDocumentMoniker": "HotelBooking\\Models\\ErrorViewModel.cs",
@@ -574,7 +589,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 55,
+              "DocumentIndex": 60,
               "Title": "RoomImage.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Infrastructure\\RoomImage.cs",
               "RelativeDocumentMoniker": "HotelBooking.Infrastructure\\RoomImage.cs",
@@ -586,7 +601,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 48,
+              "DocumentIndex": 53,
               "Title": "User.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Infrastructure\\User.cs",
               "RelativeDocumentMoniker": "HotelBooking.Infrastructure\\User.cs",
@@ -598,19 +613,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 37,
+              "DocumentIndex": 14,
               "Title": "DbSeeder.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Data\\DbSeeder.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Data\\DbSeeder.cs",
               "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Data\\DbSeeder.cs",
               "RelativeToolTip": "HotelBooking.Application\\Data\\DbSeeder.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAIA1wBsAAAASAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAIA1wBsAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-16T04:09:32.589Z"
+              "WhenOpened": "2026-07-16T04:09:32.589Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 59,
+              "DocumentIndex": 64,
               "Title": "Index.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Report\\Index.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\Report\\Index.cshtml",
@@ -622,7 +638,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 33,
               "Title": "Edit.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\AdminRoom\\Edit.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\AdminRoom\\Edit.cshtml",
@@ -634,7 +650,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 34,
               "Title": "Create.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\AdminRoom\\Create.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\AdminRoom\\Create.cshtml",
@@ -646,7 +662,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 27,
               "Title": "ReportController.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\ReportController.cs",
               "RelativeDocumentMoniker": "HotelBooking\\Controllers\\ReportController.cs",
@@ -658,7 +674,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 56,
+              "DocumentIndex": 61,
               "Title": "Index.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\AdminRoom\\Index.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\AdminRoom\\Index.cshtml",
@@ -670,7 +686,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 32,
               "Title": "AdminRoomController.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\AdminRoomController.cs",
               "RelativeDocumentMoniker": "HotelBooking\\Controllers\\AdminRoomController.cs",
@@ -682,31 +698,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 61,
+              "DocumentIndex": 0,
               "Title": "Index.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\FrontDesk\\Index.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\FrontDesk\\Index.cshtml",
               "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\FrontDesk\\Index.cshtml",
               "RelativeToolTip": "HotelBooking\\Views\\FrontDesk\\Index.cshtml",
-              "ViewState": "AgIAABYAAAAAAAAAAAAowDgAAAAIAAAAAAAAAA==",
+              "ViewState": "AgIAAIYAAAAAAAAAAAAowJIAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-07-16T03:22:18.267Z"
+              "WhenOpened": "2026-07-16T03:22:18.267Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 1,
               "Title": "FrontDeskController.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\FrontDeskController.cs",
               "RelativeDocumentMoniker": "HotelBooking\\Controllers\\FrontDeskController.cs",
-              "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\FrontDeskController.cs",
-              "RelativeToolTip": "HotelBooking\\Controllers\\FrontDeskController.cs",
-              "ViewState": "AgIAACEAAAAAAAAAAAAAACQAAAABAAAAAAAAAA==",
+              "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\FrontDeskController.cs*",
+              "RelativeToolTip": "HotelBooking\\Controllers\\FrontDeskController.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACQAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-16T03:21:07.82Z"
+              "WhenOpened": "2026-07-16T03:21:07.82Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 46,
+              "DocumentIndex": 51,
               "Title": "ReportService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\ReportService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Services\\ReportService.cs",
@@ -718,7 +736,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 15,
               "Title": "IReportService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Interfaces\\IReportService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Interfaces\\IReportService.cs",
@@ -730,7 +748,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 36,
+              "DocumentIndex": 47,
               "Title": "ReportDtos.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\DTOs\\ReportDtos.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\DTOs\\ReportDtos.cs",
@@ -742,31 +760,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 45,
+              "DocumentIndex": 2,
               "Title": "FrontDeskService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\FrontDeskService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Services\\FrontDeskService.cs",
-              "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\FrontDeskService.cs",
-              "RelativeToolTip": "HotelBooking.Application\\Services\\FrontDeskService.cs",
-              "ViewState": "AgIAADYAAAAAAAAAAAAowFQAAAAAAAAAAAAAAA==",
+              "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\FrontDeskService.cs*",
+              "RelativeToolTip": "HotelBooking.Application\\Services\\FrontDeskService.cs*",
+              "ViewState": "AgIAAD8AAAAAAAAAAAAowF8AAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-16T03:17:30.241Z"
+              "WhenOpened": "2026-07-16T03:17:30.241Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 42,
+              "DocumentIndex": 3,
               "Title": "IFrontDeskService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Interfaces\\IFrontDeskService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Interfaces\\IFrontDeskService.cs",
-              "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Interfaces\\IFrontDeskService.cs",
-              "RelativeToolTip": "HotelBooking.Application\\Interfaces\\IFrontDeskService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Interfaces\\IFrontDeskService.cs*",
+              "RelativeToolTip": "HotelBooking.Application\\Interfaces\\IFrontDeskService.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-16T03:16:56.251Z"
+              "WhenOpened": "2026-07-16T03:16:56.251Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 37,
               "Title": "RoomManageService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\RoomManageService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Services\\RoomManageService.cs",
@@ -778,7 +798,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 22,
               "Title": "IRoomManageService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Interfaces\\IRoomManageService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Interfaces\\IRoomManageService.cs",
@@ -786,12 +806,11 @@
               "RelativeToolTip": "HotelBooking.Application\\Interfaces\\IRoomManageService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-16T03:15:25.601Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-16T03:15:25.601Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 39,
               "Title": "RoomManageDtos.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\DTOs\\RoomManageDtos.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\DTOs\\RoomManageDtos.cs",
@@ -803,7 +822,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 58,
+              "DocumentIndex": 63,
               "Title": "Index.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Home\\Index.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\Home\\Index.cshtml",
@@ -815,7 +834,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 64,
+              "DocumentIndex": 67,
               "Title": "Index.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Booking\\Index.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\Booking\\Index.cshtml",
@@ -827,7 +846,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 66,
+              "DocumentIndex": 69,
               "Title": "Create.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Booking\\Create.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\Booking\\Create.cshtml",
@@ -839,7 +858,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 30,
               "Title": "BookingController.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\BookingController.cs",
               "RelativeDocumentMoniker": "HotelBooking\\Controllers\\BookingController.cs",
@@ -851,19 +870,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 43,
+              "DocumentIndex": 5,
               "Title": "BookingService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\BookingService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Services\\BookingService.cs",
-              "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\BookingService.cs",
-              "RelativeToolTip": "HotelBooking.Application\\Services\\BookingService.cs",
-              "ViewState": "AgIAAEUAAAAAAAAAAAAAAEEAAAAAAAAAAAAAAA==",
+              "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\BookingService.cs*",
+              "RelativeToolTip": "HotelBooking.Application\\Services\\BookingService.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-16T02:44:51.387Z"
+              "WhenOpened": "2026-07-16T02:44:51.387Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 41,
+              "DocumentIndex": 50,
               "Title": "IBookingService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Interfaces\\IBookingService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Interfaces\\IBookingService.cs",
@@ -875,7 +895,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 41,
               "Title": "BookingDtos.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\DTOs\\BookingDtos.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\DTOs\\BookingDtos.cs",
@@ -887,7 +907,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 65,
+              "DocumentIndex": 68,
               "Title": "Details.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Room\\Details.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\Room\\Details.cshtml",
@@ -899,19 +919,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 67,
+              "DocumentIndex": 7,
               "Title": "SearchResults.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Room\\SearchResults.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\Room\\SearchResults.cshtml",
               "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Room\\SearchResults.cshtml",
               "RelativeToolTip": "HotelBooking\\Views\\Room\\SearchResults.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAABYAAAAAAAAAAAAowC4AAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-07-16T02:36:42.827Z"
+              "WhenOpened": "2026-07-16T02:36:42.827Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 57,
+              "DocumentIndex": 62,
               "Title": "Search.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Room\\Search.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\Room\\Search.cshtml",
@@ -923,7 +944,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 26,
               "Title": "RoomController.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\RoomController.cs",
               "RelativeDocumentMoniker": "HotelBooking\\Controllers\\RoomController.cs",
@@ -935,7 +956,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 54,
+              "DocumentIndex": 59,
               "Title": "Room.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Infrastructure\\Room.cs",
               "RelativeDocumentMoniker": "HotelBooking.Infrastructure\\Room.cs",
@@ -947,7 +968,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
+              "DocumentIndex": 46,
               "Title": "RoomService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\RoomService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Services\\RoomService.cs",
@@ -959,7 +980,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 44,
               "Title": "IRoomService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Interfaces\\IRoomService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Interfaces\\IRoomService.cs",
@@ -971,7 +992,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 42,
               "Title": "RoomDtos.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\DTOs\\RoomDtos.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\DTOs\\RoomDtos.cs",
@@ -983,7 +1004,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 68,
+              "DocumentIndex": 70,
               "Title": "launchSettings.json",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "HotelBooking\\Properties\\launchSettings.json",
@@ -995,7 +1016,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 29,
               "Title": "HomeController.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\HomeController.cs",
               "RelativeDocumentMoniker": "HotelBooking\\Controllers\\HomeController.cs",
@@ -1007,19 +1028,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 60,
+              "DocumentIndex": 10,
               "Title": "_Layout.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Shared\\_Layout.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\Shared\\_Layout.cshtml",
               "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Shared\\_Layout.cshtml",
               "RelativeToolTip": "HotelBooking\\Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAowB0AAAArAAAAAAAAAA==",
+              "ViewState": "AgIAAFgAAAAAAAAAAAAowHkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-07-15T09:35:53.393Z"
+              "WhenOpened": "2026-07-15T09:35:53.393Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 62,
+              "DocumentIndex": 65,
               "Title": "AccessDenied.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Account\\AccessDenied.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\Account\\AccessDenied.cshtml",
@@ -1031,7 +1053,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 63,
+              "DocumentIndex": 66,
               "Title": "Login.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Account\\Login.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\Account\\Login.cshtml",
@@ -1043,32 +1065,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 69,
+              "DocumentIndex": 12,
               "Title": "Register.cshtml",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Account\\Register.cshtml",
               "RelativeDocumentMoniker": "HotelBooking\\Views\\Account\\Register.cshtml",
               "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Views\\Account\\Register.cshtml",
               "RelativeToolTip": "HotelBooking\\Views\\Account\\Register.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAWAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAABUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-07-15T09:29:26.187Z"
+              "WhenOpened": "2026-07-15T09:29:26.187Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 9,
               "Title": "AccountController.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\AccountController.cs",
               "RelativeDocumentMoniker": "HotelBooking\\Controllers\\AccountController.cs",
               "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Controllers\\AccountController.cs",
               "RelativeToolTip": "HotelBooking\\Controllers\\AccountController.cs",
-              "ViewState": "AgIAAIgAAAAAAAAAAAA0wJ8AAAAyAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJ8AAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-07-15T09:27:52.036Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 23,
               "Title": "AuthService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Services\\AuthService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Services\\AuthService.cs",
@@ -1076,12 +1099,11 @@
               "RelativeToolTip": "HotelBooking.Application\\Services\\AuthService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAA+AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-15T09:22:13.385Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-15T09:22:13.385Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 40,
+              "DocumentIndex": 49,
               "Title": "IAuthService.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\Interfaces\\IAuthService.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\Interfaces\\IAuthService.cs",
@@ -1093,19 +1115,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 38,
+              "DocumentIndex": 13,
               "Title": "AuthDtos.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\DTOs\\AuthDtos.cs",
               "RelativeDocumentMoniker": "HotelBooking.Application\\DTOs\\AuthDtos.cs",
               "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking.Application\\DTOs\\AuthDtos.cs",
               "RelativeToolTip": "HotelBooking.Application\\DTOs\\AuthDtos.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAC4AAAAAAAAAAAA2wEAAAABAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-15T09:17:42.465Z"
+              "WhenOpened": "2026-07-15T09:17:42.465Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 52,
+              "DocumentIndex": 57,
               "Title": "Amenity.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Infrastructure\\Amenity.cs",
               "RelativeDocumentMoniker": "HotelBooking.Infrastructure\\Amenity.cs",
@@ -1117,33 +1140,32 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 6,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Program.cs",
               "RelativeDocumentMoniker": "HotelBooking\\Program.cs",
               "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking\\Program.cs",
               "RelativeToolTip": "HotelBooking\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAywCAAAAAHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-07-15T08:56:20.471Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 17,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\appsettings.json",
               "RelativeDocumentMoniker": "HotelBooking\\appsettings.json",
               "ToolTip": "D:\\PRN222\\HoltelBooking\\HotelBooking\\appsettings.json",
               "RelativeToolTip": "HotelBooking\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-07-15T08:55:27.02Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-15T08:55:27.02Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 53,
+              "DocumentIndex": 58,
               "Title": "Refund.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Infrastructure\\Refund.cs",
               "RelativeDocumentMoniker": "HotelBooking.Infrastructure\\Refund.cs",
@@ -1155,7 +1177,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 50,
+              "DocumentIndex": 55,
               "Title": "RoomType.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Infrastructure\\RoomType.cs",
               "RelativeDocumentMoniker": "HotelBooking.Infrastructure\\RoomType.cs",
@@ -1167,7 +1189,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 51,
+              "DocumentIndex": 56,
               "Title": "VwRoomOccupancy.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Infrastructure\\VwRoomOccupancy.cs",
               "RelativeDocumentMoniker": "HotelBooking.Infrastructure\\VwRoomOccupancy.cs",
@@ -1179,7 +1201,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 49,
+              "DocumentIndex": 54,
               "Title": "VwMonthlyRevenue.cs",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking.Infrastructure\\VwMonthlyRevenue.cs",
               "RelativeDocumentMoniker": "HotelBooking.Infrastructure\\VwMonthlyRevenue.cs",
@@ -1191,7 +1213,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 70,
+              "DocumentIndex": 71,
               "Title": "HotelBooking.csproj",
               "DocumentMoniker": "D:\\PRN222\\HoltelBooking\\HotelBooking\\HotelBooking.csproj",
               "RelativeDocumentMoniker": "HotelBooking\\HotelBooking.csproj",

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 public class FrontDeskController : Controller
 {
     private readonly IFrontDeskService _frontDeskService;
-
     public FrontDeskController(IFrontDeskService frontDeskService)
     {
         _frontDeskService = frontDeskService;
@@ -16,6 +15,7 @@ public class FrontDeskController : Controller
     {
         ViewBag.Arrivals = await _frontDeskService.GetTodayArrivalsAsync();
         ViewBag.Departures = await _frontDeskService.GetTodayDeparturesAsync();
+        ViewBag.AllCheckedIn = await _frontDeskService.GetAllCheckedInAsync(); // thêm mới
         return View();
     }
 
