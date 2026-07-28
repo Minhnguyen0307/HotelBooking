@@ -70,6 +70,10 @@
                             {
                                 <span class="badge-luxury bg-danger text-white"><i class="fa-solid fa-ban me-1"></i> Đã hủy</span>
                             }
+                            else if (b.Status == "CancelRequested")
+                            {
+                                <span class="badge-luxury bg-warning text-dark"><i class="fa-solid fa-hourglass-half me-1"></i> Yêu cầu hủy</span>
+                            }
                             else
                             {
                                 <span class="badge bg-info text-white">@b.Status</span>

@@ -1,4 +1,4 @@
-﻿namespace HotelBooking.Application.DTOs
+namespace HotelBooking.Application.DTOs
 {
     public class BookingCreateDto
     {
@@ -31,6 +31,8 @@
         public string Status { get; set; } = string.Empty;
         public decimal TotalPrice { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? CustomerName { get; set; }
+        public string? CancelReason { get; set; }
     }
 
     public class BookingResult
