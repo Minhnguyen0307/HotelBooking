@@ -2,6 +2,7 @@
     var arrivals = (List<HotelBooking.Application.DTOs.BookingListItemDto>)ViewBag.Arrivals;
     var departures = (List<HotelBooking.Application.DTOs.BookingListItemDto>)ViewBag.Departures;
     var allCheckedIn = (List<HotelBooking.Application.DTOs.BookingListItemDto>)ViewBag.AllCheckedIn;
+    var reviews = (List<HotelBooking.Application.DTOs.ReviewItemDto>)(ViewBag.Reviews ?? new List<HotelBooking.Application.DTOs.ReviewItemDto>());
     var today = DateOnly.FromDateTime(DateTime.Today);
     ViewData["Title"] = "Quầy lễ tân";
 }
@@ -233,4 +234,163 @@
             </div>
         </div>
     </div>
+
+    <!-- Khối Quản lý & Phản hồi Đánh giá Khách hàng của Lễ tân -->
+    <div class="mt-5" id="guest-reviews">
+        <div class="p-4 bg-white rounded-4 shadow-sm border" style="border-radius: 16px;">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="mb-1 text-primary" style="font-family: 'Playfair Display'; font-weight: 700;">
+                        <i class="fa-solid fa-comments me-2"></i> Phản Hồi Đánh Giá Của Khách Hàng (@reviews.Count)
+                    </h4>
+                    <p class="text-muted small mb-0">Lễ tân theo dõi các phản hồi, lời khen hoặc góp ý từ khách lưu trú và gửi câu trả lời chính thức.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+                        <i class="fa-solid fa-clock me-1"></i> Chưa phản hồi: @reviews.Count(r => string.IsNullOrEmpty(r.StaffResponse))
+                    </span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                        <i class="fa-solid fa-circle-check me-1"></i> Đã phản hồi: @reviews.Count(r => !string.IsNullOrEmpty(r.StaffResponse))
+                    </span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-luxury align-middle">
+                    <thead>
+                        <tr>
+                            <th>Phòng & Khách Hàng</th>
+                            <th>Đánh Giá</th>
+                            <th>Nội Dung Nhận Xét</th>
+                            <th>Trạng Thái & Phản Hồi Lễ Tân</th>
+                            <th class="text-end">Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in reviews)
+                        {
+                            bool hasReply = !string.IsNullOrEmpty(r.StaffResponse);
+                            <tr>
+                                <td>
+                                    <span class="d-block fw-bold text-dark">Phòng @r.RoomNumber</span>
+                                    <span class="small text-muted">@r.UserName</span>
+                                    <span class="d-block text-muted" style="font-size: 0.75rem;">@r.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                </td>
+                                <td>
+                                    <div class="text-warning small mb-1">
+                                        @for (int s = 1; s <= 5; s++)
+                                        {
+                                            if (s <= r.Rating)
+                                            {
+                                                <i class="fa-solid fa-star"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fa-regular fa-star text-muted"></i>
+                                            }
+                                        }
+                                    </div>
+                                    <span class="badge bg-light text-dark border">@r.Rating / 5 sao</span>
+                                </td>
+                                <td style="max-width: 320px;">
+                                    <p class="mb-1 text-secondary small" style="line-height: 1.4;">
+                                        @(string.IsNullOrWhiteSpace(r.Comment) ? "(Không có nhận xét bằng chữ)" : r.Comment)
+                                    </p>
+                                    @if (r.ImageUrls != null && r.ImageUrls.Any())
+                                    {
+                                        <div class="d-flex gap-1 mt-1">
+                                            @foreach (var img in r.ImageUrls)
+                                            {
+                                                <img src="@img" class="rounded border" style="width: 40px; height: 40px; object-fit: cover;" alt="Ảnh review" />
+                                            }
+                                        </div>
+                                    }
+                                </td>
+                                <td style="max-width: 300px;">
+                                    @if (hasReply)
+                                    {
+                                        <div class="p-2 bg-light rounded border small">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="badge bg-success-subtle text-success">Đã phản hồi</span>
+                                                <span class="text-muted" style="font-size: 0.7rem;">@r.RespondedAt?.ToString("dd/MM/yyyy")</span>
+                                            </div>
+                                            <div class="text-muted text-truncate" style="font-size: 0.85rem;" title="@r.StaffResponse">
+                                                @r.StaffResponse
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                                            <i class="fa-solid fa-triangle-exclamation me-1"></i> Chờ phản hồi
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-sm @(hasReply ? "btn-outline-secondary" : "btn-primary") px-3" 
+                                            onclick="openStaffReplyModal(@r.ReviewId, '@r.RoomNumber', '@r.UserName', `@(r.StaffResponse ?? "")`)">
+                                        <i class="fa-solid fa-reply me-1"></i> @(hasReply ? "Sửa phản hồi" : "Phản hồi")
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+
+                        @if (!reviews.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted small">Chưa có đánh giá nào từ khách hàng.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Modal Lễ tân Phản hồi Đánh giá -->
+<div class="modal fade" id="staffReplyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow border-0" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" style="font-family: 'Playfair Display'; color: var(--primary-dark);">
+                    <i class="fa-solid fa-headset text-primary me-2"></i> Phản Hồi Đánh Giá Khách Hàng
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="ReplyReview" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <input type="hidden" id="modalReviewId" name="reviewId" value="" />
+                    <div class="p-3 bg-light rounded-3 mb-3 small">
+                        <span class="d-block text-muted">Khách hàng: <strong id="modalCustomerName" class="text-dark"></strong></span>
+                        <span class="d-block text-muted">Phòng: <strong id="modalRoomNumber" class="text-dark"></strong></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark small text-uppercase">Nội dung phản hồi từ Lễ tân <span class="text-danger">*</span></label>
+                        <textarea id="modalResponseText" name="response" class="form-control" rows="4" 
+                                  placeholder="Nhập lời cảm ơn, giải thích hoặc hướng hỗ trợ khách hàng..." required style="border-radius: 10px;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light px-3" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Lưu & Gửi phản hồi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openStaffReplyModal(reviewId, roomNumber, customerName, currentReply) {
+        document.getElementById('modalReviewId').value = reviewId;
+        document.getElementById('modalRoomNumber').textContent = 'Phòng ' + roomNumber;
+        document.getElementById('modalCustomerName').textContent = customerName;
+        document.getElementById('modalResponseText').value = currentReply || '';
+        const modal = new bootstrap.Modal(document.getElementById('staffReplyModal'));
+        modal.show();
+    }
+</script>

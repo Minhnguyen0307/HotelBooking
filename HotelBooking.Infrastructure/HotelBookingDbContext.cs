@@ -37,6 +37,10 @@ public partial class HotelBookingDbContext : DbContext
 
     public virtual DbSet<RoomType> RoomTypes { get; set; }
 
+    public virtual DbSet<Review> Reviews { get; set; }
+
+    public virtual DbSet<ReviewImage> ReviewImages { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<VwMonthlyRevenue> VwMonthlyRevenues { get; set; }
@@ -264,6 +268,37 @@ public partial class HotelBookingDbContext : DbContext
                 .ToView("vw_RoomOccupancy");
 
             entity.Property(e => e.RoomNumber).HasMaxLength(20);
+        });
+
+        modelBuilder.Entity<Review>(entity =>
+        {
+            entity.HasKey(e => e.ReviewId);
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.Room).WithMany(p => p.Reviews)
+                .HasForeignKey(d => d.RoomId)
+                .HasConstraintName("FK_Reviews_Rooms");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Reviews)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_Reviews_Users");
+
+            entity.HasOne(d => d.RespondedByUser).WithMany()
+                .HasForeignKey(d => d.RespondedByUserId)
+                .HasConstraintName("FK_Reviews_Staff");
+        });
+
+        modelBuilder.Entity<ReviewImage>(entity =>
+        {
+            entity.HasKey(e => e.ReviewImageId);
+
+            entity.Property(e => e.ImageUrl).HasMaxLength(500);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.Review).WithMany(p => p.ReviewImages)
+                .HasForeignKey(d => d.ReviewId)
+                .HasConstraintName("FK_ReviewImages_Reviews");
         });
 
         OnModelCreatingPartial(modelBuilder);

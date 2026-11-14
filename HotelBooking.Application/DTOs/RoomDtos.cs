@@ -30,5 +30,6 @@ namespace HotelBooking.Application.DTOs
         public List<string> ImageUrls { get; set; } = new();
         public List<string> Amenities { get; set; } = new();
         public string? Address { get; set; }
+        public RoomReviewsSummaryDto ReviewsSummary { get; set; } = new();
     }
 }
