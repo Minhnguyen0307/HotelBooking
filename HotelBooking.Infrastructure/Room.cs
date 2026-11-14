@@ -30,4 +30,6 @@ public partial class Room
     public virtual RoomType RoomType { get; set; } = null!;
 
     public virtual ICollection<Amenity> Amenities { get; set; } = new List<Amenity>();
+
+    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }
