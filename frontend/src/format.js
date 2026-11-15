@@ -7,9 +7,7 @@ export const STATUS = {
   Cancelled: 'Đã hủy',
   Available: 'Trống',
   Booked: 'Đã đặt',
-  Maintenance: 'Bảo trì',
-  Dirty: 'Chờ dọn phòng',
-  Occupied: 'Có khách',
+  Maintenance: 'Bảo trì'
 };
 
 export function money(value) {
@@ -37,12 +35,6 @@ export function addDays(iso, days) {
 
 export function statusLabel(status) {
   return STATUS[status] || status || '';
-}
-
-export function nightsBetween(checkIn, checkOut) {
-  const a = new Date(`${checkIn}T00:00:00`);
-  const b = new Date(`${checkOut}T00:00:00`);
-  return Math.max(0, Math.round((b - a) / 86400000));
 }
 
 export function searchParams(data) {

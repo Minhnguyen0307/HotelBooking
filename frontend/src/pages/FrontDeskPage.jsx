@@ -3,7 +3,6 @@ import { api } from '../api';
 import { useAuth } from '../auth';
 import { addDays, money, statusLabel, today, tomorrow } from '../format';
 import { AsyncView, StarRow, useLoad } from '../ui';
-import { SignalRNotification } from '../SignalRNotification';
 
 const NAV = [
   ['board', 'Quầy hôm nay'],
@@ -72,14 +71,7 @@ export function FrontDeskPage() {
           {(data) => (
             <>
               {view === 'board' && (
-                <Board
-                  data={data}
-                  selectedId={selectedId}
-                  onOpen={setSelectedId}
-                  onCancel={(id) => api(`/api/frontdesk/confirm-cancel/${id}`, { method: 'POST' }).then((result) => refresh(result.message)).catch((err) => setError(err.message))}
-                  onDone={refresh}
-                  onError={setError}
-                />
+                <Board data={data} selectedId={selectedId} onOpen={setSelectedId} onCancel={(id) => api(`/api/frontdesk/confirm-cancel/${id}`, { method: 'POST' }).then((result) => refresh(result.message)).catch((err) => setError(err.message))} />
               )}
               {view === 'phone' && (
                 <PhoneBook
@@ -100,70 +92,13 @@ export function FrontDeskPage() {
         onDone={refresh}
         onError={setError}
       />
-      <SignalRNotification />
     </div>
   );
 }
 
-function Board({ data, selectedId, onOpen, onCancel, onDone, onError }) {
-  const [fastCode, setFastCode] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [fastSuccess, setFastSuccess] = useState(null);
-
-  async function handleFastCheckIn(e) {
-    e.preventDefault();
-    if (!fastCode.trim()) return;
-    setLoading(true);
-    setFastSuccess(null);
-    try {
-      const res = await api('/api/frontdesk/fast-checkin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: fastCode.trim() })
-      });
-      setFastSuccess(res);
-      setFastCode('');
-      if (onDone) onDone(res.message);
-    } catch (err) {
-      if (onError) onError(err.message || 'Lỗi quét mã / check-in nhanh');
-    } finally {
-      setLoading(false);
-    }
-  }
-
+function Board({ data, selectedId, onOpen, onCancel }) {
   return (
     <div className="desk-board">
-      <section style={{ gridColumn: '1 / -1', background: '#eef6ff', border: '1px solid #b8daff', borderRadius: '8px', padding: '14px 18px', marginBottom: '8px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          <div>
-            <h3 style={{ margin: 0, color: '#004085', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>⚡ Fast Check-in (Mã QR / Nhập mã siêu tốc)</span>
-            </h3>
-            <p style={{ margin: '4px 0 0 0', fontSize: '0.88rem', color: '#004085' }}>
-              Quét mã QR từ điện thoại của khách hoặc nhập mã ngắn (VD: <code>HBS-102</code> hoặc <code>102</code>) để check-in tức thì trong 3 giây.
-            </p>
-          </div>
-          <form onSubmit={handleFastCheckIn} style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <input
-              type="text"
-              placeholder="Quét mã QR hoặc nhập HBS-xxx..."
-              value={fastCode}
-              onChange={(e) => setFastCode(e.target.value)}
-              disabled={loading}
-              style={{ padding: '8px 12px', minWidth: '260px', borderRadius: '4px', border: '1px solid #ced4da', fontSize: '0.95rem' }}
-              autoFocus
-            />
-            <button type="submit" className="btn" disabled={loading} style={{ background: '#0056b3', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 600 }}>
-              {loading ? 'Đang xử lý...' : '⚡ Quét & Check-in'}
-            </button>
-          </form>
-        </div>
-        {fastSuccess && (
-          <div style={{ marginTop: '10px', padding: '10px 14px', background: '#d4edda', color: '#155724', borderRadius: '4px', fontSize: '0.9rem', border: '1px solid #c3e6cb' }}>
-            ✅ <strong>{fastSuccess.message}</strong> — Khách: <b>{fastSuccess.guestName}</b> | Phòng: <b>{fastSuccess.roomNumber}</b> ({fastSuccess.propertyName}) | Mã đơn: <b>#{fastSuccess.bookingId}</b>
-          </div>
-        )}
-      </section>
       <section>
         <h2>Check-in · khách đến</h2>
         <StayList rows={data.arrivals} selectedId={selectedId} action="Check-in" onOpen={onOpen} />

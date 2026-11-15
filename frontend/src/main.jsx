@@ -21,9 +21,6 @@ import { AdminRoomsPage } from './pages/AdminRoomsPage';
 import { RoomFormPage } from './pages/RoomFormPage';
 import { RoomTypesPage } from './pages/RoomTypesPage';
 import { CustomersPage } from './pages/CustomersPage';
-import { AdminPromoCodesPage } from './pages/AdminPromoCodesPage';
-import { AdminReviewsPage } from './pages/AdminReviewsPage';
-import { AdminSettingsPage } from './pages/AdminSettingsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import './styles.css';
 
@@ -51,9 +48,6 @@ createRoot(document.getElementById('root')).render(
             <Route path="admin/rooms/:id" element={<RequireAuth roles={['Manager', 'Admin']}><RoomFormPage /></RequireAuth>} />
             <Route path="admin/types" element={<RequireAuth roles={['Manager', 'Admin']}><RoomTypesPage /></RequireAuth>} />
             <Route path="admin/customers" element={<RequireAuth roles={['Manager', 'Admin']}><CustomersPage /></RequireAuth>} />
-            <Route path="admin/promos" element={<RequireAuth roles={['Manager', 'Admin']}><AdminPromoCodesPage /></RequireAuth>} />
-            <Route path="admin/reviews" element={<RequireAuth roles={['Manager', 'Admin']}><AdminReviewsPage /></RequireAuth>} />
-            <Route path="admin/settings" element={<RequireAuth roles={['Manager', 'Admin']}><AdminSettingsPage /></RequireAuth>} />
             <Route path="reports" element={<RequireAuth roles={['Manager', 'Admin']}><ReportsPage /></RequireAuth>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>

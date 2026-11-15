@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
 
+const HERO = 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80';
+
 function loadGoogleScript() {
   if (window.google?.accounts?.id) return Promise.resolve();
   return new Promise((resolve, reject) => {
@@ -27,6 +29,9 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState('');
+  const [staff, setStaff] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [busy, setBusy] = useState(false);
   const buttonRef = useRef(null);
   const fromRef = useRef('/');
   fromRef.current = location.state?.from || '/';
@@ -73,27 +78,77 @@ export function LoginPage() {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.target));
     setError('');
+    setBusy(true);
     try {
       const account = await login(data.email, data.password);
       const requested = location.state?.from;
       navigate(requested || (account?.role === 'Receptionist' ? '/frontdesk' : '/'), { replace: true });
     } catch (err) {
       setError(err.message);
+    } finally {
+      setBusy(false);
     }
   }
 
   return (
-    <form className="panel stack account-card" onSubmit={onSubmit}>
-      <p className="eyebrow">HBS</p>
-      <h1>Chào mừng trở lại</h1>
-      <p className="lede">Mời bạn đăng nhập để tiếp tục kỳ nghỉ.</p>
-      {error && <div className="banner">{error}</div>}
-      <label>Email<input name="email" type="email" required /></label>
-      <label>Mật khẩu<input name="password" type="password" required /></label>
-      <button className="btn" type="submit">Đăng nhập</button>
-      <div className="or-line">hoặc</div>
-      <div className="google-login" ref={buttonRef} />
-      <p className="muted links"><Link to="/forgot">Quên mật khẩu</Link> · <Link to="/register">Tạo tài khoản</Link></p>
-    </form>
+    <div className="auth-screen">
+      <header className="auth-top">
+        <Link className="lux-logo" to="/">
+          <span className="lux-mark">H</span>
+          <span>
+            <strong>HBS HOTEL</strong>
+            <small>Luxury Resorts · Đà Nẵng</small>
+          </span>
+        </Link>
+        <Link to="/">← Trang chủ</Link>
+      </header>
+      <main>
+        <section className="auth-card">
+          <aside>
+            <img src={HERO} alt="HBS Luxury Hotel Đà Nẵng" />
+            <div>
+              <p>HBS Privé</p>
+              <h2>Khởi đầu hành trình <span>nghỉ dưỡng đẳng cấp</span></h2>
+              <p className="auth-copy">Đăng nhập để giữ phòng, xem đơn và tiếp tục kỳ nghỉ tại năm cơ sở HBS ở Đà Nẵng.</p>
+              <ul>
+                <li>Ưu đãi WELCOME10 khi đặt trực tiếp</li>
+                <li>Quản lý đơn và thanh toán trên tài khoản của bạn</li>
+              </ul>
+            </div>
+          </aside>
+          <div className="auth-form">
+            <div className="auth-roles">
+              <button type="button" className={staff ? '' : 'on'} onClick={() => setStaff(false)}>Khách hàng</button>
+              <button type="button" className={staff ? 'on' : ''} onClick={() => setStaff(true)}>Nhân viên</button>
+            </div>
+            <p className="lux-kicker dark">{staff ? 'Cổng lễ tân HBS' : 'Cổng thành viên HBS'}</p>
+            <h1>Chào mừng trở lại</h1>
+            <p>{staff ? 'Đăng nhập tài khoản nhân viên để vào quầy lễ tân hoặc báo cáo.' : 'Mời bạn đăng nhập để tiếp tục kỳ nghỉ và quản lý đặt phòng.'}</p>
+            {error && <div className="banner">{error}</div>}
+            <form onSubmit={onSubmit}>
+              <label>Email đăng nhập
+                <input name="email" type="email" required placeholder={staff ? 'staff@hotel.com' : 'khachhang@hotel.com'} />
+              </label>
+              <label>Mật khẩu
+                <span className="auth-pass">
+                  <input name="password" type={showPassword ? 'text' : 'password'} required placeholder="••••••••" />
+                  <button type="button" onClick={() => setShowPassword((value) => !value)}>{showPassword ? 'Ẩn' : 'Hiện'}</button>
+                </span>
+              </label>
+              <div className="auth-row">
+                <Link to="/forgot">Quên mật khẩu?</Link>
+              </div>
+              <button className="lux-navy" type="submit" disabled={busy}>{busy ? 'Đang xác thực...' : 'Đăng nhập'}</button>
+            </form>
+            <div className={staff ? 'auth-social is-hidden' : 'auth-social'}>
+              <p>hoặc</p>
+              <div className="google-login" ref={buttonRef} />
+              <p>Chưa là hội viên? <Link to="/register" state={{ from: location.state?.from }}>Tạo tài khoản mới</Link></p>
+            </div>
+            {staff && <p className="auth-hint">Dùng tài khoản lễ tân, quản lý hoặc quản trị được cấp để vào quầy và buồng phòng.</p>}
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }

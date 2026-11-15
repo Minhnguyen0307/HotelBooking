@@ -3,24 +3,45 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import { money, today, tomorrow } from '../format';
+import { LuxBar } from '../lux';
 import { AsyncView, Photo, StarPicker, StarRow, StayDates, useLoad } from '../ui';
 
 export function RoomPage() {
   const { id } = useParams();
-  const { user, hasRole } = useAuth();
+  const { user, ready, hasRole } = useAuth();
   const navigate = useNavigate();
   const [tick, setTick] = useState(0);
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState('');
+  const [addons, setAddons] = useState({ spa: false, breakfast: false, extraBed: false });
   const saved = JSON.parse(sessionStorage.getItem('search') || '{}');
   const state = useLoad(() => api(`/api/rooms/${id}`), [id, tick]);
 
+  function askLogin() {
+    navigate('/login', { state: { from: `/rooms/${id}` } });
+  }
+
   async function onPreview(event) {
+    if (!user) {
+      askLogin();
+      return;
+    }
     const form = event.target.form;
     const data = Object.fromEntries(new FormData(form));
     setError('');
     try {
-      const result = await api(`/api/bookings/preview?roomId=${id}&checkInDate=${data.checkInDate}&checkOutDate=${data.checkOutDate}&numberOfGuests=${data.numberOfGuests}`);
+      const promo = (data.promoCode || '').trim();
+      const query = new URLSearchParams({
+        roomId: id,
+        checkInDate: data.checkInDate,
+        checkOutDate: data.checkOutDate,
+        numberOfGuests: data.numberOfGuests
+      });
+      if (promo) query.set('promoCode', promo);
+      if (addons.spa) query.set('spa', 'true');
+      if (addons.breakfast) query.set('breakfast', 'true');
+      if (addons.extraBed) query.set('extraBed', 'true');
+      const result = await api(`/api/bookings/preview?${query}`);
       setPreview(result);
     } catch (err) {
       setError(err.message);
@@ -29,6 +50,10 @@ export function RoomPage() {
 
   async function onBook(event) {
     event.preventDefault();
+    if (!user) {
+      askLogin();
+      return;
+    }
     const data = Object.fromEntries(new FormData(event.target));
     setError('');
     try {
@@ -42,6 +67,10 @@ export function RoomPage() {
           guestName: data.guestName,
           guestPhone: data.guestPhone,
           guestNote: data.guestNote,
+          promoCode: (data.promoCode || '').trim(),
+          spa: addons.spa,
+          breakfast: addons.breakfast,
+          extraBed: addons.extraBed,
           paymentChoice: data.paymentChoice
         }
       });
@@ -84,52 +113,96 @@ export function RoomPage() {
   }
 
   return (
-    <AsyncView state={state}>
+    <div className="lux lux-page">
+      <LuxBar solid />
+      <AsyncView state={state}>
       {(data) => {
         const room = data.room;
         const summary = room.reviewsSummary || { reviews: [], averageRating: 0, totalReviews: 0 };
+        const includesBreakfast = (room.amenities || []).includes('Buffet sáng');
         return (
-          <>
+          <section className="lux-book-page">
             {error && <div className="banner">{error}</div>}
-            <div className="split">
-              <article className="card">
+            <div className="lux-detail">
+              <article className="lux-book-card">
                 <Photo url={(room.imageUrls || [])[0]} />
-                <div className="pad">
-                  <p className="pill">{room.propertyName} · {room.area}</p>
-                  <h1>Phòng {room.roomNumber}</h1>
-                  <p>{room.description}</p>
-                  <p className="muted">{room.address} · {room.typeName}</p>
-                  <p>{(room.amenities || []).map((item) => <span className="pill" key={item}>{item}</span>)}</p>
-                  <p className="price">{money(room.basePrice)} / đêm</p>
-                  <p className="fare">{room.occupancyRule}</p>
+                <p className="lux-kicker dark">{room.propertyName} · {room.area}</p>
+                <h1>Phòng {room.roomNumber}</h1>
+                <div className="lux-meta">
+                  <span>{room.typeName}</span>
+                  <span>Tối đa {room.maxGuests} khách</span>
+                  {includesBreakfast && <span>Đã gồm buffet sáng</span>}
+                  <strong>{money(room.basePrice)} / đêm</strong>
                 </div>
+                <p>{room.description}</p>
+                <p className="lux-note">{room.address}</p>
+                <p className="lux-note">{room.occupancyRule}</p>
+                <p className="lux-amenity">{(room.amenities || []).join(' · ')}</p>
               </article>
-              <form className="panel stack" onSubmit={onBook}>
-                <h2>Mời bạn lưu trú</h2>
-                <StayDates checkIn={saved.checkInDate || today()} checkOut={saved.checkOutDate || tomorrow()} />
-                <label>Số khách<input name="numberOfGuests" type="number" min="1" max={room.maxGuests} defaultValue={saved.guests || 1} required /></label>
-                <label>Người nhận phòng<input name="guestName" defaultValue={user?.fullName || ''} required /></label>
-                <label>Số điện thoại<input name="guestPhone" inputMode="tel" pattern="0[0-9]{9}" defaultValue={user?.phoneNumber || ''} required /></label>
-                <label>Lời nhắn<textarea name="guestNote" maxLength="500" placeholder="Giờ đến, yêu cầu phòng..."></textarea></label>
+              {!ready ? (
+                <aside className="lux-book-card lux-reserve">
+                  <p className="lux-note">Đang kiểm tra tài khoản...</p>
+                </aside>
+              ) : !user ? (
+                <aside className="lux-book-card lux-reserve">
+                  <p className="lux-kicker dark">HBS Reservation</p>
+                  <h2>Đăng nhập để đặt phòng</h2>
+                  <p>Quý khách cần đăng nhập trước khi giữ phòng. Sau khi đăng nhập, trang này mở lại để tiếp tục đặt.</p>
+                  <button className="lux-gold" type="button" onClick={askLogin}>Đăng nhập</button>
+                  <Link className="lux-line" to="/register" state={{ from: `/rooms/${id}` }}>Đăng ký tài khoản</Link>
+                </aside>
+              ) : (
+              <form className="lux-book-card lux-reserve" onSubmit={onBook}>
+                <p className="lux-kicker dark">HBS Reservation</p>
+                <h2>Đặt phòng trực tuyến</h2>
+                <div className="lux-fields">
+                  <StayDates checkIn={saved.checkInDate || today()} checkOut={saved.checkOutDate || tomorrow()} />
+                  <label>Số khách<input name="numberOfGuests" type="number" min="1" max={room.maxGuests} defaultValue={saved.guests || 1} required /></label>
+                  <label>Họ và tên quý khách<input name="guestName" defaultValue={user?.fullName || ''} required /></label>
+                  <label>Số điện thoại<input name="guestPhone" inputMode="tel" pattern="0[0-9]{9}" placeholder="0901234567" defaultValue={user?.phoneNumber || ''} required /></label>
+                  <label>Yêu cầu đặc biệt<textarea name="guestNote" maxLength="500" placeholder="Đưa đón, tầng cao, kỷ niệm..."></textarea></label>
+                  <label className="span-2">Mã giảm giá<input name="promoCode" placeholder="Để trống nếu không dùng. Ví dụ WELCOME10" /></label>
+                </div>
+                <fieldset className="pay-choice">
+                  <legend>Dịch vụ thêm</legend>
+                  <label className="choice">
+                    <input type="checkbox" checked={addons.spa} onChange={(event) => setAddons((current) => ({ ...current, spa: event.target.checked }))} />
+                    Spa · 300.000 ₫
+                  </label>
+                  <label className="choice">
+                    <input type="checkbox" checked={addons.breakfast} onChange={(event) => setAddons((current) => ({ ...current, breakfast: event.target.checked }))} />
+                    Buffet sáng · {includesBreakfast ? 'đã gồm trong phòng' : '180.000 ₫ / khách / đêm'}
+                  </label>
+                  {addons.breakfast && includesBreakfast && <p className="service-note">Phòng đã có suất buffet sáng rồi.</p>}
+                  <label className="choice">
+                    <input type="checkbox" checked={addons.extraBed} onChange={(event) => setAddons((current) => ({ ...current, extraBed: event.target.checked }))} />
+                    Giường phụ · 250.000 ₫ / đêm
+                  </label>
+                </fieldset>
                 <fieldset className="pay-choice">
                   <legend>Thanh toán</legend>
                   <label className="choice"><input type="radio" name="paymentChoice" value="Now" defaultChecked /> Thanh toán ngay</label>
                   <label className="choice"><input type="radio" name="paymentChoice" value="Cash" /> Tiền mặt khi nhận phòng</label>
                 </fieldset>
                 {preview && (
-                  <div className="fare">
+                  <div className="lux-quote">
                     <span>{preview.stayLabel} · {preview.nights} đêm · {preview.numberOfGuests} khách</span>
                     <span>Giá phòng {money(preview.roomCharge)}</span>
                     <span>Phụ thu {money(preview.surcharge)}</span>
-                    <strong>Tổng {money(preview.totalPrice)}</strong>
+                    {(preview.services || []).map((line) => (
+                      <span key={line.name}>{line.amount > 0 ? `${line.name} ${money(line.amount)}` : line.note}</span>
+                    ))}
+                    {preview.discount > 0 && <span>Giảm mã {preview.promoCode} −{money(preview.discount)}</span>}
+                    <strong>Tổng {money(preview.payable ?? preview.totalPrice)}</strong>
                     <span>{preview.summary}</span>
                   </div>
                 )}
-                <button className="btn secondary" type="button" onClick={onPreview}>Xem giá</button>
-                <button className="btn" type="submit">Xác nhận đặt</button>
+                <button className="lux-line" type="button" onClick={onPreview}>Xem giá</button>
+                <button className="lux-gold" type="submit">Tiến hành đặt hạng phòng này</button>
               </form>
+              )}
             </div>
-            <section>
+            <section className="lux-reviews">
               <h2>Đánh giá <StarRow value={summary.averageRating} /> · {summary.totalReviews || 0} lượt</h2>
               {(summary.reviews || []).length === 0 && <p className="muted">Chưa có đánh giá.</p>}
               {(summary.reviews || []).map((review) => (
@@ -156,11 +229,12 @@ export function RoomPage() {
                   <label>Ảnh<input name="images" type="file" accept="image/*" multiple /></label>
                   <button className="btn" type="submit">Gửi đánh giá</button>
                 </form>
-              ) : <p className="muted">Mời bạn <Link to="/login">đăng nhập</Link> để chia sẻ trải nghiệm.</p>}
+              ) : <p className="lux-note">Mời bạn <Link to="/login">đăng nhập</Link> để chia sẻ trải nghiệm.</p>}
             </section>
-          </>
+          </section>
         );
       }}
-    </AsyncView>
+      </AsyncView>
+    </div>
   );
 }

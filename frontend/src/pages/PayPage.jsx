@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { money } from '../format';
+import { LuxBar } from '../lux';
 import { AsyncView, useLoad } from '../ui';
 
 export function PayPage() {
@@ -32,31 +33,40 @@ export function PayPage() {
   }
 
   return (
-    <AsyncView state={state}>
+    <div className="lux lux-page">
+      <LuxBar solid />
+      <AsyncView state={state}>
       {(data) => {
         const booking = data.booking;
         if (data.alreadyPaid || booking.status !== 'Pending') {
           return (
-            <div className="panel">
-              <h1>Đơn #{booking.bookingId}</h1>
-              <p>Đơn này không còn chờ thanh toán.</p>
-              <Link className="btn" to="/bookings">Về đơn của tôi</Link>
-            </div>
+            <section className="lux-book-page">
+              <article className="lux-book-card lux-reserve">
+                <h1>Đơn #{booking.bookingId}</h1>
+                <p>Đơn này không còn chờ thanh toán.</p>
+                <Link className="lux-gold" to="/bookings">Về đơn của tôi</Link>
+              </article>
+            </section>
           );
         }
         return (
-          <form className="panel stack account-card" onSubmit={onSubmit}>
-            <h1>Thanh toán #{booking.bookingId}</h1>
+          <form className="lux-book-page lux-book-card lux-reserve" onSubmit={onSubmit}>
+            <p className="lux-kicker dark">HBS Reservation</p>
+            <h1>Thanh toán đơn #{booking.bookingId}</h1>
             {error && <div className="banner">{error}</div>}
             <p>{booking.guestName} · {booking.guestPhone}</p>
             {booking.guestNote && <p className="muted">{booking.guestNote}</p>}
             <p>{booking.checkInDate} → {booking.checkOutDate} · {booking.numberOfGuests} khách</p>
-            <div className="fare">
+            <div className="lux-quote">
               {booking.stayLabel && <span>{booking.stayLabel}</span>}
               {booking.roomCharge != null && <span>Giá phòng {money(booking.roomCharge)}</span>}
               {booking.surcharge > 0 && <span>Phụ thu {money(booking.surcharge)}</span>}
               {booking.summary && <span>{booking.summary}</span>}
-              <strong>Tổng {money(booking.totalPrice)}</strong>
+              {(booking.services || []).map((line) => (
+                <span key={line.name}>{line.name} {money(line.amount)}</span>
+              ))}
+              {booking.discount > 0 && <span>Giảm giá −{money(booking.discount)}</span>}
+              <strong>Tổng {money(booking.payable ?? booking.totalPrice)}</strong>
             </div>
             <label>
               Phương thức
@@ -67,10 +77,11 @@ export function PayPage() {
               </select>
             </label>
             <label>Số thẻ hoặc tài khoản<input name="cardNumber" required /></label>
-            <button className="btn" type="submit">Thanh toán</button>
+            <button className="lux-gold" type="submit">Thanh toán</button>
           </form>
         );
       }}
-    </AsyncView>
+      </AsyncView>
+    </div>
   );
 }

@@ -453,13 +453,16 @@ namespace HotelBooking.Application.Services
             var discounts = await _context.FolioItems
                 .Where(f => f.BookingId == booking.BookingId && f.Category == "Discount")
                 .SumAsync(f => f.UnitPrice * f.Quantity);
+            var bookedServices = await _context.FolioItems
+                .Where(f => f.BookingId == booking.BookingId && f.Category == "Service")
+                .SumAsync(f => f.UnitPrice * f.Quantity);
             var paid = await _context.Payments
                 .Where(p => p.BookingId == booking.BookingId && p.PaymentStatus == "Success")
                 .SumAsync(p => p.Amount);
             var pending = await _context.Payments
                 .FirstOrDefaultAsync(p => p.BookingId == booking.BookingId && p.PaymentMethod == "Cash" && p.PaymentStatus == "Pending");
             if (pending == null) return;
-            var due = booking.TotalPrice - discounts - paid;
+            var due = booking.TotalPrice + bookedServices - discounts - paid;
             if (due <= 0) pending.PaymentStatus = "Failed";
             else pending.Amount = due;
         }

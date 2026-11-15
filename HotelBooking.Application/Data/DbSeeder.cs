@@ -211,6 +211,20 @@ namespace HotelBooking.Application.Data
             }
 
             await context.SaveChangesAsync();
+
+            var breakfast = await EnsureAmenity(context, "Buffet sáng");
+            await context.SaveChangesAsync();
+            var suites = await context.Rooms
+                .Include(r => r.RoomType)
+                .Include(r => r.Amenities)
+                .Where(r => r.RoomType.TypeName == "Suite")
+                .ToListAsync();
+            foreach (var suite in suites)
+            {
+                if (suite.Amenities.All(amenity => amenity.Name != "Buffet sáng"))
+                    suite.Amenities.Add(breakfast);
+            }
+            await context.SaveChangesAsync();
         }
 
         private static async Task<Amenity> EnsureAmenity(HotelBookingDbContext context, string name)

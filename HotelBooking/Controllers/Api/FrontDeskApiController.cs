@@ -128,65 +128,6 @@ public class FrontDeskApiController : ControllerBase
         return Result(success, error, "Đã nhận phòng.");
     }
 
-    [HttpPost("fast-checkin")]
-    public async Task<IActionResult> FastCheckIn([FromBody] FastCheckInRequest request)
-    {
-        var raw = (request.Code ?? string.Empty).Trim();
-        if (string.IsNullOrWhiteSpace(raw))
-            return BadRequest(new { message = "Vui lòng nhập hoặc quét mã QR đơn đặt phòng." });
-
-        int bookingId = 0;
-        if (raw.StartsWith("HBS-", StringComparison.OrdinalIgnoreCase))
-            int.TryParse(raw[4..], out bookingId);
-        else if (raw.StartsWith('#'))
-            int.TryParse(raw[1..], out bookingId);
-        else if (raw.StartsWith('{') && raw.Contains("bookingId"))
-        {
-            try
-            {
-                var doc = System.Text.Json.JsonDocument.Parse(raw);
-                if (doc.RootElement.TryGetProperty("bookingId", out var prop))
-                    bookingId = prop.GetInt32();
-            }
-            catch { }
-        }
-        else
-            int.TryParse(raw, out bookingId);
-
-        if (bookingId <= 0)
-            return BadRequest(new { message = $"Mã '{raw}' không hợp lệ. Vui lòng quét mã QR hoặc nhập mã đơn (VD: HBS-102 hoặc 102)." });
-
-        var folio = await _deskService.GetFolioAsync(bookingId);
-        if (folio == null)
-            return NotFound(new { message = $"Không tìm thấy đơn đặt phòng #{bookingId}." });
-
-        if (folio.Status == "CheckedIn")
-            return Ok(new { message = $"Đơn #{bookingId} của khách '{folio.GuestName}' đã hoàn tất check-in trước đó.", bookingId, roomNumber = folio.RoomNumber });
-
-        if (folio.Status == "Cancelled")
-            return BadRequest(new { message = $"Đơn #{bookingId} đã bị hủy." });
-
-        var (success, error) = await _deskService.CheckInConfirmAsync(bookingId, new CheckInDto
-        {
-            GuestName = folio.GuestName,
-            GuestPhone = folio.GuestPhone
-        });
-
-        if (!success) return BadRequest(new { message = error });
-        return Ok(new
-        {
-            message = $"⚡ Fast Check-in thành công trong 3s! Khách: {folio.GuestName} · Phòng {folio.RoomNumber} ({folio.PropertyName})",
-            bookingId,
-            roomNumber = folio.RoomNumber,
-            guestName = folio.GuestName
-        });
-    }
-
-    public class FastCheckInRequest
-    {
-        public string Code { get; set; } = string.Empty;
-    }
-
     [HttpPost("check-out/{bookingId:int}")]
     public async Task<IActionResult> CheckOut(int bookingId, CheckoutDto dto)
     {

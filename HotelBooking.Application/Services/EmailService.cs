@@ -65,13 +65,12 @@ namespace HotelBooking.Application.Services
                     <p>Kính gửi quý khách <strong>{guestName}</strong>,</p>
                     <p>HBS Luxury Hotel xin nhắc nhở về kỳ nghỉ sắp tới của quý khách vào ngày mai: <strong>{checkInDate:dd/MM/yyyy}</strong>.</p>
                     <div style='background: #f7faf9; border-left: 4px solid #1f4d45; padding: 16px; margin: 20px 0;'>
-                        <p style='margin: 4px 0;'><strong>Mã đơn đặt phòng:</strong> #{bookingId} (Mã Fast Check-in: HBS-{bookingId})</p>
+                        <p style='margin: 4px 0;'><strong>Mã đơn đặt phòng:</strong> #{bookingId}</p>
                         <p style='margin: 4px 0;'><strong>Phòng số:</strong> {roomNumber}</p>
                         <p style='margin: 4px 0;'><strong>Cơ sở:</strong> {propertyName}</p>
                         <p style='margin: 4px 0;'><strong>Địa chỉ:</strong> {address}</p>
                         <p style='margin: 4px 0;'><strong>Giờ nhận phòng tiêu chuẩn:</strong> 14:00</p>
                     </div>
-                    <p>💡 <em>Mẹo Fast Check-in:</em> Khi đến khách sạn, quý khách chỉ cần đưa mã số đơn hoặc mã QR trên ứng dụng tại quầy lễ tân để hoàn tất thủ tục nhận phòng trong 3 giây.</p>
                     <p>Nếu quý khách có yêu cầu đặc biệt về giờ đến hoặc dịch vụ đón tiễn, vui lòng liên hệ tổng đài <strong>1900-8888</strong>.</p>
                     <p style='margin-top: 24px;'>Trân trọng,<br/><strong>Ban Quản lý HBS Luxury Hotel</strong></p>
                 </div>";

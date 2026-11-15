@@ -61,11 +61,18 @@ public class PaymentsApiController : ControllerBase
         if (payments.Any(p => p.PaymentStatus == "Success"))
             return BadRequest(new { message = "Đơn đặt phòng này đã được thanh toán." });
 
+        var discount = await _context.FolioItems
+            .Where(f => f.BookingId == booking.BookingId && f.Category == "Discount")
+            .SumAsync(f => f.UnitPrice * f.Quantity);
+        var services = await _context.FolioItems
+            .Where(f => f.BookingId == booking.BookingId && f.Category == "Service")
+            .SumAsync(f => f.UnitPrice * f.Quantity);
+        var payable = Math.Max(0, booking.TotalPrice - discount + services);
         var transactionId = "TXN-" + Guid.NewGuid().ToString("N")[..12].ToUpperInvariant();
         var payment = await _paymentService.CreatePaymentRecordAsync(
             request.BookingId,
             request.PaymentMethod,
-            booking.TotalPrice,
+            payable,
             transactionId,
             "Success");
 
@@ -89,7 +96,7 @@ public class PaymentsApiController : ControllerBase
             .FirstOrDefaultAsync(b => b.BookingId == bookingId && b.CustomerId == ApiUser.Id(User));
     }
 
-    private static object ToBooking(Booking booking)
+    private object ToBooking(Booking booking)
     {
         var room = booking.BookingRooms.Select(br => br.Room).FirstOrDefault();
         var nights = Math.Max(0, booking.CheckOutDate.DayNumber - booking.CheckInDate.DayNumber);
@@ -97,11 +104,21 @@ public class PaymentsApiController : ControllerBase
             ? null
             : OccupancyPricing.Price(room.RoomType.TypeName, room.RoomType.MaxGuests, room.RoomType.BasePrice, booking.NumberOfGuests, nights);
 
+        var lines = _context.FolioItems.Where(f => f.BookingId == booking.BookingId).ToList();
+        var discount = lines.Where(f => f.Category == "Discount").Sum(f => f.UnitPrice * f.Quantity);
+        var services = lines.Where(f => f.Category == "Service")
+            .Select(f => new { name = f.Description, amount = f.UnitPrice * f.Quantity })
+            .ToList();
+        var servicesTotal = services.Sum(f => f.amount);
         return new
         {
             booking.BookingId,
             booking.Status,
             booking.TotalPrice,
+            discount,
+            services,
+            servicesTotal,
+            payable = Math.Max(0, booking.TotalPrice - discount + servicesTotal),
             booking.CheckInDate,
             booking.CheckOutDate,
             booking.NumberOfGuests,
