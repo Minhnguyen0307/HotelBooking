@@ -4,7 +4,7 @@ namespace HotelBooking.Application.Interfaces
 {
     public interface IDeskService
     {
-        IReadOnlyList<ServiceOfferDto> Services { get; }
+        Task<List<ServiceOfferDto>> GetServicesAsync();
         Task<List<DeskRoomDto>> GetRoomsAsync();
         Task<List<DeskRoomDto>> AvailableRoomsAsync(DateOnly checkIn, DateOnly checkOut, int? ignoreBookingId);
         Task<List<DeskIssueDto>> OpenIssuesAsync();

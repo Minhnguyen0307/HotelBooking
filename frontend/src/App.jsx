@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './auth';
 import { AccountMarks } from './lux';
@@ -20,6 +21,12 @@ export default function App() {
     navigate('/login');
   }
 
+  useEffect(() => {
+    if (location.pathname !== '/' || !user) return;
+    if (manager) navigate('/reports', { replace: true });
+    else if (staff) navigate('/frontdesk', { replace: true });
+  }, [location.pathname, user, manager, staff, navigate]);
+
   return (
     <div className={`shell${home ? ' is-home' : ''}`}>
       {!home && <div className="topbar">
@@ -34,6 +41,8 @@ export default function App() {
             <>
               <NavLink to="/reports">Báo cáo</NavLink>
               <NavLink to="/admin/rooms">Phòng</NavLink>
+              <NavLink to="/admin/services">Dịch vụ</NavLink>
+              <NavLink to="/admin/promos">Mã giảm</NavLink>
               <NavLink to="/admin/customers">Khách</NavLink>
               <NavLink to="/admin/staff">Nhân viên</NavLink>
             </>

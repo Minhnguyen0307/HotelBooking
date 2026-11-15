@@ -32,7 +32,7 @@ public class FrontDeskApiController : ControllerBase
             checkedIn = await _frontDeskService.GetAllCheckedInAsync(),
             reviews = await _reviewService.GetAllReviewsAsync(),
             rooms = await _deskService.GetRoomsAsync(),
-            services = _deskService.Services,
+            services = await _deskService.GetServicesAsync(),
             issues = await _deskService.OpenIssuesAsync()
         });
     }

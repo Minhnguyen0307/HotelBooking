@@ -89,6 +89,16 @@ namespace HotelBooking.Application.Data
                         ReportedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
                         CONSTRAINT FK_Issues_Rooms FOREIGN KEY (RoomId) REFERENCES Rooms(RoomId) ON DELETE CASCADE
                     );
+                IF OBJECT_ID('HotelServices') IS NULL
+                    CREATE TABLE HotelServices (
+                        HotelServiceId INT IDENTITY(1,1) PRIMARY KEY,
+                        ServiceCode NVARCHAR(40) NOT NULL UNIQUE,
+                        Name NVARCHAR(80) NOT NULL,
+                        Price DECIMAL(18,2) NOT NULL,
+                        UnitLabel NVARCHAR(40) NOT NULL,
+                        ForBooking BIT NOT NULL,
+                        ForDesk BIT NOT NULL
+                    );
                 IF OBJECT_ID('PromoCodes') IS NULL
                     CREATE TABLE PromoCodes (
                         PromoCodeId INT IDENTITY(1,1) PRIMARY KEY,
@@ -98,6 +108,31 @@ namespace HotelBooking.Application.Data
                         IsActive BIT NOT NULL DEFAULT 1
                     );
                 """);
+
+            var serviceCatalog = new (string Code, string Name, decimal Price, string Unit, bool Booking, bool Desk)[]
+            {
+                ("breakfast", "Buffet sáng", 180_000m, "Mỗi khách mỗi đêm", true, false),
+                ("spa", "Spa", 300_000m, "Mỗi lượt", true, true),
+                ("extra-bed", "Giường phụ", 250_000m, "Mỗi đêm", true, false),
+                ("minibar-water", "Mini-bar nước", 25_000m, "Mỗi món", false, true),
+                ("minibar-snack", "Mini-bar snack", 45_000m, "Mỗi món", false, true),
+                ("laundry", "Giặt ủi", 80_000m, "Mỗi món", false, true),
+                ("restaurant", "Nhà hàng", 150_000m, "Mỗi món", false, true)
+            };
+            foreach (var item in serviceCatalog)
+            {
+                if (await context.HotelServices.AnyAsync(s => s.ServiceCode == item.Code)) continue;
+                context.HotelServices.Add(new HotelService
+                {
+                    ServiceCode = item.Code,
+                    Name = item.Name,
+                    Price = item.Price,
+                    UnitLabel = item.Unit,
+                    ForBooking = item.Booking,
+                    ForDesk = item.Desk
+                });
+            }
+            await context.SaveChangesAsync();
 
             if (!await context.PromoCodes.AnyAsync())
             {

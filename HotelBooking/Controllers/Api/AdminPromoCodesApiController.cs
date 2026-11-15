@@ -50,11 +50,13 @@ public class AdminPromoCodesApiController : ControllerBase
 
         if (dto.DiscountPercent > 100)
             return BadRequest(new { message = "Phần trăm giảm tối đa là 100%." });
+        if (dto.DiscountPercent > 0 && dto.DiscountAmount > 0)
+            return BadRequest(new { message = "Chỉ nhập phần trăm hoặc số tiền, không nhập cả hai." });
 
         var promo = new PromoCode
         {
             Code = code,
-            DiscountAmount = dto.DiscountAmount > 0 ? dto.DiscountAmount : 0,
+            DiscountAmount = dto.DiscountPercent > 0 ? 0 : dto.DiscountAmount,
             DiscountPercent = dto.DiscountPercent > 0 ? dto.DiscountPercent : 0,
             IsActive = dto.IsActive
         };
@@ -63,6 +65,24 @@ public class AdminPromoCodesApiController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Ok(new { message = $"Đã tạo mã khuyến mãi '{code}' thành công.", promoCodeId = promo.PromoCodeId });
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] CreatePromoDto dto)
+    {
+        var promo = await _context.PromoCodes.FindAsync(id);
+        if (promo == null) return NotFound(new { message = "Không tìm thấy mã khuyến mãi." });
+        if (dto.DiscountPercent <= 0 && dto.DiscountAmount <= 0)
+            return BadRequest(new { message = "Vui lòng nhập phần trăm giảm hoặc số tiền giảm." });
+        if (dto.DiscountPercent > 100)
+            return BadRequest(new { message = "Phần trăm giảm tối đa là 100%." });
+        if (dto.DiscountPercent > 0 && dto.DiscountAmount > 0)
+            return BadRequest(new { message = "Chỉ nhập phần trăm hoặc số tiền, không nhập cả hai." });
+        promo.DiscountAmount = dto.DiscountPercent > 0 ? 0 : dto.DiscountAmount;
+        promo.DiscountPercent = dto.DiscountPercent > 0 ? dto.DiscountPercent : 0;
+        promo.IsActive = dto.IsActive;
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Đã cập nhật mã giảm giá." });
     }
 
     [HttpPost("{id:int}/toggle")]

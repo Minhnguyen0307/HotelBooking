@@ -51,6 +51,8 @@ public partial class HotelBookingDbContext : DbContext
 
     public virtual DbSet<PromoCode> PromoCodes { get; set; }
 
+    public virtual DbSet<HotelService> HotelServices { get; set; }
+
     public virtual DbSet<VwMonthlyRevenue> VwMonthlyRevenues { get; set; }
 
     public virtual DbSet<VwRoomOccupancy> VwRoomOccupancies { get; set; }
@@ -358,6 +360,16 @@ public partial class HotelBookingDbContext : DbContext
             entity.HasOne(d => d.Room).WithMany()
                 .HasForeignKey(d => d.RoomId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<HotelService>(entity =>
+        {
+            entity.HasKey(e => e.HotelServiceId);
+            entity.HasIndex(e => e.ServiceCode).IsUnique();
+            entity.Property(e => e.ServiceCode).HasMaxLength(40);
+            entity.Property(e => e.Name).HasMaxLength(80);
+            entity.Property(e => e.UnitLabel).HasMaxLength(40);
+            entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
         });
 
         modelBuilder.Entity<PromoCode>(entity =>

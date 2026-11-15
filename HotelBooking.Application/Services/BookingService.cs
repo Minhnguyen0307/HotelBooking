@@ -103,7 +103,7 @@ namespace HotelBooking.Application.Services
             var discount = await DiscountAmount(dto.PromoCode, totalPrice);
             if (discount.Error != null)
                 return FailPreview(discount.Error);
-            var services = QuoteAddOns(room, dto, nights);
+            var services = await QuoteAddOns(room, dto, nights);
             var servicesTotal = services.Sum(line => line.Amount);
 
             return new BookingPreviewResult
@@ -148,21 +148,28 @@ namespace HotelBooking.Application.Services
             return (Math.Min(Math.Max(0, amount), roomTotal), null);
         }
 
-        private static List<BookingServiceLineDto> QuoteAddOns(Room room, BookingCreateDto dto, int nights)
+        private async Task<List<BookingServiceLineDto>> QuoteAddOns(Room room, BookingCreateDto dto, int nights)
         {
+            var catalog = await _context.HotelServices.ToListAsync();
+            decimal PriceOf(string code, decimal fallback) => catalog.FirstOrDefault(s => s.ServiceCode == code)?.Price ?? fallback;
+            string NameOf(string code, string fallback) => catalog.FirstOrDefault(s => s.ServiceCode == code)?.Name ?? fallback;
             var lines = new List<BookingServiceLineDto>();
             var guests = Math.Max(1, dto.NumberOfGuests);
             if (dto.Breakfast)
             {
                 var included = room.Amenities.Any(amenity => amenity.Name == "Buffet sáng");
+                var name = NameOf("breakfast", "Buffet sáng");
                 lines.Add(included
-                    ? new BookingServiceLineDto { Name = "Buffet sáng", Amount = 0, Note = "Phòng đã có suất buffet sáng rồi." }
-                    : new BookingServiceLineDto { Name = $"Buffet sáng · {guests} khách · {nights} đêm", Amount = 180_000m * guests * nights });
+                    ? new BookingServiceLineDto { Name = name, Amount = 0, Note = "Phòng đã có suất buffet sáng rồi." }
+                    : new BookingServiceLineDto { Name = $"{name} · {guests} khách · {nights} đêm", Amount = PriceOf("breakfast", 180_000m) * guests * nights });
             }
             if (dto.Spa)
-                lines.Add(new BookingServiceLineDto { Name = "Spa", Amount = 300_000m });
+                lines.Add(new BookingServiceLineDto { Name = NameOf("spa", "Spa"), Amount = PriceOf("spa", 300_000m) });
             if (dto.ExtraBed)
-                lines.Add(new BookingServiceLineDto { Name = $"Giường phụ · {nights} đêm", Amount = 250_000m * nights });
+            {
+                var name = NameOf("extra-bed", "Giường phụ");
+                lines.Add(new BookingServiceLineDto { Name = $"{name} · {nights} đêm", Amount = PriceOf("extra-bed", 250_000m) * nights });
+            }
             return lines;
         }
 
@@ -196,7 +203,7 @@ namespace HotelBooking.Application.Services
 
             var guestName = (dto.GuestName ?? string.Empty).Trim();
             var guestPhone = new string((dto.GuestPhone ?? string.Empty).Where(char.IsDigit).ToArray());
-            var services = QuoteAddOns(room, dto, nights);
+            var services = await QuoteAddOns(room, dto, nights);
             var breakfastNote = services.FirstOrDefault(line => line.Note != null)?.Note;
             var guestNote = string.IsNullOrWhiteSpace(dto.GuestNote) ? null : dto.GuestNote.Trim();
             if (breakfastNote != null)

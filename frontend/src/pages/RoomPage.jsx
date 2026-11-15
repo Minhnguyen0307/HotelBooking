@@ -16,6 +16,9 @@ export function RoomPage() {
   const [addons, setAddons] = useState({ spa: false, breakfast: false, extraBed: false });
   const saved = JSON.parse(sessionStorage.getItem('search') || '{}');
   const state = useLoad(() => api(`/api/rooms/${id}`), [id, tick]);
+  const catalog = useLoad(() => api('/api/services'), []);
+  const offers = catalog.data || [];
+  const offer = (code) => offers.find((item) => item.serviceCode === code);
 
   function askLogin() {
     navigate('/login', { state: { from: `/rooms/${id}` } });
@@ -167,16 +170,18 @@ export function RoomPage() {
                   <legend>Dịch vụ thêm</legend>
                   <label className="choice">
                     <input type="checkbox" checked={addons.spa} onChange={(event) => setAddons((current) => ({ ...current, spa: event.target.checked }))} />
-                    Spa · 300.000 ₫
+                    {offer('spa') ? `${offer('spa').name} · ${money(offer('spa').price)}` : 'Spa · 300.000 ₫'}
                   </label>
                   <label className="choice">
                     <input type="checkbox" checked={addons.breakfast} onChange={(event) => setAddons((current) => ({ ...current, breakfast: event.target.checked }))} />
-                    Buffet sáng · {includesBreakfast ? 'đã gồm trong phòng' : '180.000 ₫ / khách / đêm'}
+                    {offer('breakfast')
+                      ? `${offer('breakfast').name} · ${includesBreakfast ? 'đã gồm trong phòng' : `${money(offer('breakfast').price)} · ${offer('breakfast').unitLabel}`}`
+                      : `Buffet sáng · ${includesBreakfast ? 'đã gồm trong phòng' : '180.000 ₫ / khách / đêm'}`}
                   </label>
                   {addons.breakfast && includesBreakfast && <p className="service-note">Phòng đã có suất buffet sáng rồi.</p>}
                   <label className="choice">
                     <input type="checkbox" checked={addons.extraBed} onChange={(event) => setAddons((current) => ({ ...current, extraBed: event.target.checked }))} />
-                    Giường phụ · 250.000 ₫ / đêm
+                    {offer('extra-bed') ? `${offer('extra-bed').name} · ${money(offer('extra-bed').price)} · ${offer('extra-bed').unitLabel}` : 'Giường phụ · 250.000 ₫ / đêm'}
                   </label>
                 </fieldset>
                 <fieldset className="pay-choice">

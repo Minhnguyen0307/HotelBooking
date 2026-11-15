@@ -17,14 +17,20 @@ namespace HotelBooking.Application.Services
             _context = context;
         }
 
-        public IReadOnlyList<ServiceOfferDto> Services { get; } =
-        [
-            new() { Name = "Mini-bar nước", Price = 25_000 },
-            new() { Name = "Mini-bar snack", Price = 45_000 },
-            new() { Name = "Giặt ủi", Price = 80_000 },
-            new() { Name = "Nhà hàng", Price = 150_000 },
-            new() { Name = "Spa", Price = 300_000 }
-        ];
+        public async Task<List<ServiceOfferDto>> GetServicesAsync()
+        {
+            var rows = await _context.HotelServices.Where(s => s.ForDesk).OrderBy(s => s.HotelServiceId).ToListAsync();
+            if (rows.Count > 0)
+                return rows.Select(s => new ServiceOfferDto { Name = s.Name, Price = s.Price }).ToList();
+            return
+            [
+                new() { Name = "Mini-bar nước", Price = 25_000 },
+                new() { Name = "Mini-bar snack", Price = 45_000 },
+                new() { Name = "Giặt ủi", Price = 80_000 },
+                new() { Name = "Nhà hàng", Price = 150_000 },
+                new() { Name = "Spa", Price = 300_000 }
+            ];
+        }
 
         public async Task<List<DeskRoomDto>> GetRoomsAsync()
         {
@@ -320,6 +326,8 @@ namespace HotelBooking.Application.Services
             var name = (dto.Description ?? string.Empty).Trim();
             if (name.Length < 2 || dto.Quantity < 1 || dto.UnitPrice < 0)
                 return (false, "Dịch vụ chưa đủ thông tin.");
+            var priced = await DeskPriceAsync(name, dto.UnitPrice);
+            if (priced.Error != null) return (false, priced.Error);
             var category = dto.Category is "Minibar" or "Damage" ? dto.Category : "Service";
             _context.FolioItems.Add(new FolioItem
             {
@@ -327,7 +335,7 @@ namespace HotelBooking.Application.Services
                 Category = category,
                 Description = name,
                 Quantity = dto.Quantity,
-                UnitPrice = dto.UnitPrice,
+                UnitPrice = priced.Price,
                 CreatedAt = DateTime.UtcNow
             });
             await _context.SaveChangesAsync();
@@ -397,13 +405,16 @@ namespace HotelBooking.Application.Services
 
             foreach (var line in dto.Minibar.Where(l => l.Quantity > 0))
             {
+                var itemName = (line.Name ?? string.Empty).Trim();
+                var priced = await DeskPriceAsync(itemName, line.UnitPrice);
+                if (priced.Error != null) return (false, priced.Error);
                 _context.FolioItems.Add(new FolioItem
                 {
                     BookingId = bookingId,
                     Category = "Minibar",
-                    Description = line.Name,
+                    Description = itemName,
                     Quantity = line.Quantity,
-                    UnitPrice = line.UnitPrice,
+                    UnitPrice = priced.Price,
                     CreatedAt = DateTime.UtcNow
                 });
             }
@@ -487,6 +498,15 @@ namespace HotelBooking.Application.Services
                 CreatedAt = DateTime.UtcNow
             });
             return null;
+        }
+
+        private async Task<(decimal Price, string? Error)> DeskPriceAsync(string name, decimal fallback)
+        {
+            var rows = await _context.HotelServices.Where(s => s.ForDesk).ToListAsync();
+            if (rows.Count == 0) return (fallback, null);
+            var match = rows.FirstOrDefault(s => s.Name == name);
+            if (match == null) return (0, "Dịch vụ không có trong bảng giá.");
+            return (match.Price, null);
         }
 
         private async Task<(decimal Amount, string? Error)> DiscountAmount(string? code, decimal roomTotal)

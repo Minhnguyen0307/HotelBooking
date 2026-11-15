@@ -5,6 +5,19 @@ import { useAuth } from '../auth';
 
 const HERO = 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80';
 
+function deskFor(account) {
+  if (account?.role === 'Receptionist') return '/frontdesk';
+  if (account?.role === 'Admin' || account?.role === 'Manager') return '/reports';
+  return '';
+}
+
+function landing(account, requested) {
+  const desk = deskFor(account);
+  const guestPage = !requested || requested === '/' || requested === '/search' || requested.startsWith('/rooms/') || requested.startsWith('/pay/');
+  if (desk && guestPage) return desk;
+  return requested || desk || '/';
+}
+
 function loadGoogleScript() {
   if (window.google?.accounts?.id) return Promise.resolve();
   return new Promise((resolve, reject) => {
@@ -51,7 +64,7 @@ export function LoginPage() {
           setError('');
           try {
             const account = await loginWithGoogle(response.credential);
-            navigate(fromRef.current !== '/' ? fromRef.current : account?.role === 'Receptionist' ? '/frontdesk' : '/', { replace: true });
+            navigate(landing(account, fromRef.current), { replace: true });
           } catch (err) {
             setError(err.message);
           }
@@ -82,7 +95,7 @@ export function LoginPage() {
     try {
       const account = await login(data.email, data.password);
       const requested = location.state?.from;
-      navigate(requested || (account?.role === 'Receptionist' ? '/frontdesk' : '/'), { replace: true });
+      navigate(landing(account, requested), { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
