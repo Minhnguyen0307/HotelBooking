@@ -75,6 +75,7 @@ CREATE TABLE Rooms (
     Status          NVARCHAR(20) NOT NULL DEFAULT 'Available',
                     -- 'Available', 'Booked', 'Maintenance'  (UC-27, FE-10)
     Description     NVARCHAR(MAX) NULL,
+    Address         NVARCHAR(255) NULL,
     CreatedAt       DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
     UpdatedAt       DATETIME2 NULL,
     CONSTRAINT FK_Rooms_RoomTypes FOREIGN KEY (RoomTypeId) REFERENCES RoomTypes(RoomTypeId),

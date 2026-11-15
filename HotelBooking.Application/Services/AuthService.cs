@@ -1,7 +1,6 @@
 using HotelBooking.Application.DTOs;
 using HotelBooking.Application.Interfaces;
 using HotelBooking.Infrastructure;
-using HotelBooking.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
