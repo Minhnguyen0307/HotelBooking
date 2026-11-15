@@ -7,8 +7,8 @@ import { dateTime, money, statusLabel } from '../format';
 function paymentMethodLabel(item) {
   const method = (item.paymentMethod || '').toLowerCase();
   if (method === 'cash') return 'Tiền mặt khi nhận phòng';
-  if (method.includes('vietqr')) return 'VietQR mô phỏng';
-  if (method === 'now') return 'VietQR mô phỏng';
+  if (method.includes('vietqr')) return 'VietQR chuyển khoản';
+  if (method === 'now') return 'VietQR chuyển khoản';
   return item.paymentMethod || 'Chưa chọn';
 }
 

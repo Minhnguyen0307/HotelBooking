@@ -173,26 +173,47 @@ BEGIN
     );
 END;
 
-/* Voucher demo chung và voucher 50k/100k/200k dành riêng cho khách đặt lần đầu. */
-IF NOT EXISTS (SELECT 1 FROM dbo.PromoCodes WHERE Code = N'SUMMER2026')
-    INSERT dbo.PromoCodes (Code, DiscountAmount, DiscountPercent, IsActive, MinimumOrderAmount, MaxUses, UsageCount, ExpiresAt)
-    VALUES (N'SUMMER2026', 0, 10, 1, 1000000, 50, 0, '2026-12-31T23:59:59');
+/* Giá phòng mẫu phù hợp bài tập và mã ưu đãi trong khoảng 2.000–10.000 đồng. */
+UPDATE dbo.RoomTypes
+SET BasePrice = CASE
+    WHEN LOWER(TypeName) LIKE '%standard%' THEN 10000
+    WHEN LOWER(TypeName) LIKE '%deluxe%' THEN 15000
+    ELSE 20000
+END;
 
-IF NOT EXISTS (SELECT 1 FROM dbo.PromoCodes WHERE Code = N'GIAM200K')
-    INSERT dbo.PromoCodes (Code, DiscountAmount, DiscountPercent, IsActive, MinimumOrderAmount, MaxUses, UsageCount, ExpiresAt)
-    VALUES (N'GIAM200K', 200000, 0, 1, 1000000, 50, 0, '2026-12-31T23:59:59');
+DECLARE @Expiry DATETIME2 = '2027-12-31T23:59:59';
+DECLARE @DemoPromos TABLE (Code NVARCHAR(30), DiscountAmount DECIMAL(18,2), MinimumOrderAmount DECIMAL(18,2), IsNewCustomerOnly BIT);
+INSERT @DemoPromos VALUES
+    (N'WELCOME2K', 2000, 10000, 1),
+    (N'WELCOME5K', 5000, 15000, 1),
+    (N'WELCOME10K', 10000, 20000, 1),
+    (N'WELCOME10', 2000, 10000, 0),
+    (N'GIAM2K', 2000, 10000, 0),
+    (N'GIAM5K', 5000, 15000, 0),
+    (N'GIAM10K', 10000, 20000, 0),
+    (N'GIAM100', 5000, 15000, 0),
+    (N'SUMMER2026', 2000, 10000, 0),
+    (N'GIAM200K', 10000, 20000, 0);
 
-IF NOT EXISTS (SELECT 1 FROM dbo.PromoCodes WHERE Code = N'WELCOME50K')
-    INSERT dbo.PromoCodes (Code, DiscountAmount, DiscountPercent, IsActive, MinimumOrderAmount, MaxUses, UsageCount, ExpiresAt, IsNewCustomerOnly)
-    VALUES (N'WELCOME50K', 50000, 0, 1, 500000, 100, 0, '2026-12-31T23:59:59', 1);
+UPDATE p
+SET DiscountAmount = d.DiscountAmount,
+    DiscountPercent = 0,
+    IsActive = 1,
+    MinimumOrderAmount = d.MinimumOrderAmount,
+    MaxUses = 100,
+    ExpiresAt = @Expiry,
+    IsNewCustomerOnly = d.IsNewCustomerOnly
+FROM dbo.PromoCodes p
+JOIN @DemoPromos d ON d.Code = p.Code;
 
-IF NOT EXISTS (SELECT 1 FROM dbo.PromoCodes WHERE Code = N'WELCOME100K')
-    INSERT dbo.PromoCodes (Code, DiscountAmount, DiscountPercent, IsActive, MinimumOrderAmount, MaxUses, UsageCount, ExpiresAt, IsNewCustomerOnly)
-    VALUES (N'WELCOME100K', 100000, 0, 1, 500000, 100, 0, '2026-12-31T23:59:59', 1);
+INSERT dbo.PromoCodes (Code, DiscountAmount, DiscountPercent, IsActive, MinimumOrderAmount, MaxUses, UsageCount, ExpiresAt, IsNewCustomerOnly)
+SELECT d.Code, d.DiscountAmount, 0, 1, d.MinimumOrderAmount, 100, 0, @Expiry, d.IsNewCustomerOnly
+FROM @DemoPromos d
+WHERE NOT EXISTS (SELECT 1 FROM dbo.PromoCodes p WHERE p.Code = d.Code);
 
-IF NOT EXISTS (SELECT 1 FROM dbo.PromoCodes WHERE Code = N'WELCOME200K')
-    INSERT dbo.PromoCodes (Code, DiscountAmount, DiscountPercent, IsActive, MinimumOrderAmount, MaxUses, UsageCount, ExpiresAt, IsNewCustomerOnly)
-    VALUES (N'WELCOME200K', 200000, 0, 1, 500000, 100, 0, '2026-12-31T23:59:59', 1);
+UPDATE dbo.PromoCodes
+SET IsActive = 0
+WHERE Code IN (N'WELCOME50K', N'WELCOME100K', N'WELCOME200K');
 
 COMMIT TRANSACTION;
 GO

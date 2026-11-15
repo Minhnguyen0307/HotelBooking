@@ -219,20 +219,50 @@ namespace HotelBooking.Application.Data
 
             var demoPromos = new[]
             {
-                new PromoCode { Code = "WELCOME10", DiscountPercent = 10, MinimumOrderAmount = 500_000m, MaxUses = 100, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true },
-                new PromoCode { Code = "WELCOME50K", DiscountAmount = 50_000m, MinimumOrderAmount = 500_000m, MaxUses = 100, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true, IsNewCustomerOnly = true },
-                new PromoCode { Code = "WELCOME100K", DiscountAmount = 100_000m, MinimumOrderAmount = 500_000m, MaxUses = 100, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true, IsNewCustomerOnly = true },
-                new PromoCode { Code = "WELCOME200K", DiscountAmount = 200_000m, MinimumOrderAmount = 500_000m, MaxUses = 100, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true, IsNewCustomerOnly = true },
-                new PromoCode { Code = "GIAM100", DiscountAmount = 100_000m, MinimumOrderAmount = 500_000m, MaxUses = 100, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true },
-                new PromoCode { Code = "SUMMER2026", DiscountPercent = 10, MinimumOrderAmount = 1_000_000m, MaxUses = 50, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true },
-                new PromoCode { Code = "GIAM200K", DiscountAmount = 200_000m, MinimumOrderAmount = 1_000_000m, MaxUses = 50, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true }
+                new PromoCode { Code = "WELCOME2K", DiscountAmount = 2_000m, MinimumOrderAmount = 10_000m, MaxUses = 100, ExpiresAt = new DateTime(2027, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true, IsNewCustomerOnly = true },
+                new PromoCode { Code = "WELCOME5K", DiscountAmount = 5_000m, MinimumOrderAmount = 15_000m, MaxUses = 100, ExpiresAt = new DateTime(2027, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true, IsNewCustomerOnly = true },
+                new PromoCode { Code = "WELCOME10K", DiscountAmount = 10_000m, MinimumOrderAmount = 20_000m, MaxUses = 100, ExpiresAt = new DateTime(2027, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true, IsNewCustomerOnly = true },
+                new PromoCode { Code = "WELCOME10", DiscountAmount = 2_000m, MinimumOrderAmount = 10_000m, MaxUses = 100, ExpiresAt = new DateTime(2027, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true },
+                new PromoCode { Code = "GIAM2K", DiscountAmount = 2_000m, MinimumOrderAmount = 10_000m, MaxUses = 100, ExpiresAt = new DateTime(2027, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true },
+                new PromoCode { Code = "GIAM5K", DiscountAmount = 5_000m, MinimumOrderAmount = 15_000m, MaxUses = 100, ExpiresAt = new DateTime(2027, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true },
+                new PromoCode { Code = "GIAM10K", DiscountAmount = 10_000m, MinimumOrderAmount = 20_000m, MaxUses = 100, ExpiresAt = new DateTime(2027, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true },
+                new PromoCode { Code = "GIAM100", DiscountAmount = 5_000m, MinimumOrderAmount = 15_000m, MaxUses = 100, ExpiresAt = new DateTime(2027, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true },
+                new PromoCode { Code = "SUMMER2026", DiscountAmount = 2_000m, MinimumOrderAmount = 10_000m, MaxUses = 50, ExpiresAt = new DateTime(2027, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true },
+                new PromoCode { Code = "GIAM200K", DiscountAmount = 10_000m, MinimumOrderAmount = 20_000m, MaxUses = 50, ExpiresAt = new DateTime(2027, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true }
             };
             foreach (var promo in demoPromos)
             {
-                if (!await context.PromoCodes.AnyAsync(item => item.Code == promo.Code))
+                var existingPromo = await context.PromoCodes.FirstOrDefaultAsync(item => item.Code == promo.Code);
+                if (existingPromo == null)
                     context.PromoCodes.Add(promo);
+                else
+                {
+                    existingPromo.DiscountAmount = promo.DiscountAmount;
+                    existingPromo.DiscountPercent = promo.DiscountPercent;
+                    existingPromo.MinimumOrderAmount = promo.MinimumOrderAmount;
+                    existingPromo.MaxUses = promo.MaxUses;
+                    existingPromo.ExpiresAt = promo.ExpiresAt;
+                    existingPromo.IsActive = promo.IsActive;
+                    existingPromo.IsNewCustomerOnly = promo.IsNewCustomerOnly;
+                }
             }
             await context.SaveChangesAsync();
+
+            await context.Database.ExecuteSqlRawAsync("""
+                UPDATE dbo.PromoCodes
+                SET IsActive = 0
+                WHERE Code IN (N'WELCOME50K', N'WELCOME100K', N'WELCOME200K');
+                """);
+
+            await context.Database.ExecuteSqlRawAsync("""
+                UPDATE dbo.RoomTypes
+                SET BasePrice = CASE
+                    WHEN LOWER(TypeName) LIKE '%standard%' THEN 10000
+                    WHEN LOWER(TypeName) LIKE '%deluxe%' THEN 15000
+                    ELSE 20000
+                END
+                WHERE BasePrice < 10000 OR BasePrice > 20000;
+                """);
 
             await EnsureChainAsync(context);
             await EnsureOccupancyAsync(context);

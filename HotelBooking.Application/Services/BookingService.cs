@@ -237,6 +237,7 @@ namespace HotelBooking.Application.Services
             if (breakfastNote != null)
                 guestNote = string.IsNullOrWhiteSpace(guestNote) ? breakfastNote : $"{guestNote} {breakfastNote}";
             var payNow = !string.Equals(dto.PaymentChoice, "Cash", StringComparison.OrdinalIgnoreCase);
+            var requiresPayment = payNow && amountDue > 0;
 
             if (guestName.Length < 2 || guestName.Length > 150)
                 return new BookingResult { Success = false, ErrorMessage = "Vui lòng nhập tên người nhận phòng." };
@@ -260,8 +261,8 @@ namespace HotelBooking.Application.Services
                 GuestName = guestName,
                 GuestPhone = guestPhone,
                 GuestNote = guestNote,
-                PaymentChoice = payNow ? "Now" : "Cash",
-                Status = payNow ? "Pending" : "Confirmed",
+                PaymentChoice = requiresPayment ? "Now" : payNow ? "Now" : "Cash",
+                Status = requiresPayment ? "Pending" : "Confirmed",
                 TotalPrice = roomTotal,
                 CreatedAt = DateTime.UtcNow
             };
@@ -272,7 +273,17 @@ namespace HotelBooking.Application.Services
                 PricePerNight = quote.PricePerNight
             });
 
-            if (!payNow)
+            if (requiresPayment)
+            {
+                booking.Payments.Add(new Payment
+                {
+                    Amount = amountDue,
+                    PaymentMethod = "VietQR",
+                    PaymentStatus = "Pending",
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+            else if (!payNow)
             {
                 booking.Payments.Add(new Payment
                 {
@@ -321,7 +332,7 @@ namespace HotelBooking.Application.Services
                 CheckInDate = dto.CheckInDate.ToString("yyyy-MM-dd"),
                 CheckOutDate = dto.CheckOutDate.ToString("yyyy-MM-dd")
             });
-            return new BookingResult { Success = true, BookingId = booking.BookingId, RequiresPayment = payNow };
+            return new BookingResult { Success = true, BookingId = booking.BookingId, RequiresPayment = requiresPayment };
         }
 
         private static bool NormalizeGuests(BookingCreateDto dto, out string? error)
@@ -459,6 +470,8 @@ namespace HotelBooking.Application.Services
             var successfulPayments = await _context.Payments
                 .Where(payment => payment.BookingId == bookingId && payment.PaymentStatus == "Success")
                 .ToListAsync();
+            var awaitingVietQr = await _context.Payments.AnyAsync(payment =>
+                payment.BookingId == bookingId && payment.PaymentMethod == "VietQR" && payment.PaymentStatus == "Pending");
             decimal refundAmount = 0;
             foreach (var payment in successfulPayments)
             {
@@ -481,8 +494,10 @@ namespace HotelBooking.Application.Services
             await _context.SaveChangesAsync();
 
             var message = refundAmount > 0
-                ? $"Đã hủy đơn. Yêu cầu hoàn {OccupancyPricing.Money(refundAmount)} đã được ghi nhận; thời gian xử lý dự kiến 3–5 ngày làm việc (mô phỏng)."
-                : "Đã hủy đơn. Đơn chưa có thanh toán thành công nên không phát sinh hoàn tiền.";
+                ? $"Đã hủy đơn. Yêu cầu hoàn {OccupancyPricing.Money(refundAmount)} đã được ghi nhận; nhân viên sẽ xử lý hoàn tiền sau khi đối chiếu giao dịch."
+                : awaitingVietQr
+                    ? "Đã hủy đơn. Khoản VietQR chưa được xác nhận; nếu bạn đã chuyển tiền, nhân viên sẽ đối chiếu giao dịch và ghi nhận hoàn tiền."
+                    : "Đã hủy đơn. Đơn chưa có thanh toán thành công nên không phát sinh hoàn tiền.";
             return new BookingResult { Success = true, Message = message, RefundAmount = refundAmount };
         }
     }

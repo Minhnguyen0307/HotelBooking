@@ -257,9 +257,9 @@ INSERT INTO Roles (RoleName) VALUES ('Customer'), ('Receptionist'), ('Manager'),
 GO
 
 INSERT INTO RoomTypes (TypeName, Description, BasePrice, MaxGuests) VALUES
-(N'Standard', N'Phong tieu chuan, day du tien nghi co ban', 500000, 2),
-(N'Deluxe',   N'Phong cao cap, view dep hon', 800000, 3),
-(N'Suite',    N'Phong hang sang, phong khach rieng', 1500000, 4);
+(N'Standard', N'Phong tieu chuan, day du tien nghi co ban', 10000, 2),
+(N'Deluxe',   N'Phong cao cap, view dep hon', 15000, 3),
+(N'Suite',    N'Phong hang sang, phong khach rieng', 20000, 4);
 GO
 
 INSERT INTO Amenities (Name) VALUES
