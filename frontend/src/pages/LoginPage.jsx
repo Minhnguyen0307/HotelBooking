@@ -46,7 +46,7 @@ export function LoginPage() {
           setError('');
           try {
             const account = await loginWithGoogle(response.credential);
-            navigate(fromRef.current !== '/' ? fromRef.current : account?.role === 'Receptionist' ? '/frontdesk' : '/', { replace: true });
+            navigate(fromRef.current !== '/' ? fromRef.current : account?.role === 'Admin' ? '/admin/rooms' : account?.role === 'Receptionist' ? '/frontdesk' : '/', { replace: true });
           } catch (err) {
             setError(err.message);
           }
@@ -76,7 +76,7 @@ export function LoginPage() {
     try {
       const account = await login(data.email, data.password);
       const requested = location.state?.from;
-      navigate(requested || (account?.role === 'Receptionist' ? '/frontdesk' : '/'), { replace: true });
+      navigate(requested || (account?.role === 'Admin' ? '/admin/rooms' : account?.role === 'Receptionist' ? '/frontdesk' : '/'), { replace: true });
     } catch (err) {
       setError(err.message);
     }
