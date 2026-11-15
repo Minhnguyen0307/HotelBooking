@@ -118,6 +118,8 @@ namespace HotelBooking.Application.DTOs
         public decimal Due { get; set; }
         public bool RoomPaid { get; set; }
         public string PaymentNote { get; set; } = string.Empty;
+        public string? ConfirmedByName { get; set; }
+        public DateTime? ConfirmedAt { get; set; }
         public List<FolioLineDto> Lines { get; set; } = new();
     }
 

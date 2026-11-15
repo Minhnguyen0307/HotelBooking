@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import { addDays, money, statusLabel, today, tomorrow } from '../format';
@@ -28,7 +29,7 @@ const PAYMENTS = [
 const NOTE = 'Phòng không hút thuốc, giường đôi, view hướng biển, dị ứng đồ ăn...';
 
 export function FrontDeskPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, hasRole } = useAuth();
   const [tick, setTick] = useState(0);
   const [view, setView] = useState('board');
   const [selectedId, setSelectedId] = useState(null);
@@ -56,6 +57,7 @@ export function FrontDeskPage() {
         </div>
         <div className="desk-top-user">
           <span>{user?.fullName}</span>
+          {hasRole('Manager', 'Admin') && <Link to="/reports">Về quản trị</Link>}
           <button type="button" onClick={() => { logout(); window.location.assign('/login'); }}>Đăng xuất</button>
         </div>
       </header>
@@ -278,6 +280,7 @@ function Bill({ bookingId, services, tick, onDone, onError }) {
             <p>{roomPaid ? 'Số tiền cần thanh toán thêm' : 'Số tiền khách cần thanh toán'}</p>
             <strong className="slip-amount">{money(extraDue)}</strong>
             <p className={`stamp ${settled ? 'paid' : 'unpaid'}`}>{settled ? 'ĐÃ THANH TOÁN' : 'CHƯA THANH TOÁN'}</p>
+            <p>Người xác nhận: {folio.confirmedByName || 'Chưa chốt bill'}</p>
             <button className="btn" type="button" onClick={() => setSlipOpen(false)}>Đóng phiếu</button>
           </article>
         </div>

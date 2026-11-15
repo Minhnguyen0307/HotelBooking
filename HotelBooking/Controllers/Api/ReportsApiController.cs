@@ -27,6 +27,31 @@ public class ReportsApiController : ControllerBase
         });
     }
 
+    [HttpGet("summary")]
+    public async Task<IActionResult> Summary()
+    {
+        return Ok(await _reportService.GetExecutiveSummaryAsync());
+    }
+
+    [HttpGet("revenue")]
+    public async Task<IActionResult> Revenue([FromQuery] string? period, [FromQuery] DateOnly? date)
+    {
+        return Ok(await _reportService.GetRevenuePeriodAsync(period, date));
+    }
+
+    [HttpGet("bills")]
+    public async Task<IActionResult> Bills()
+    {
+        return Ok(await _reportService.GetConfirmedBillsAsync());
+    }
+
+    [HttpGet("charts")]
+    public async Task<IActionResult> GetCharts()
+    {
+        var data = await _reportService.GetChartDataAsync();
+        return Ok(data);
+    }
+
     [HttpGet("revenue.csv")]
     public async Task<IActionResult> RevenueCsv()
     {

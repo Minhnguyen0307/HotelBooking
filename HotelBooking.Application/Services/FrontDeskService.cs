@@ -8,6 +8,7 @@ namespace HotelBooking.Application.Services
     public class FrontDeskService : IFrontDeskService
     {
         private readonly HotelBookingDbContext _context;
+
         public FrontDeskService(HotelBookingDbContext context)
         {
             _context = context;
@@ -61,13 +62,11 @@ namespace HotelBooking.Application.Services
                 .ToListAsync();
         }
 
-        // Hàm mới: lấy TẤT CẢ booking đang "CheckedIn" (kể cả quá hạn từ trước),
-        // để nhân viên có thể trả phòng bất cứ lúc nào, không giới hạn chỉ hôm nay
         public async Task<List<BookingListItemDto>> GetAllCheckedInAsync()
         {
             return await _context.Bookings
                 .Where(b => b.Status == "CheckedIn")
-                .OrderBy(b => b.CheckOutDate) // quá hạn lâu nhất hiện lên đầu
+                .OrderBy(b => b.CheckOutDate)
                 .Select(b => new BookingListItemDto
                 {
                     BookingId = b.BookingId,
@@ -164,14 +163,12 @@ namespace HotelBooking.Application.Services
             booking.Status = "Cancelled";
             booking.CancelledAt = DateTime.UtcNow;
 
-            // Set room status back to Available
             foreach (var br in booking.BookingRooms)
             {
                 var room = await _context.Rooms.FindAsync(br.RoomId);
                 if (room != null) room.Status = "Available";
             }
 
-            // Check if booking is paid and initiate a refund
             var payment = await _context.Payments
                 .FirstOrDefaultAsync(p => p.BookingId == bookingId && p.PaymentStatus == "Success");
             if (payment != null)

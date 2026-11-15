@@ -145,7 +145,7 @@ export function BookingsPage() {
     <AsyncView state={state}>
       {(bookings) => (
         <>
-          <h1>Đơn của tôi</h1>
+          <h1>Lịch sử đặt phòng</h1>
           {error && <div className="banner">{error}</div>}
           {notice && <div className="banner ok" role="status">{notice}</div>}
           <BookingTable

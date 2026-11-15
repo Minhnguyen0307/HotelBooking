@@ -11,6 +11,9 @@ namespace HotelBooking.Application.DTOs
         public string GuestName { get; set; } = string.Empty;
         public string GuestPhone { get; set; } = string.Empty;
         public string? GuestNote { get; set; }
+        public bool Spa { get; set; }
+        public bool Breakfast { get; set; }
+        public bool ExtraBed { get; set; }
         public string PaymentChoice { get; set; } = "Now";
         public string? PromoCode { get; set; }
         public List<BookingAddOnSelectionDto> AddOns { get; set; } = new();
@@ -43,6 +46,13 @@ namespace HotelBooking.Application.DTOs
         public bool IsNewCustomerOnly { get; set; }
     }
 
+    public class BookingServiceLineDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public string? Note { get; set; }
+    }
+
     public class BookingConfirmDto
     {
         public int RoomId { get; set; }
@@ -66,6 +76,11 @@ namespace HotelBooking.Application.DTOs
         public decimal DiscountTotal { get; set; }
         public string? PromoCode { get; set; }
         public List<BookingAddOnLineDto> AddOns { get; set; } = new();
+        public decimal Discount { get; set; }
+        public decimal ServicesTotal { get; set; }
+        public List<BookingServiceLineDto> Services { get; set; } = new();
+        public string? BreakfastNote { get; set; }
+        public decimal Payable { get; set; }
         public string Summary { get; set; } = string.Empty;
     }
 

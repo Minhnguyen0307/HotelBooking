@@ -3,6 +3,8 @@ using HotelBooking.Application.Interfaces;
 using HotelBooking.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using HotelBooking.Application.Settings;
 using HotelBooking.Application.Hubs;
 namespace HotelBooking.Application.Services
 
@@ -11,10 +13,12 @@ namespace HotelBooking.Application.Services
     {
         private readonly HotelBookingDbContext _context;
         private readonly IHubContext<RoomHub> _hubContext;
-        public BookingService(HotelBookingDbContext context , IHubContext<RoomHub> hubContext)
+        private readonly HotelPolicies _policy;
+        public BookingService(HotelBookingDbContext context, IHubContext<RoomHub> hubContext, IOptions<HotelPolicies> policyOptions)
         {
             _context = context;
             _hubContext = hubContext;
+            _policy = policyOptions.Value;
         }
         private async Task<bool> IsRoomAvailableAsync(int roomId, DateOnly checkIn, DateOnly checkOut)
         {
@@ -82,21 +86,42 @@ namespace HotelBooking.Application.Services
             var addOnQuote = BookingAddOnPricing.Quote(dto.AddOns, nights, dto.NumberOfGuests);
             if (addOnQuote.Error != null) return FailPreview(addOnQuote.Error);
 
-            var subtotal = quote.TotalPrice + addOnQuote.Lines.Sum(line => line.TotalPrice);
+            var dateMarkup = CalculateDynamicDateMarkup(dto.CheckInDate, dto.CheckOutDate, room.RoomType.BasePrice, out var markupSummary);
+            var subtotal = quote.TotalPrice + dateMarkup + addOnQuote.Lines.Sum(line => line.TotalPrice);
             var promo = await GetDiscountAsync(customerId, dto.PromoCode, subtotal);
             if (promo.Error != null) return FailPreview(promo.Error);
 
             return new BookingPreviewResult
             {
                 Success = true,
-                Preview = ToConfirm(room, dto, nights, quote, addOnQuote.Lines, promo.Amount, subtotal - promo.Amount)
+                Preview = ToConfirm(room, dto, nights, quote, addOnQuote.Lines, promo.Amount, subtotal - promo.Amount, dateMarkup, markupSummary)
             };
         }
 
         private static BookingPreviewResult FailPreview(string message) =>
             new() { Success = false, ErrorMessage = message };
 
-        private static BookingConfirmDto ToConfirm(Room room, BookingCreateDto dto, int nights, OccupancyPricing.Quote quote, List<BookingAddOnPricing.Line> addOns, decimal discount, decimal total) =>
+        private decimal CalculateDynamicDateMarkup(DateOnly checkIn, DateOnly checkOut, decimal basePrice, out string breakdown)
+        {
+            decimal markupTotal = 0;
+            var holidays = new HashSet<string>(_policy.Holidays ?? new List<string>(), StringComparer.OrdinalIgnoreCase);
+            var details = new List<string>();
+            for (var date = checkIn; date < checkOut; date = date.AddDays(1))
+            {
+                var holidayKey = date.ToString("dd-MM");
+                double percent = holidays.Contains(holidayKey)
+                    ? _policy.HolidayMarkupPercent
+                    : date.DayOfWeek is DayOfWeek.Friday or DayOfWeek.Saturday ? _policy.WeekendMarkupPercent : 0;
+                if (percent <= 0) continue;
+                var amount = Math.Round(basePrice * (decimal)(percent / 100.0), 0);
+                markupTotal += amount;
+                details.Add($"{date:dd/MM} +{percent}% (+{OccupancyPricing.Money(amount)})");
+            }
+            breakdown = string.Join("; ", details);
+            return markupTotal;
+        }
+
+        private static BookingConfirmDto ToConfirm(Room room, BookingCreateDto dto, int nights, OccupancyPricing.Quote quote, List<BookingAddOnPricing.Line> addOns, decimal discount, decimal total, decimal dateMarkup, string markupSummary) =>
             new()
             {
                 RoomId = room.RoomId,
@@ -115,7 +140,7 @@ namespace HotelBooking.Application.Services
                 ExtraGuests = quote.ExtraGuests,
                 ExtraGuestFee = quote.Plan.ExtraGuestFeePerNight,
                 RoomCharge = quote.RoomCharge,
-                Surcharge = quote.Surcharge,
+                Surcharge = quote.Surcharge + dateMarkup,
                 AddOnsTotal = addOns.Sum(line => line.TotalPrice),
                 DiscountTotal = discount,
                 PromoCode = discount > 0 ? dto.PromoCode?.Trim().ToUpperInvariant() : null,
@@ -128,7 +153,9 @@ namespace HotelBooking.Application.Services
                     TotalPrice = line.TotalPrice,
                     UnitLabel = line.UnitLabel
                 }).ToList(),
-                Summary = quote.Summary
+                Summary = string.IsNullOrWhiteSpace(markupSummary)
+                    ? quote.Summary
+                    : $"{quote.Summary} · Phụ thu ngày lễ/cuối tuần: +{OccupancyPricing.Money(dateMarkup)} ({markupSummary})"
             };
 
         public async Task<BookingResult> CreateBookingAsync(int customerId, BookingCreateDto dto)
@@ -162,7 +189,9 @@ namespace HotelBooking.Application.Services
             if (addOnQuote.Error != null)
                 return new BookingResult { Success = false, ErrorMessage = addOnQuote.Error };
 
-            var subtotal = quote.TotalPrice + addOnQuote.Lines.Sum(line => line.TotalPrice);
+            var dateMarkup = CalculateDynamicDateMarkup(dto.CheckInDate, dto.CheckOutDate, room.RoomType.BasePrice, out _);
+            var roomTotal = quote.TotalPrice + dateMarkup;
+            var subtotal = roomTotal + addOnQuote.Lines.Sum(line => line.TotalPrice);
             var promo = await GetDiscountAsync(customerId, dto.PromoCode, subtotal);
             if (promo.Error != null)
                 return new BookingResult { Success = false, ErrorMessage = promo.Error };
@@ -197,7 +226,7 @@ namespace HotelBooking.Application.Services
                 GuestNote = guestNote,
                 PaymentChoice = payNow ? "Now" : "Cash",
                 Status = payNow ? "Pending" : "Confirmed",
-                TotalPrice = quote.TotalPrice,
+                TotalPrice = roomTotal,
                 CreatedAt = DateTime.UtcNow
             };
 

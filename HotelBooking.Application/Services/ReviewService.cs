@@ -188,5 +188,17 @@ namespace HotelBooking.Application.Services
                 ImageUrls = r.ReviewImages.Select(img => img.ImageUrl).ToList()
             }).ToList();
         }
+
+        public async Task<(bool Success, string? Error)> DeleteReviewAsync(int reviewId)
+        {
+            var review = await _context.Reviews
+                .Include(r => r.ReviewImages)
+                .FirstOrDefaultAsync(r => r.ReviewId == reviewId);
+            if (review == null) return (false, "Không tìm thấy bài đánh giá.");
+
+            _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+            return (true, null);
+        }
     }
 }

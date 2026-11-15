@@ -48,7 +48,10 @@ export function RoomTypesPage() {
     <AsyncView state={state}>
       {(types) => (
         <>
-          <h1>Loại phòng</h1>
+          <header className="page-head">
+            <p className="eyebrow">Quản trị</p>
+            <h1>Loại phòng</h1>
+          </header>
           {error && <div className="banner">{error}</div>}
           <form className="panel form-grid" onSubmit={onSubmit}>
             <label>Tên<input name="typeName" required /></label>

@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [error, setError] = useState('');
 
   async function onSubmit(event) {
@@ -12,7 +13,7 @@ export function RegisterPage() {
     setError('');
     try {
       const result = await api('/api/auth/register', { method: 'POST', body: data });
-      navigate('/login', { state: { message: result.message, kind: 'ok' } });
+      navigate('/login', { state: { message: result.message, kind: 'ok', from: location.state?.from } });
     } catch (err) {
       setError(err.message);
     }
