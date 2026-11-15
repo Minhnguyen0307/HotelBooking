@@ -21,9 +21,9 @@ public class BookingsApiController : ControllerBase
     public async Task<IActionResult> Preview([FromQuery] BookingCreateDto dto)
     {
         var preview = await _bookingService.GetBookingPreviewAsync(dto);
-        if (preview == null)
-            return NotFound(new { message = "Không tạo được xem trước đơn đặt phòng." });
-        return Ok(preview);
+        if (!preview.Success || preview.Preview == null)
+            return BadRequest(new { message = preview.ErrorMessage ?? "Không tạo được xem trước đơn đặt phòng." });
+        return Ok(preview.Preview);
     }
 
     [HttpPost]
@@ -35,8 +35,11 @@ public class BookingsApiController : ControllerBase
 
         return Ok(new
         {
-            message = "Đơn đặt phòng đã được tạo. Vui lòng thanh toán.",
-            bookingId = result.BookingId
+            message = result.RequiresPayment
+                ? "Đơn đã được giữ. Mời bạn thanh toán ngay."
+                : "Đã giữ phòng. Quý khách thanh toán tiền mặt khi nhận phòng.",
+            bookingId = result.BookingId,
+            requiresPayment = result.RequiresPayment
         });
     }
 

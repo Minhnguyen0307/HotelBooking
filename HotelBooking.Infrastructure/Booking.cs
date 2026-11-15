@@ -15,6 +15,14 @@ public partial class Booking
 
     public int NumberOfGuests { get; set; }
 
+    public string? GuestName { get; set; }
+
+    public string? GuestPhone { get; set; }
+
+    public string? GuestNote { get; set; }
+
+    public string PaymentChoice { get; set; } = "Now";
+
     public string Status { get; set; } = null!;
 
     public decimal TotalPrice { get; set; }

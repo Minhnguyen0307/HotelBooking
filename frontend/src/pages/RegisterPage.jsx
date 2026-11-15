@@ -20,7 +20,9 @@ export function RegisterPage() {
 
   return (
     <form className="panel stack account-card" onSubmit={onSubmit}>
-      <h1>Đăng ký</h1>
+      <p className="eyebrow">HBS</p>
+      <h1>Mời bạn gia nhập</h1>
+      <p className="lede">Tạo tài khoản để giữ phòng cho chuyến đi.</p>
       {error && <div className="banner">{error}</div>}
       <label>Họ tên<input name="fullName" required /></label>
       <label>Email<input name="email" type="email" required /></label>

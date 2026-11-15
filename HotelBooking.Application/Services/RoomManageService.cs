@@ -18,14 +18,17 @@ namespace HotelBooking.Application.Services
         {
             return await _context.Rooms
                 .Include(r => r.RoomType)
-                .OrderBy(r => r.RoomNumber)
+                .Include(r => r.Property)
+                .OrderBy(r => r.Property.Name)
+                .ThenBy(r => r.RoomNumber)
                 .Select(r => new RoomManageListItemDto
                 {
                     RoomId = r.RoomId,
                     RoomNumber = r.RoomNumber,
                     TypeName = r.RoomType.TypeName,
                     Status = r.Status,
-                    Floor = r.Floor
+                    Floor = r.Floor,
+                    PropertyName = r.Property.Name
                 })
                 .ToListAsync();
         }
@@ -43,7 +46,8 @@ namespace HotelBooking.Application.Services
                 Floor = room.Floor,
                 Status = room.Status,
                 Description = room.Description,
-                Address = room.Address
+                Address = room.Address,
+                PropertyId = room.PropertyId
             };
         }
 
@@ -52,7 +56,11 @@ namespace HotelBooking.Application.Services
             bool duplicate = await _context.Rooms
                 .AnyAsync(r => r.RoomNumber == dto.RoomNumber && r.RoomId != dto.RoomId);
             if (duplicate)
-                return (false, "Số phòng này đã tồn tại.");
+                return (false, "Số phòng này đã thuộc một cơ sở khác trong chuỗi.");
+
+            var property = await _context.Properties.FirstOrDefaultAsync(p => p.PropertyId == dto.PropertyId);
+            if (property == null)
+                return (false, "Hãy chọn cơ sở cho phòng.");
 
             Room room;
 
@@ -68,7 +76,8 @@ namespace HotelBooking.Application.Services
                 existingRoom.Floor = dto.Floor;
                 existingRoom.Status = dto.Status;
                 existingRoom.Description = dto.Description;
-                existingRoom.Address = dto.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng";
+                existingRoom.PropertyId = property.PropertyId;
+                existingRoom.Address = property.Address;
                 existingRoom.UpdatedAt = DateTime.UtcNow;
 
                 room = existingRoom;
@@ -88,7 +97,8 @@ namespace HotelBooking.Application.Services
                     Floor = dto.Floor,
                     Status = dto.Status,
                     Description = dto.Description,
-                    Address = dto.Address ?? "123 Võ Nguyên Giáp, phường Sơn Trà, TP Đà Nẵng",
+                    PropertyId = property.PropertyId,
+                    Address = property.Address,
                     CreatedAt = DateTime.UtcNow
                 };
 

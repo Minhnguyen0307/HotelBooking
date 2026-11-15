@@ -44,12 +44,20 @@ export function RoomPage() {
           roomId: Number(id),
           checkInDate: data.checkInDate,
           checkOutDate: data.checkOutDate,
-          numberOfGuests: totalGuests,
+          numberOfGuests: totalGuests || Number(data.numberOfGuests || 1),
           adults,
-          children
+          children,
+          guestName: data.guestName,
+          guestPhone: data.guestPhone,
+          guestNote: data.guestNote,
+          paymentChoice: data.paymentChoice
         }
       });
-      navigate(`/pay/${result.bookingId}`, { state: { message: result.message, kind: 'ok' } });
+      if (result.requiresPayment) {
+        navigate(`/pay/${result.bookingId}`, { state: { message: result.message, kind: 'ok' } });
+      } else {
+        navigate('/bookings', { state: { message: result.message, kind: 'ok' } });
+      }
     } catch (err) {
       if (err.status === 401) navigate('/login', { state: { from: `/rooms/${id}` } });
       else setError(err.message);
@@ -95,16 +103,17 @@ export function RoomPage() {
               <article className="card">
                 <Photo url={(room.imageUrls || [])[0]} />
                 <div className="pad">
-                  <p className="pill">{room.typeName}</p>
+                  <p className="pill">{room.propertyName} · {room.area}</p>
                   <h1>Phòng {room.roomNumber}</h1>
                   <p>{room.description}</p>
-                  <p className="muted">{room.address} · Tối đa {room.maxGuests} khách</p>
+                  <p className="muted">{room.address} · {room.typeName}</p>
                   <p>{(room.amenities || []).map((item) => <span className="pill" key={item}>{item}</span>)}</p>
                   <p className="price">{money(room.basePrice)} / đêm</p>
+                  <p className="fare">{room.occupancyRule}</p>
                 </div>
               </article>
               <form className="panel stack" onSubmit={onBook}>
-                <h2>Đặt phòng</h2>
+                <h2>Mời bạn lưu trú</h2>
                 <StayDates checkIn={saved.checkInDate || today()} checkOut={saved.checkOutDate || tomorrow()} />
                 <div className="form-grid">
                   <label>
@@ -116,11 +125,19 @@ export function RoomPage() {
                     <input name="children" type="number" min="0" defaultValue={saved.children || 0} onChange={() => setPreview(null)} required />
                   </label>
                 </div>
+                <label>Người nhận phòng<input name="guestName" defaultValue={user?.fullName || ''} required /></label>
+                <label>Số điện thoại<input name="guestPhone" inputMode="tel" pattern="0[0-9]{9}" defaultValue={user?.phoneNumber || ''} required /></label>
+                <label>Lời nhắn<textarea name="guestNote" maxLength="500" placeholder="Giờ đến, yêu cầu phòng..."></textarea></label>
+                <fieldset className="pay-choice">
+                  <legend>Thanh toán</legend>
+                  <label className="choice"><input type="radio" name="paymentChoice" value="Now" defaultChecked /> Thanh toán ngay</label>
+                  <label className="choice"><input type="radio" name="paymentChoice" value="Cash" /> Tiền mặt khi nhận phòng</label>
+                </fieldset>
                 {preview ? (
                   <div className="panel stack" style={{ background: 'var(--paper)', fontSize: '0.9rem', padding: '0.8rem' }}>
                     <div className="spread">
                       <span>Thời gian:</span>
-                      <strong>{preview.nights} đêm</strong>
+                      <strong>{preview.nights} đêm · {preview.numberOfGuests} khách</strong>
                     </div>
                     <div className="spread">
                       <span>Giá gốc/đêm:</span>
@@ -143,6 +160,7 @@ export function RoomPage() {
                       <strong>Tổng tiền:</strong>
                       <span className="price">{money(preview.totalPrice)}</span>
                     </div>
+                    {preview.summary && <small className="muted">{preview.summary}</small>}
                     {preview.priceBreakdown && <small className="muted">{preview.priceBreakdown}</small>}
                   </div>
                 ) : (

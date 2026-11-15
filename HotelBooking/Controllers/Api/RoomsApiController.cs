@@ -30,12 +30,31 @@ public class RoomsApiController : ControllerBase
     [HttpGet("featured")]
     public async Task<IActionResult> Featured()
     {
-        var rooms = await _roomService.SearchAvailableRoomsAsync(new RoomSearchDto
+        return Ok(await _roomService.GetShowcaseRoomsAsync());
+    }
+
+    [HttpGet("catalog")]
+    public async Task<IActionResult> Catalog([FromQuery] RoomSearchDto criteria)
+    {
+        if (criteria.CheckInDate == default)
+            criteria.CheckInDate = DateOnly.FromDateTime(DateTime.Today);
+        if (criteria.CheckOutDate == default)
+            criteria.CheckOutDate = criteria.CheckInDate.AddDays(1);
+
+        try
         {
-            CheckInDate = DateOnly.FromDateTime(DateTime.Today),
-            CheckOutDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1))
-        });
-        return Ok(rooms.Take(6));
+            return Ok(await _roomService.GetPropertyRoomsAsync(criteria));
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpGet("properties")]
+    public async Task<IActionResult> Properties()
+    {
+        return Ok(await _roomService.GetPropertiesAsync());
     }
 
     [HttpGet("search")]

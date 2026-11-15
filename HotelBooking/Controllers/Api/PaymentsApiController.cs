@@ -1,4 +1,5 @@
 using HotelBooking.Application.Interfaces;
+using HotelBooking.Application.Services;
 using HotelBooking.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -84,23 +85,41 @@ public class PaymentsApiController : ControllerBase
         return await _context.Bookings
             .Include(b => b.BookingRooms)
             .ThenInclude(br => br.Room)
+            .ThenInclude(r => r.RoomType)
             .FirstOrDefaultAsync(b => b.BookingId == bookingId && b.CustomerId == ApiUser.Id(User));
     }
 
-    private static object ToBooking(Booking booking) => new
+    private static object ToBooking(Booking booking)
     {
-        booking.BookingId,
-        booking.Status,
-        booking.TotalPrice,
-        booking.CheckInDate,
-        booking.CheckOutDate,
-        booking.NumberOfGuests,
-        rooms = booking.BookingRooms.Select(br => new
+        var room = booking.BookingRooms.Select(br => br.Room).FirstOrDefault();
+        var nights = Math.Max(0, booking.CheckOutDate.DayNumber - booking.CheckInDate.DayNumber);
+        var quote = room?.RoomType == null
+            ? null
+            : OccupancyPricing.Price(room.RoomType.TypeName, room.RoomType.MaxGuests, room.RoomType.BasePrice, booking.NumberOfGuests, nights);
+
+        return new
         {
-            br.Room.RoomNumber,
-            br.PricePerNight
-        })
-    };
+            booking.BookingId,
+            booking.Status,
+            booking.TotalPrice,
+            booking.CheckInDate,
+            booking.CheckOutDate,
+            booking.NumberOfGuests,
+            booking.GuestName,
+            booking.GuestPhone,
+            booking.GuestNote,
+            booking.PaymentChoice,
+            stayLabel = quote?.Plan.Label,
+            roomCharge = quote?.RoomCharge,
+            surcharge = quote?.Surcharge,
+            summary = quote?.Summary,
+            rooms = booking.BookingRooms.Select(br => new
+            {
+                br.Room.RoomNumber,
+                br.PricePerNight
+            })
+        };
+    }
 
     public class ProcessPaymentRequest
     {

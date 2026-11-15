@@ -52,5 +52,6 @@ export function searchParams(data) {
   });
   if (data.guests) params.set('guests', data.guests);
   if (data.roomTypeId) params.set('roomTypeId', data.roomTypeId);
+  if (data.propertyId) params.set('propertyId', data.propertyId);
   return params;
 }
