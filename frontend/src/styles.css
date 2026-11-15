@@ -440,6 +440,87 @@ th { color: var(--muted); font-weight: 600; font-size: 0.84rem; }
 .slip .stamp.paid { color: #1f6b45; border-color: #1f6b45; }
 .slip .stamp.unpaid { color: #9d3b32; border-color: #9d3b32; }
 .bill .btn.secondary { color: #1f4d45; }
+.report-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1.25rem 0 1.5rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.75rem;
+}
+.report-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.45rem 1.1rem;
+  color: var(--muted);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.report-tab:hover {
+  color: var(--sea-dark);
+  background: #efe6d8;
+}
+.report-tab.active {
+  background: var(--sea);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(31, 77, 69, 0.2);
+}
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 1.15rem 1.25rem;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 0.3rem;
+  transition: transform 0.2s ease;
+}
+.kpi-card:hover { transform: translateY(-2px); }
+.kpi-card span {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+.kpi-card strong {
+  font-family: Fraunces, serif;
+  font-size: 1.85rem;
+  color: var(--sea);
+  line-height: 1.15;
+}
+.kpi-card small {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.15rem;
+}
+.filter-panel {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.2rem;
+}
+.filter-panel .form-grid {
+  align-items: flex-end;
+}
+table tfoot tr td {
+  font-weight: 700;
+  border-top: 2px solid var(--line);
+  background: #fdfaf5;
+  color: var(--ink);
+}
+.total-highlight {
+  color: var(--sea);
+  font-weight: 700;
+}
+
 @media (max-width: 980px) {
   .desk-app { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; }
   .desk-nav { grid-auto-flow: column; overflow: auto; }

@@ -58,4 +58,36 @@
         public decimal TotalAmount { get; set; }
         public int Count { get; set; }
     }
+
+    public class PropertyRevenueSummaryDto
+    {
+        public int PropertyId { get; set; }
+        public string PropertyName { get; set; } = string.Empty;
+        public string Area { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        public int TotalRooms { get; set; }
+        public decimal TotalRevenue { get; set; }
+        public int TotalBookingsPaid { get; set; }
+        public int TotalNightsBooked { get; set; }
+        public decimal AverageRevenuePerBooking => TotalBookingsPaid > 0 ? Math.Round(TotalRevenue / TotalBookingsPaid, 0) : 0;
+    }
+
+    public class PropertyMonthlyRevenueDto
+    {
+        public int PropertyId { get; set; }
+        public string PropertyName { get; set; } = string.Empty;
+        public string Area { get; set; } = string.Empty;
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public decimal TotalRevenue { get; set; }
+        public int TotalBookingsPaid { get; set; }
+        public int TotalNightsBooked { get; set; }
+    }
+
+    public class PropertyOptionDto
+    {
+        public int PropertyId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Area { get; set; } = string.Empty;
+    }
 }

@@ -18,12 +18,15 @@ public class ReportsApiController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] int? propertyId, [FromQuery] int? year, [FromQuery] int? month)
     {
         return Ok(new
         {
             revenue = await _reportService.GetMonthlyRevenueAsync(),
-            occupancy = await _reportService.GetRoomOccupancyAsync()
+            occupancy = await _reportService.GetRoomOccupancyAsync(),
+            propertyRevenue = await _reportService.GetPropertyRevenueSummaryAsync(propertyId, year, month),
+            propertyMonthlyRevenue = await _reportService.GetPropertyMonthlyRevenueAsync(propertyId, year),
+            properties = await _reportService.GetPropertiesListAsync()
         });
     }
 
@@ -60,6 +63,33 @@ public class ReportsApiController : ControllerBase
         foreach (var item in data)
             csv.AppendLine($"{item.RoomNumber},{item.TotalBookings},{item.TotalNightsBooked}");
         return Csv(csv.ToString(), "BaoCaoTanSuatPhong.csv");
+    }
+
+    [HttpGet("property-revenue.csv")]
+    public async Task<IActionResult> PropertyRevenueCsv([FromQuery] int? propertyId, [FromQuery] int? year, [FromQuery] int? month)
+    {
+        var data = await _reportService.GetPropertyRevenueSummaryAsync(propertyId, year, month);
+        var csv = new StringBuilder();
+        csv.AppendLine("Mã Cơ Sở,Tên Cơ Sở,Khu Vực,Địa Chỉ,Số Phòng,Tổng Doanh Thu (VNĐ),Số Lượt Đặt Đã Thanh Toán,Tổng Số Đêm Thuê,Doanh Thu TB Mỗi Đơn (VNĐ)");
+        foreach (var item in data)
+        {
+            var cleanAddress = (item.Address ?? string.Empty).Replace("\"", "\"\"");
+            csv.AppendLine($"{item.PropertyId},\"{item.PropertyName}\",\"{item.Area}\",\"{cleanAddress}\",{item.TotalRooms},{item.TotalRevenue},{item.TotalBookingsPaid},{item.TotalNightsBooked},{item.AverageRevenuePerBooking}");
+        }
+        return Csv(csv.ToString(), "BaoCaoDoanhThuTheoCoSo.csv");
+    }
+
+    [HttpGet("property-monthly.csv")]
+    public async Task<IActionResult> PropertyMonthlyCsv([FromQuery] int? propertyId, [FromQuery] int? year)
+    {
+        var data = await _reportService.GetPropertyMonthlyRevenueAsync(propertyId, year);
+        var csv = new StringBuilder();
+        csv.AppendLine("Năm,Tháng,Mã Cơ Sở,Tên Cơ Sở,Khu Vực,Tổng Doanh Thu (VNĐ),Số Lượt Đặt Đã Thanh Toán,Tổng Số Đêm Thuê");
+        foreach (var item in data)
+        {
+            csv.AppendLine($"{item.Year},{item.Month},{item.PropertyId},\"{item.PropertyName}\",\"{item.Area}\",{item.TotalRevenue},{item.TotalBookingsPaid},{item.TotalNightsBooked}");
+        }
+        return Csv(csv.ToString(), "BaoCaoDoanhThuCoSoTheoThang.csv");
     }
 
     private FileContentResult Csv(string content, string fileName)

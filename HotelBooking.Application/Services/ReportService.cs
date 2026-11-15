@@ -148,5 +148,158 @@ namespace HotelBooking.Application.Services
                 PaymentMethodStats = paymentMethods
             };
         }
+
+        public async Task<List<PropertyRevenueSummaryDto>> GetPropertyRevenueSummaryAsync(int? propertyId = null, int? year = null, int? month = null)
+        {
+            var propertiesQuery = _context.Properties
+                .Include(p => p.Rooms)
+                .AsQueryable();
+
+            if (propertyId.HasValue && propertyId.Value > 0)
+            {
+                propertiesQuery = propertiesQuery.Where(p => p.PropertyId == propertyId.Value);
+            }
+
+            var properties = await propertiesQuery
+                .OrderBy(p => p.PropertyId)
+                .ToListAsync();
+
+            var paymentsQuery = _context.Payments
+                .Where(p => p.PaymentStatus == "Success" && p.PaymentDate.HasValue);
+
+            if (year.HasValue && year.Value > 0)
+            {
+                paymentsQuery = paymentsQuery.Where(p => p.PaymentDate!.Value.Year == year.Value);
+            }
+
+            if (month.HasValue && month.Value > 0)
+            {
+                paymentsQuery = paymentsQuery.Where(p => p.PaymentDate!.Value.Month == month.Value);
+            }
+
+            var paymentData = await paymentsQuery
+                .Select(p => new
+                {
+                    p.Amount,
+                    p.BookingId,
+                    CheckIn = p.Booking.CheckInDate,
+                    CheckOut = p.Booking.CheckOutDate,
+                    PropertyIds = p.Booking.BookingRooms.Select(br => br.Room.PropertyId).Distinct().ToList()
+                })
+                .ToListAsync();
+
+            var result = new List<PropertyRevenueSummaryDto>();
+
+            foreach (var prop in properties)
+            {
+                var propPayments = paymentData
+                    .Where(p => p.PropertyIds.Contains(prop.PropertyId))
+                    .ToList();
+
+                var totalRev = propPayments.Sum(p => p.Amount);
+                var totalBookings = propPayments.Select(p => p.BookingId).Distinct().Count();
+
+                var distinctBookings = propPayments
+                    .GroupBy(p => p.BookingId)
+                    .Select(g => g.First())
+                    .ToList();
+
+                var totalNights = distinctBookings.Sum(b => Math.Max(1, b.CheckOut.DayNumber - b.CheckIn.DayNumber));
+
+                result.Add(new PropertyRevenueSummaryDto
+                {
+                    PropertyId = prop.PropertyId,
+                    PropertyName = prop.Name,
+                    Area = prop.Area,
+                    Address = prop.Address,
+                    TotalRooms = prop.Rooms.Count,
+                    TotalRevenue = totalRev,
+                    TotalBookingsPaid = totalBookings,
+                    TotalNightsBooked = totalNights
+                });
+            }
+
+            return result.OrderByDescending(r => r.TotalRevenue).ThenBy(r => r.PropertyName).ToList();
+        }
+
+        public async Task<List<PropertyMonthlyRevenueDto>> GetPropertyMonthlyRevenueAsync(int? propertyId = null, int? year = null)
+        {
+            var paymentsQuery = _context.Payments
+                .Where(p => p.PaymentStatus == "Success" && p.PaymentDate.HasValue);
+
+            if (year.HasValue && year.Value > 0)
+            {
+                paymentsQuery = paymentsQuery.Where(p => p.PaymentDate!.Value.Year == year.Value);
+            }
+
+            var paymentData = await paymentsQuery
+                .Select(p => new
+                {
+                    p.Amount,
+                    PaymentDate = p.PaymentDate!.Value,
+                    p.BookingId,
+                    CheckIn = p.Booking.CheckInDate,
+                    CheckOut = p.Booking.CheckOutDate,
+                    Rooms = p.Booking.BookingRooms.Select(br => new
+                    {
+                        br.Room.PropertyId,
+                        PropertyName = br.Room.Property.Name,
+                        Area = br.Room.Property.Area
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            var flatList = paymentData
+                .SelectMany(p => p.Rooms.Select(r => new
+                {
+                    r.PropertyId,
+                    r.PropertyName,
+                    r.Area,
+                    Year = p.PaymentDate.Year,
+                    Month = p.PaymentDate.Month,
+                    p.Amount,
+                    p.BookingId,
+                    Nights = Math.Max(1, p.CheckOut.DayNumber - p.CheckIn.DayNumber)
+                }))
+                .ToList();
+
+            if (propertyId.HasValue && propertyId.Value > 0)
+            {
+                flatList = flatList.Where(x => x.PropertyId == propertyId.Value).ToList();
+            }
+
+            var grouped = flatList
+                .GroupBy(x => new { x.PropertyId, x.PropertyName, x.Area, x.Year, x.Month })
+                .Select(g => new PropertyMonthlyRevenueDto
+                {
+                    PropertyId = g.Key.PropertyId,
+                    PropertyName = g.Key.PropertyName,
+                    Area = g.Key.Area,
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    TotalRevenue = g.Sum(x => x.Amount),
+                    TotalBookingsPaid = g.Select(x => x.BookingId).Distinct().Count(),
+                    TotalNightsBooked = g.GroupBy(x => x.BookingId).Sum(bg => bg.First().Nights)
+                })
+                .OrderByDescending(x => x.Year)
+                .ThenByDescending(x => x.Month)
+                .ThenBy(x => x.PropertyName)
+                .ToList();
+
+            return grouped;
+        }
+
+        public async Task<List<PropertyOptionDto>> GetPropertiesListAsync()
+        {
+            return await _context.Properties
+                .OrderBy(p => p.Name)
+                .Select(p => new PropertyOptionDto
+                {
+                    PropertyId = p.PropertyId,
+                    Name = p.Name,
+                    Area = p.Area
+                })
+                .ToListAsync();
+        }
     }
 }
