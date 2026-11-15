@@ -68,6 +68,7 @@ namespace HotelBooking.Application.Services
 
             var room = await _context.Rooms
                 .Include(r => r.RoomType)
+                .Include(r => r.Amenities)
                 .FirstOrDefaultAsync(r => r.RoomId == dto.RoomId);
 
             if (room == null)
@@ -85,16 +86,18 @@ namespace HotelBooking.Application.Services
 
             var addOnQuote = BookingAddOnPricing.Quote(dto.AddOns, nights, dto.NumberOfGuests);
             if (addOnQuote.Error != null) return FailPreview(addOnQuote.Error);
+            var serviceLines = await QuoteHotelServicesAsync(room, dto, nights);
 
             var dateMarkup = CalculateDynamicDateMarkup(dto.CheckInDate, dto.CheckOutDate, room.RoomType.BasePrice, out var markupSummary);
-            var subtotal = quote.TotalPrice + dateMarkup + addOnQuote.Lines.Sum(line => line.TotalPrice);
+            var servicesTotal = serviceLines.Sum(line => line.Amount);
+            var subtotal = quote.TotalPrice + dateMarkup + addOnQuote.Lines.Sum(line => line.TotalPrice) + servicesTotal;
             var promo = await GetDiscountAsync(customerId, dto.PromoCode, subtotal);
             if (promo.Error != null) return FailPreview(promo.Error);
 
             return new BookingPreviewResult
             {
                 Success = true,
-                Preview = ToConfirm(room, dto, nights, quote, addOnQuote.Lines, promo.Amount, subtotal - promo.Amount, dateMarkup, markupSummary)
+                Preview = ToConfirm(room, dto, nights, quote, addOnQuote.Lines, serviceLines, promo.Amount, subtotal - promo.Amount, dateMarkup, markupSummary)
             };
         }
 
@@ -121,7 +124,29 @@ namespace HotelBooking.Application.Services
             return markupTotal;
         }
 
-        private static BookingConfirmDto ToConfirm(Room room, BookingCreateDto dto, int nights, OccupancyPricing.Quote quote, List<BookingAddOnPricing.Line> addOns, decimal discount, decimal total, decimal dateMarkup, string markupSummary) =>
+        private async Task<List<BookingServiceLineDto>> QuoteHotelServicesAsync(Room room, BookingCreateDto dto, int nights)
+        {
+            var catalog = await _context.HotelServices.Where(service => service.ForBooking).ToListAsync();
+            decimal Price(string code, decimal fallback) => catalog.FirstOrDefault(service => service.ServiceCode == code)?.Price ?? fallback;
+            string Name(string code, string fallback) => catalog.FirstOrDefault(service => service.ServiceCode == code)?.Name ?? fallback;
+            var lines = new List<BookingServiceLineDto>();
+            var guests = Math.Max(1, dto.NumberOfGuests);
+            if (dto.Breakfast)
+            {
+                var name = Name("breakfast", "Buffet sáng");
+                var included = room.Amenities.Any(amenity => amenity.Name == "Buffet sáng");
+                lines.Add(included
+                    ? new BookingServiceLineDto { Name = name, Amount = 0, Note = "Phòng đã có suất buffet sáng rồi." }
+                    : new BookingServiceLineDto { Name = $"{name} · {guests} khách · {nights} đêm", Amount = Price("breakfast", 180_000m) * guests * nights });
+            }
+            if (dto.Spa)
+                lines.Add(new BookingServiceLineDto { Name = Name("spa", "Spa"), Amount = Price("spa", 300_000m) });
+            if (dto.ExtraBed)
+                lines.Add(new BookingServiceLineDto { Name = $"{Name("extra-bed", "Giường phụ")} · {nights} đêm", Amount = Price("extra-bed", 250_000m) * nights });
+            return lines;
+        }
+
+        private static BookingConfirmDto ToConfirm(Room room, BookingCreateDto dto, int nights, OccupancyPricing.Quote quote, List<BookingAddOnPricing.Line> addOns, List<BookingServiceLineDto> services, decimal discount, decimal total, decimal dateMarkup, string markupSummary) =>
             new()
             {
                 RoomId = room.RoomId,
@@ -153,6 +178,11 @@ namespace HotelBooking.Application.Services
                     TotalPrice = line.TotalPrice,
                     UnitLabel = line.UnitLabel
                 }).ToList(),
+                Services = services,
+                ServicesTotal = services.Sum(line => line.Amount),
+                Discount = discount,
+                Payable = total,
+                BreakfastNote = services.FirstOrDefault(line => line.Note != null)?.Note,
                 Summary = string.IsNullOrWhiteSpace(markupSummary)
                     ? quote.Summary
                     : $"{quote.Summary} · Phụ thu ngày lễ/cuối tuần: +{OccupancyPricing.Money(dateMarkup)} ({markupSummary})"
@@ -173,6 +203,7 @@ namespace HotelBooking.Application.Services
 
             var room = await _context.Rooms
                 .Include(r => r.RoomType)
+                .Include(r => r.Amenities)
                 .FirstOrDefaultAsync(r => r.RoomId == dto.RoomId);
 
             if (room == null)
@@ -188,10 +219,12 @@ namespace HotelBooking.Application.Services
             var addOnQuote = BookingAddOnPricing.Quote(dto.AddOns, nights, dto.NumberOfGuests);
             if (addOnQuote.Error != null)
                 return new BookingResult { Success = false, ErrorMessage = addOnQuote.Error };
+            var serviceLines = await QuoteHotelServicesAsync(room, dto, nights);
 
             var dateMarkup = CalculateDynamicDateMarkup(dto.CheckInDate, dto.CheckOutDate, room.RoomType.BasePrice, out _);
             var roomTotal = quote.TotalPrice + dateMarkup;
-            var subtotal = roomTotal + addOnQuote.Lines.Sum(line => line.TotalPrice);
+            var serviceLinesTotal = serviceLines.Sum(line => line.Amount);
+            var subtotal = roomTotal + addOnQuote.Lines.Sum(line => line.TotalPrice) + serviceLinesTotal;
             var promo = await GetDiscountAsync(customerId, dto.PromoCode, subtotal);
             if (promo.Error != null)
                 return new BookingResult { Success = false, ErrorMessage = promo.Error };
@@ -200,6 +233,9 @@ namespace HotelBooking.Application.Services
             var guestName = (dto.GuestName ?? string.Empty).Trim();
             var guestPhone = new string((dto.GuestPhone ?? string.Empty).Where(char.IsDigit).ToArray());
             var guestNote = string.IsNullOrWhiteSpace(dto.GuestNote) ? null : dto.GuestNote.Trim();
+            var breakfastNote = serviceLines.FirstOrDefault(line => line.Note != null)?.Note;
+            if (breakfastNote != null)
+                guestNote = string.IsNullOrWhiteSpace(guestNote) ? breakfastNote : $"{guestNote} {breakfastNote}";
             var payNow = !string.Equals(dto.PaymentChoice, "Cash", StringComparison.OrdinalIgnoreCase);
 
             if (guestName.Length < 2 || guestName.Length > 150)
@@ -250,6 +286,18 @@ namespace HotelBooking.Application.Services
 
             foreach (var item in BookingAddOnPricing.ToFolioItems(addOnQuote.Lines, booking))
                 booking.FolioItems.Add(item);
+            foreach (var line in serviceLines.Where(line => line.Amount > 0))
+            {
+                booking.FolioItems.Add(new FolioItem
+                {
+                    Booking = booking,
+                    Category = "Service",
+                    Description = line.Name,
+                    Quantity = 1,
+                    UnitPrice = line.Amount,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
 
             if (promo.Amount > 0 && promo.PromoCode != null)
             {

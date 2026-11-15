@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import QRCode from 'qrcode';
 import { api } from '../api';
 import { money } from '../format';
+import { LuxBar } from '../lux';
 import { AsyncView, useLoad } from '../ui';
 
 export function PayPage() {
@@ -39,47 +40,58 @@ export function PayPage() {
   }
 
   return (
-    <AsyncView state={state}>
+    <div className="lux lux-page">
+      <LuxBar solid />
+      <AsyncView state={state}>
       {(data) => {
         const booking = data.booking;
         if (data.alreadyPaid || booking.status !== 'Pending') {
           return (
-            <div className="panel">
-              <h1>Đơn #{booking.bookingId}</h1>
-              <p>Đơn này không còn chờ thanh toán.</p>
-              <Link className="btn" to="/bookings">Về đơn của tôi</Link>
-            </div>
+            <section className="lux-book-page">
+              <article className="lux-book-card lux-reserve">
+                <h1>Đơn #{booking.bookingId}</h1>
+                <p>Đơn này không còn chờ thanh toán.</p>
+                <Link className="lux-gold" to="/bookings">Về đơn của tôi</Link>
+              </article>
+            </section>
           );
         }
         return (
-          <form className="panel stack account-card mock-payment" onSubmit={onSubmit}>
-            <h1>Thanh toán #{booking.bookingId}</h1>
+          <form className="lux-book-page lux-book-card lux-reserve mock-payment" onSubmit={onSubmit}>
+            <p className="lux-kicker dark">HBS Reservation</p>
+            <h1>Thanh toán đơn #{booking.bookingId}</h1>
             {error && <div className="banner">{error}</div>}
             <p>{booking.guestName} · {booking.guestPhone}</p>
             {booking.guestNote && <p className="muted">{booking.guestNote}</p>}
-            <p>{booking.checkInDate} → {booking.checkOutDate} · {booking.adultCount} người lớn, {booking.childCount} trẻ em</p>
-            <div className="fare">
+            <p>{booking.checkInDate} → {booking.checkOutDate} · {booking.numberOfGuests} khách</p>
+            <div className="lux-quote">
               {booking.stayLabel && <span>{booking.stayLabel}</span>}
               {booking.roomCharge != null && <span>Giá phòng {money(booking.roomCharge)}</span>}
               {booking.surcharge > 0 && <span>Phụ thu {money(booking.surcharge)}</span>}
-              {(booking.addOns || []).map((item, index) => <span key={`${item.description}-${index}`}>{item.description}: {money(item.totalPrice)}</span>)}
-              {booking.discount > 0 && <span>Ưu đãi −{money(booking.discount)}</span>}
               {booking.summary && <span>{booking.summary}</span>}
-              <strong>Tổng {money(booking.amountDue)}</strong>
+              {(booking.services || []).map((line) => (
+                <span key={line.name}>{line.name} {money(line.amount)}</span>
+              ))}
+              {(booking.addOns || []).map((line, index) => (
+                <span key={`${line.description}-${index}`}>{line.description} {money(line.totalPrice)}</span>
+              ))}
+              {booking.discount > 0 && <span>Giảm giá −{money(booking.discount)}</span>}
+              <strong>Tổng {money(booking.payable ?? booking.totalPrice)}</strong>
             </div>
             <div className="mock-qr-panel">
-              {qrImage && <img src={qrImage} alt={`QR mô phỏng cho booking ${booking.bookingId}`} />}
+              {qrImage && <img src={qrImage} alt={`QR mô phỏng cho đơn ${booking.bookingId}`} />}
               <div>
                 <strong>Mã QR thanh toán demo</strong>
                 <p>Nội dung: BOOKING_{booking.bookingId}</p>
-                <p className="muted">Mã này chỉ chứa dữ liệu mô phỏng, không chuyển tiền và không kết nối ngân hàng.</p>
+                <p className="muted">QR chỉ để minh họa giao diện; không kết nối ngân hàng hoặc chuyển tiền thật.</p>
               </div>
             </div>
-            <button className="btn" type="submit">Mô phỏng thanh toán thành công</button>
-            <Link to="/bookings" className="btn secondary">Để thanh toán sau</Link>
+            <button className="lux-gold" type="submit">Mô phỏng thanh toán thành công</button>
+            <Link to="/bookings" className="lux-line">Để thanh toán sau</Link>
           </form>
         );
       }}
-    </AsyncView>
+      </AsyncView>
+    </div>
   );
 }

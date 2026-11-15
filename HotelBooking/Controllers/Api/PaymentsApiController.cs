@@ -117,7 +117,7 @@ public class PaymentsApiController : ControllerBase
             booking.PaymentChoice,
             stayLabel = quote?.Plan.Label,
             roomCharge = quote?.RoomCharge,
-            surcharge = quote?.Surcharge,
+            surcharge = quote == null ? 0 : Math.Max(0, booking.TotalPrice - quote.RoomCharge),
             summary = quote?.Summary,
             addOns = booking.FolioItems.Where(item => item.Category == "Service").Select(item => new
             {
