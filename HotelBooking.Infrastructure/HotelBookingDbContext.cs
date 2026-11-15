@@ -59,7 +59,7 @@ public partial class HotelBookingDbContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=HotelBookingDB;Trusted_Connection=True;TrustServerCertificate=True;");
+            optionsBuilder.UseSqlServer("Server=D_Lap;Database=HotelBookingDB;Trusted_Connection=True;TrustServerCertificate=True;");
         }
     }
 
@@ -98,6 +98,8 @@ public partial class HotelBookingDbContext : DbContext
             entity.Property(e => e.GuestPhone).HasMaxLength(20);
             entity.Property(e => e.GuestNote).HasMaxLength(500);
             entity.Property(e => e.PaymentChoice).HasMaxLength(20).HasDefaultValue("Now");
+            entity.Property(e => e.AdultCount).HasDefaultValue(1);
+            entity.Property(e => e.ChildCount).HasDefaultValue(0);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
@@ -162,6 +164,7 @@ public partial class HotelBookingDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Payments_Bookings");
         });
+
 
         modelBuilder.Entity<Refund>(entity =>
         {
@@ -343,7 +346,7 @@ public partial class HotelBookingDbContext : DbContext
             entity.Property(e => e.Description).HasMaxLength(200);
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
-            entity.HasOne(d => d.Booking).WithMany()
+            entity.HasOne(d => d.Booking).WithMany(p => p.FolioItems)
                 .HasForeignKey(d => d.BookingId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
@@ -365,7 +368,10 @@ public partial class HotelBookingDbContext : DbContext
             entity.HasIndex(e => e.Code).IsUnique();
             entity.Property(e => e.Code).HasMaxLength(30);
             entity.Property(e => e.DiscountAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.MinimumOrderAmount).HasColumnType("decimal(18, 2)").HasDefaultValue(0m);
+            entity.Property(e => e.UsageCount).HasDefaultValue(0);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.IsNewCustomerOnly).HasDefaultValue(false);
         });
 
         OnModelCreatingPartial(modelBuilder);

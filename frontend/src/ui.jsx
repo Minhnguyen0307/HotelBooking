@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './auth';
 import { addDays, money, statusLabel, today } from './format';
 
 export function useLoad(loader, deps) {
   const [state, setState] = useState({ loading: true, error: null, data: null });
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -20,9 +21,9 @@ export function useLoad(loader, deps) {
     return () => {
       cancelled = true;
     };
-  }, deps);
+  }, [...deps, attempt]);
 
-  return state;
+  return { ...state, retry: () => setAttempt((current) => current + 1) };
 }
 
 export function AsyncView({ state, children }) {
@@ -44,7 +45,8 @@ export function AsyncView({ state, children }) {
     return (
       <>
         <h1>Không tải được dữ liệu</h1>
-        <p>{state.error.message}</p>
+        <p role="alert">{state.error.message || 'Đã xảy ra lỗi khi tải dữ liệu.'}</p>
+        <button className="btn" type="button" onClick={state.retry}>Thử tải lại</button>
       </>
     );
   }
@@ -239,7 +241,7 @@ export function RoomGrid({ rooms, showAvailability = false, featured = false }) 
   );
 }
 
-export function BookingTable({ rows, actions }) {
+export function BookingTable({ rows, actions, showPaymentChoice = true, expandedId, onToggleDetails, renderDetails }) {
   if (!rows?.length) return <p className="muted">Không có đơn.</p>;
   return (
     <div className="table-wrap">
@@ -257,24 +259,44 @@ export function BookingTable({ rows, actions }) {
         </thead>
         <tbody>
           {rows.map((item) => (
-            <tr key={item.bookingId}>
+            <Fragment key={item.bookingId}>
+            <tr>
               <td>#{item.bookingId}</td>
               <td>{item.propertyName ? `${item.propertyName} · ` : ''}{item.roomNumber} · {item.typeName}</td>
               <td>
                 {item.guestName || item.customerName || ''}
                 {item.guestPhone && <div className="muted">{item.guestPhone}</div>}
+                {(item.adultCount || item.childCount) && <div className="muted">{item.adultCount || 0} người lớn · {item.childCount || 0} trẻ em</div>}
                 {item.guestNote && <div className="muted">{item.guestNote}</div>}
               </td>
               <td>{item.checkInDate} → {item.checkOutDate}</td>
-              <td><span className="pill">{statusLabel(item.status)}</span></td>
+              <td>
+                <span className="pill">{statusLabel(item.status)}</span>
+                {item.status === 'Cancelled' && item.cancelReason && (
+                  <div className="muted">Lý do hủy: {item.cancelReason}</div>
+                )}
+              </td>
               <td>
                 {money(item.totalPrice)}
-                {item.paymentChoice && (
+                {showPaymentChoice && item.paymentChoice && (
                   <div className="muted">{item.paymentChoice === 'Cash' ? 'Tiền mặt khi nhận phòng' : 'Thanh toán ngay'}</div>
                 )}
               </td>
-              <td>{actions ? actions(item) : null}</td>
+              <td>
+                <div className="stack">
+                  {onToggleDetails && (
+                    <button className="btn small secondary" type="button" onClick={() => onToggleDetails(item.bookingId)}>
+                      {expandedId === item.bookingId ? 'Đóng chi tiết' : 'Chi tiết'}
+                    </button>
+                  )}
+                  {actions ? actions(item) : null}
+                </div>
+              </td>
             </tr>
+            {expandedId === item.bookingId && renderDetails && (
+              <tr className="booking-details-row"><td colSpan={7}>{renderDetails(item)}</td></tr>
+            )}
+            </Fragment>
           ))}
         </tbody>
       </table>

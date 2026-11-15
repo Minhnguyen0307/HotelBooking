@@ -17,10 +17,26 @@ public class BookingsApiController : ControllerBase
         _bookingService = bookingService;
     }
 
+    [HttpGet("promos")]
+    public async Task<IActionResult> AvailablePromos()
+    {
+        var promos = await _bookingService.GetAvailablePromoCodesAsync(ApiUser.Id(User));
+        return Ok(promos);
+    }
+
     [HttpGet("preview")]
     public async Task<IActionResult> Preview([FromQuery] BookingCreateDto dto)
     {
-        var preview = await _bookingService.GetBookingPreviewAsync(dto);
+        var preview = await _bookingService.GetBookingPreviewAsync(ApiUser.Id(User), dto);
+        if (!preview.Success || preview.Preview == null)
+            return BadRequest(new { message = preview.ErrorMessage ?? "Không tạo được xem trước đơn đặt phòng." });
+        return Ok(preview.Preview);
+    }
+
+    [HttpPost("preview")]
+    public async Task<IActionResult> PreviewPost([FromBody] BookingCreateDto dto)
+    {
+        var preview = await _bookingService.GetBookingPreviewAsync(ApiUser.Id(User), dto);
         if (!preview.Success || preview.Preview == null)
             return BadRequest(new { message = preview.ErrorMessage ?? "Không tạo được xem trước đơn đặt phòng." });
         return Ok(preview.Preview);
@@ -56,7 +72,7 @@ public class BookingsApiController : ControllerBase
         var result = await _bookingService.CancelBookingAsync(ApiUser.Id(User), bookingId, request?.Reason);
         if (!result.Success)
             return BadRequest(new { message = result.ErrorMessage });
-        return Ok(new { message = "Đã gửi yêu cầu hủy đặt phòng." });
+        return Ok(new { message = result.Message, refundAmount = result.RefundAmount });
     }
 
     public class CancelBookingRequest

@@ -62,7 +62,7 @@ namespace HotelBooking.Application.Services
                 PaymentId = paymentId,
                 Amount = amount,
                 Reason = reason,
-                Status = "Processed",
+                Status = "Completed",
                 RequestedAt = DateTime.UtcNow,
                 ProcessedAt = DateTime.UtcNow
             };

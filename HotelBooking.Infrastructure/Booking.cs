@@ -15,6 +15,10 @@ public partial class Booking
 
     public int NumberOfGuests { get; set; }
 
+    public int AdultCount { get; set; } = 1;
+
+    public int ChildCount { get; set; }
+
     public string? GuestName { get; set; }
 
     public string? GuestPhone { get; set; }
@@ -38,4 +42,6 @@ public partial class Booking
     public virtual User Customer { get; set; } = null!;
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
+    public virtual ICollection<FolioItem> FolioItems { get; set; } = new List<FolioItem>();
 }

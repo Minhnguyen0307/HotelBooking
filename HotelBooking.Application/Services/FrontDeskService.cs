@@ -181,7 +181,7 @@ namespace HotelBooking.Application.Services
                     PaymentId = payment.PaymentId,
                     Amount = payment.Amount,
                     Reason = booking.CancelReason ?? "Lễ tân xác nhận hủy đơn",
-                    Status = "Processed",
+                    Status = "Completed",
                     RequestedAt = DateTime.UtcNow,
                     ProcessedAt = DateTime.UtcNow
                 };

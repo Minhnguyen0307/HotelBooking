@@ -41,3 +41,5 @@ $Recycle.Bin/
 publish/
 **/bin/
 **/obj/
+_build/
+*.log

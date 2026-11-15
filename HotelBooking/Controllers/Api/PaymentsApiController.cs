@@ -27,10 +27,11 @@ public class PaymentsApiController : ControllerBase
         var booking = await LoadOwnBooking(bookingId);
         if (booking == null) return NotFound(new { message = "Không tìm thấy đơn đặt phòng." });
 
+        var amountDue = await GetAmountDueAsync(booking);
         var payments = await _paymentService.GetPaymentsByBookingIdAsync(bookingId);
         return Ok(new
         {
-            booking = ToBooking(booking),
+            booking = ToBooking(booking, amountDue),
             alreadyPaid = payments.Any(p => p.PaymentStatus == "Success"),
             payments = payments.Select(p => new
             {
@@ -54,20 +55,20 @@ public class PaymentsApiController : ControllerBase
         if (booking.Status != "Pending")
             return BadRequest(new { message = "Đơn đặt phòng này không ở trạng thái chờ thanh toán." });
 
-        if (string.IsNullOrWhiteSpace(request.CardNumber))
-            return BadRequest(new { message = "Vui lòng nhập thông tin thẻ hoặc tài khoản hợp lệ." });
-
         var payments = await _paymentService.GetPaymentsByBookingIdAsync(request.BookingId);
         if (payments.Any(p => p.PaymentStatus == "Success"))
             return BadRequest(new { message = "Đơn đặt phòng này đã được thanh toán." });
 
-        var transactionId = "TXN-" + Guid.NewGuid().ToString("N")[..12].ToUpperInvariant();
+        var amountDue = await GetAmountDueAsync(booking);
+        var transactionId = "MOCK-" + Guid.NewGuid().ToString("N")[..12].ToUpperInvariant();
         var payment = await _paymentService.CreatePaymentRecordAsync(
             request.BookingId,
-            request.PaymentMethod,
-            booking.TotalPrice,
+            "VietQR Mock",
+            amountDue,
             transactionId,
             "Success");
+        booking.Status = "Confirmed";
+        await _context.SaveChangesAsync();
 
         return Ok(new
         {
@@ -76,7 +77,8 @@ public class PaymentsApiController : ControllerBase
             status = "Success",
             transactionId = payment.TransactionId,
             paymentMethod = payment.PaymentMethod,
-            amount = payment.Amount
+            amount = payment.Amount,
+            simulated = true
         });
     }
 
@@ -86,10 +88,11 @@ public class PaymentsApiController : ControllerBase
             .Include(b => b.BookingRooms)
             .ThenInclude(br => br.Room)
             .ThenInclude(r => r.RoomType)
+            .Include(b => b.FolioItems)
             .FirstOrDefaultAsync(b => b.BookingId == bookingId && b.CustomerId == ApiUser.Id(User));
     }
 
-    private static object ToBooking(Booking booking)
+    private static object ToBooking(Booking booking, decimal amountDue)
     {
         var room = booking.BookingRooms.Select(br => br.Room).FirstOrDefault();
         var nights = Math.Max(0, booking.CheckOutDate.DayNumber - booking.CheckInDate.DayNumber);
@@ -102,9 +105,12 @@ public class PaymentsApiController : ControllerBase
             booking.BookingId,
             booking.Status,
             booking.TotalPrice,
+            amountDue,
             booking.CheckInDate,
             booking.CheckOutDate,
             booking.NumberOfGuests,
+            booking.AdultCount,
+            booking.ChildCount,
             booking.GuestName,
             booking.GuestPhone,
             booking.GuestNote,
@@ -113,6 +119,14 @@ public class PaymentsApiController : ControllerBase
             roomCharge = quote?.RoomCharge,
             surcharge = quote?.Surcharge,
             summary = quote?.Summary,
+            addOns = booking.FolioItems.Where(item => item.Category == "Service").Select(item => new
+            {
+                item.Description,
+                item.Quantity,
+                item.UnitPrice,
+                totalPrice = item.UnitPrice * item.Quantity
+            }),
+            discount = booking.FolioItems.Where(item => item.Category == "Discount").Sum(item => item.UnitPrice * item.Quantity),
             rooms = booking.BookingRooms.Select(br => new
             {
                 br.Room.RoomNumber,
@@ -124,7 +138,15 @@ public class PaymentsApiController : ControllerBase
     public class ProcessPaymentRequest
     {
         public int BookingId { get; set; }
-        public string PaymentMethod { get; set; } = "Card";
-        public string CardNumber { get; set; } = string.Empty;
+    }
+
+    private async Task<decimal> GetAmountDueAsync(Booking booking)
+    {
+        var items = booking.FolioItems.Count > 0
+            ? booking.FolioItems
+            : await _context.FolioItems.Where(item => item.BookingId == booking.BookingId).ToListAsync();
+        var services = items.Where(item => item.Category == "Service").Sum(item => item.UnitPrice * item.Quantity);
+        var discounts = items.Where(item => item.Category == "Discount").Sum(item => item.UnitPrice * item.Quantity);
+        return Math.Max(0, booking.TotalPrice + services - discounts);
     }
 }

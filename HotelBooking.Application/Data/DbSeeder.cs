@@ -9,6 +9,14 @@ namespace HotelBooking.Application.Data
     {
         public static async Task SeedAsync(HotelBookingDbContext context)
         {
+            await context.Database.ExecuteSqlRawAsync("""
+                IF COL_LENGTH('dbo.Properties', 'Address') IS NULL
+                    ALTER TABLE dbo.Properties ADD Address NVARCHAR(255) NOT NULL
+                        CONSTRAINT DF_Properties_Address_Compat DEFAULT N'';
+                IF COL_LENGTH('dbo.Rooms', 'Address') IS NULL
+                    ALTER TABLE dbo.Rooms ADD Address NVARCHAR(255) NULL;
+                """);
+
             var hasher = new PasswordHasher<User>();
 
             var roleNames = new[] { "Customer", "Receptionist", "Manager", "Admin" };
@@ -57,14 +65,63 @@ namespace HotelBooking.Application.Data
             await context.Database.ExecuteSqlRawAsync("""
                 IF COL_LENGTH('Bookings', 'GuestName') IS NULL
                     ALTER TABLE Bookings ADD GuestName NVARCHAR(150) NULL;
+                IF COL_LENGTH('dbo.Bookings', 'CancelledAt') IS NULL
+                    ALTER TABLE dbo.Bookings ADD CancelledAt DATETIME2 NULL;
+                IF COL_LENGTH('dbo.Bookings', 'CancelReason') IS NULL
+                    ALTER TABLE dbo.Bookings ADD CancelReason NVARCHAR(300) NULL;
                 IF COL_LENGTH('Bookings', 'GuestPhone') IS NULL
                     ALTER TABLE Bookings ADD GuestPhone NVARCHAR(20) NULL;
                 IF COL_LENGTH('Bookings', 'GuestNote') IS NULL
                     ALTER TABLE Bookings ADD GuestNote NVARCHAR(500) NULL;
                 IF COL_LENGTH('Bookings', 'PaymentChoice') IS NULL
                     ALTER TABLE Bookings ADD PaymentChoice NVARCHAR(20) NOT NULL CONSTRAINT DF_Bookings_PaymentChoice DEFAULT 'Now';
+                IF EXISTS (
+                    SELECT 1 FROM sys.check_constraints
+                    WHERE parent_object_id = OBJECT_ID('dbo.Payments')
+                      AND name = 'CK_Payments_Status'
+                      AND definition NOT LIKE '%Refunded%'
+                )
+                    ALTER TABLE dbo.Payments DROP CONSTRAINT CK_Payments_Status;
+                IF NOT EXISTS (
+                    SELECT 1 FROM sys.check_constraints
+                    WHERE parent_object_id = OBJECT_ID('dbo.Payments')
+                      AND definition LIKE '%Refunded%'
+                )
+                    ALTER TABLE dbo.Payments ADD CONSTRAINT CK_Payments_Status_HotelBooking
+                        CHECK (PaymentStatus IN ('Pending','Success','Failed','Refunded'));
+                IF COL_LENGTH('Bookings', 'AdultCount') IS NULL
+                    EXEC(N'ALTER TABLE Bookings ADD AdultCount INT NULL;');
+                EXEC(N'UPDATE Bookings SET AdultCount = CASE WHEN NumberOfGuests > 0 THEN NumberOfGuests ELSE 1 END WHERE AdultCount IS NULL;');
+                IF EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.Bookings') AND name = 'AdultCount' AND is_nullable = 1)
+                    EXEC(N'ALTER TABLE Bookings ALTER COLUMN AdultCount INT NOT NULL;');
+                IF COL_LENGTH('Bookings', 'ChildCount') IS NULL
+                    ALTER TABLE Bookings ADD ChildCount INT NOT NULL CONSTRAINT DF_Bookings_ChildCount DEFAULT 0;
                 IF COL_LENGTH('Rooms', 'HousekeepingStatus') IS NULL
                     ALTER TABLE Rooms ADD HousekeepingStatus NVARCHAR(20) NOT NULL CONSTRAINT DF_Rooms_Housekeeping DEFAULT 'Clean';
+                IF OBJECT_ID('dbo.Reviews', 'U') IS NULL
+                    EXEC(N'CREATE TABLE dbo.Reviews (
+                        ReviewId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+                        RoomId INT NOT NULL,
+                        UserId INT NOT NULL,
+                        Rating INT NOT NULL,
+                        Comment NVARCHAR(MAX) NULL,
+                        CreatedAt DATETIME2 NOT NULL CONSTRAINT DF_Reviews_CreatedAt DEFAULT GETDATE(),
+                        StaffResponse NVARCHAR(MAX) NULL,
+                        RespondedByUserId INT NULL,
+                        RespondedAt DATETIME2 NULL,
+                        CONSTRAINT FK_Reviews_Rooms FOREIGN KEY (RoomId) REFERENCES dbo.Rooms(RoomId),
+                        CONSTRAINT FK_Reviews_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(UserId),
+                        CONSTRAINT FK_Reviews_Staff FOREIGN KEY (RespondedByUserId) REFERENCES dbo.Users(UserId),
+                        CONSTRAINT CK_Reviews_Rating CHECK (Rating BETWEEN 1 AND 5)
+                    );');
+                IF OBJECT_ID('dbo.ReviewImages', 'U') IS NULL
+                    EXEC(N'CREATE TABLE dbo.ReviewImages (
+                        ReviewImageId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+                        ReviewId INT NOT NULL,
+                        ImageUrl NVARCHAR(500) NOT NULL,
+                        CreatedAt DATETIME2 NOT NULL CONSTRAINT DF_ReviewImages_CreatedAt DEFAULT GETDATE(),
+                        CONSTRAINT FK_ReviewImages_Reviews FOREIGN KEY (ReviewId) REFERENCES dbo.Reviews(ReviewId) ON DELETE CASCADE
+                    );');
                 IF OBJECT_ID('FolioItems') IS NULL
                     CREATE TABLE FolioItems (
                         FolioItemId INT IDENTITY(1,1) PRIMARY KEY,
@@ -75,6 +132,18 @@ namespace HotelBooking.Application.Data
                         UnitPrice DECIMAL(18,2) NOT NULL,
                         CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
                         CONSTRAINT FK_Folio_Bookings FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId) ON DELETE CASCADE
+                    );
+                IF OBJECT_ID('dbo.Refunds', 'U') IS NULL
+                    CREATE TABLE dbo.Refunds (
+                        RefundId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+                        PaymentId INT NOT NULL,
+                        Amount DECIMAL(18,2) NOT NULL,
+                        Reason NVARCHAR(300) NULL,
+                        Status NVARCHAR(20) NOT NULL CONSTRAINT DF_Refunds_Status_Compat DEFAULT 'Pending',
+                        RequestedAt DATETIME2 NOT NULL CONSTRAINT DF_Refunds_RequestedAt_Compat DEFAULT SYSUTCDATETIME(),
+                        ProcessedAt DATETIME2 NULL,
+                        CONSTRAINT FK_Refunds_Payments_Compat FOREIGN KEY (PaymentId) REFERENCES dbo.Payments(PaymentId),
+                        CONSTRAINT CK_Refunds_Status_Compat CHECK (Status IN ('Pending','Approved','Rejected','Completed'))
                     );
                 IF OBJECT_ID('RoomIssues') IS NULL
                     CREATE TABLE RoomIssues (
@@ -91,17 +160,40 @@ namespace HotelBooking.Application.Data
                         Code NVARCHAR(30) NOT NULL UNIQUE,
                         DiscountAmount DECIMAL(18,2) NOT NULL DEFAULT 0,
                         DiscountPercent INT NOT NULL DEFAULT 0,
-                        IsActive BIT NOT NULL DEFAULT 1
+                        IsActive BIT NOT NULL DEFAULT 1,
+                        MinimumOrderAmount DECIMAL(18,2) NOT NULL DEFAULT 0,
+                        MaxUses INT NULL,
+                        UsageCount INT NOT NULL DEFAULT 0,
+                        ExpiresAt DATETIME2 NULL
                     );
+                IF COL_LENGTH('PromoCodes', 'MinimumOrderAmount') IS NULL
+                    ALTER TABLE PromoCodes ADD MinimumOrderAmount DECIMAL(18,2) NOT NULL CONSTRAINT DF_PromoCodes_Minimum DEFAULT 0;
+                IF COL_LENGTH('PromoCodes', 'MaxUses') IS NULL
+                    ALTER TABLE PromoCodes ADD MaxUses INT NULL;
+                IF COL_LENGTH('PromoCodes', 'UsageCount') IS NULL
+                    ALTER TABLE PromoCodes ADD UsageCount INT NOT NULL CONSTRAINT DF_PromoCodes_Usage DEFAULT 0;
+                IF COL_LENGTH('PromoCodes', 'ExpiresAt') IS NULL
+                    ALTER TABLE PromoCodes ADD ExpiresAt DATETIME2 NULL;
+                IF COL_LENGTH('PromoCodes', 'IsNewCustomerOnly') IS NULL
+                    ALTER TABLE PromoCodes ADD IsNewCustomerOnly BIT NOT NULL CONSTRAINT DF_PromoCodes_NewCustomer DEFAULT 0;
                 """);
 
-            if (!await context.PromoCodes.AnyAsync())
+            var demoPromos = new[]
             {
-                context.PromoCodes.AddRange(
-                    new PromoCode { Code = "WELCOME10", DiscountPercent = 10, IsActive = true },
-                    new PromoCode { Code = "GIAM100", DiscountAmount = 100_000m, IsActive = true });
-                await context.SaveChangesAsync();
+                new PromoCode { Code = "WELCOME10", DiscountPercent = 10, MinimumOrderAmount = 500_000m, MaxUses = 100, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true },
+                new PromoCode { Code = "WELCOME50K", DiscountAmount = 50_000m, MinimumOrderAmount = 500_000m, MaxUses = 100, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true, IsNewCustomerOnly = true },
+                new PromoCode { Code = "WELCOME100K", DiscountAmount = 100_000m, MinimumOrderAmount = 500_000m, MaxUses = 100, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true, IsNewCustomerOnly = true },
+                new PromoCode { Code = "WELCOME200K", DiscountAmount = 200_000m, MinimumOrderAmount = 500_000m, MaxUses = 100, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true, IsNewCustomerOnly = true },
+                new PromoCode { Code = "GIAM100", DiscountAmount = 100_000m, MinimumOrderAmount = 500_000m, MaxUses = 100, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true },
+                new PromoCode { Code = "SUMMER2026", DiscountPercent = 10, MinimumOrderAmount = 1_000_000m, MaxUses = 50, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true },
+                new PromoCode { Code = "GIAM200K", DiscountAmount = 200_000m, MinimumOrderAmount = 1_000_000m, MaxUses = 50, ExpiresAt = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc), IsActive = true }
+            };
+            foreach (var promo in demoPromos)
+            {
+                if (!await context.PromoCodes.AnyAsync(item => item.Code == promo.Code))
+                    context.PromoCodes.Add(promo);
             }
+            await context.SaveChangesAsync();
 
             await EnsureChainAsync(context);
             await EnsureOccupancyAsync(context);
@@ -133,7 +225,14 @@ namespace HotelBooking.Application.Data
 
             foreach (var item in catalog)
             {
-                if (await context.Properties.AnyAsync(p => p.Name == item.Name)) continue;
+                var existing = await context.Properties.FirstOrDefaultAsync(p => p.Name == item.Name);
+                if (existing != null)
+                {
+                    if (string.IsNullOrWhiteSpace(existing.Address)) existing.Address = item.Address;
+                    if (string.IsNullOrWhiteSpace(existing.Area)) existing.Area = item.Area;
+                    if (string.IsNullOrWhiteSpace(existing.Description)) existing.Description = item.Description;
+                    continue;
+                }
                 context.Properties.Add(new Property
                 {
                     Name = item.Name,

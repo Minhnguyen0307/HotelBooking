@@ -14,6 +14,16 @@ export function money(value) {
   return `${new Intl.NumberFormat('vi-VN').format(value || 0)} ₫`;
 }
 
+export function dateTime(value) {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+  return new Intl.DateTimeFormat('vi-VN', {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  }).format(date);
+}
+
 export function isoDate(date) {
   const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return local.toISOString().slice(0, 10);

@@ -8,12 +8,20 @@ export function HomePage() {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState(null);
   const [dates, setDates] = useState({ checkInDate: today(), checkOutDate: tomorrow() });
-  const state = useLoad(() => Promise.all([
-    api('/api/health'),
-    api('/api/rooms/featured'),
-    api('/api/rooms/types'),
-    api('/api/rooms/properties')
-  ]), []);
+  const state = useLoad(async () => {
+    const results = await Promise.all([
+      api('/api/rooms/featured'),
+      api('/api/rooms/types'),
+      api('/api/rooms/properties')
+    ].map((request) => request.then((data) => ({ data })).catch((error) => ({ error }))));
+    if (results.every((result) => result.error)) throw results[0].error;
+    return {
+      rooms: results[0].data || [],
+      types: results[1].data || [],
+      properties: results[2].data || [],
+      loadErrors: results.filter((result) => result.error).map((result) => result.error)
+    };
+  }, []);
   const catalog = useLoad(async () => {
     if (!selectedId) return null;
     return api(`/api/rooms/catalog?${searchParams({ ...dates, propertyId: selectedId })}`);
@@ -41,8 +49,9 @@ export function HomePage() {
 
   return (
     <AsyncView state={state}>
-      {([health, rooms, types, properties]) => {
+      {({ rooms, types, properties, loadErrors }) => {
         const selected = properties.find((property) => property.propertyId === selectedId) || null;
+        const roomCount = properties.reduce((total, property) => total + (property.roomCount || 0), 0);
         const listed = Array.isArray(catalog.data)
           && catalog.data.every((room) => room.propertyId === selectedId)
           ? catalog.data
@@ -55,7 +64,7 @@ export function HomePage() {
               <div className="hero-copy">
                 <p className="eyebrow">HBS · Đà Nẵng</p>
                 <h1>Chào mừng bạn đến với kỳ nghỉ bên biển.</h1>
-                <p className="lede">Mời bạn ghé {properties.length} cơ sở của chúng tôi, với {health.rooms} phòng riêng giữa Mỹ Khê, sông Hàn và bán đảo Sơn Trà.</p>
+                <p className="lede">Mời bạn ghé {properties.length} cơ sở của chúng tôi, với {roomCount} phòng riêng giữa Mỹ Khê, sông Hàn và bán đảo Sơn Trà.</p>
               </div>
               <form className="panel stack" onSubmit={onSearch}>
                 <StayDates checkIn={dates.checkInDate} checkOut={dates.checkOutDate} onChange={onDates} />
@@ -65,6 +74,13 @@ export function HomePage() {
                 <button className="btn" type="submit">Tìm phòng trống</button>
               </form>
             </section>
+
+            {loadErrors.length > 0 && (
+              <div className="banner" role="status">
+                Một số danh sách chưa tải được. Bạn vẫn có thể xem phần dữ liệu đã tải.
+                <button className="btn secondary small" type="button" onClick={state.retry}>Tải lại</button>
+              </div>
+            )}
 
             <div className="section-head">
               <div>

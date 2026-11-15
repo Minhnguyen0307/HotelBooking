@@ -133,6 +133,8 @@ CREATE TABLE Bookings (
     CheckInDate     DATE NOT NULL,
     CheckOutDate    DATE NOT NULL,
     NumberOfGuests  INT NOT NULL,
+    AdultCount      INT NOT NULL DEFAULT 1,
+    ChildCount      INT NOT NULL DEFAULT 0,
     GuestName       NVARCHAR(150) NULL,
     GuestPhone      NVARCHAR(20) NULL,
     GuestNote       NVARCHAR(500) NULL,
@@ -144,7 +146,7 @@ CREATE TABLE Bookings (
     CancelledAt     DATETIME2 NULL,
     CancelReason    NVARCHAR(300) NULL,
     CONSTRAINT FK_Bookings_Customer FOREIGN KEY (CustomerId) REFERENCES Users(UserId),
-    CONSTRAINT CK_Bookings_Status CHECK (Status IN ('Pending','Confirmed','CheckedIn','CheckedOut','Cancelled')),
+    CONSTRAINT CK_Bookings_Status CHECK (Status IN ('Pending','Confirmed','CheckedIn','CheckedOut','CancelRequested','Cancelled')),
     CONSTRAINT CK_Bookings_Dates CHECK (CheckOutDate > CheckInDate)
 );
 GO
@@ -176,7 +178,32 @@ CREATE TABLE Payments (
     PaymentDate     DATETIME2 NULL,
     CreatedAt       DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
     CONSTRAINT FK_Payments_Bookings FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId),
-    CONSTRAINT CK_Payments_Status CHECK (PaymentStatus IN ('Pending','Success','Failed'))
+    CONSTRAINT CK_Payments_Status CHECK (PaymentStatus IN ('Pending','Success','Failed','Refunded'))
+);
+GO
+
+CREATE TABLE Reviews (
+    ReviewId        INT IDENTITY(1,1) PRIMARY KEY,
+    RoomId          INT NOT NULL,
+    UserId          INT NOT NULL,
+    Rating          INT NOT NULL CHECK (Rating BETWEEN 1 AND 5),
+    Comment         NVARCHAR(MAX) NULL,
+    CreatedAt       DATETIME2 NOT NULL DEFAULT GETDATE(),
+    StaffResponse   NVARCHAR(MAX) NULL,
+    RespondedByUserId INT NULL,
+    RespondedAt     DATETIME2 NULL,
+    CONSTRAINT FK_Reviews_Rooms FOREIGN KEY (RoomId) REFERENCES Rooms(RoomId),
+    CONSTRAINT FK_Reviews_Users FOREIGN KEY (UserId) REFERENCES Users(UserId),
+    CONSTRAINT FK_Reviews_Staff FOREIGN KEY (RespondedByUserId) REFERENCES Users(UserId)
+);
+GO
+
+CREATE TABLE ReviewImages (
+    ReviewImageId   INT IDENTITY(1,1) PRIMARY KEY,
+    ReviewId        INT NOT NULL,
+    ImageUrl        NVARCHAR(500) NOT NULL,
+    CreatedAt       DATETIME2 NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT FK_ReviewImages_Reviews FOREIGN KEY (ReviewId) REFERENCES Reviews(ReviewId) ON DELETE CASCADE
 );
 GO
 
@@ -325,6 +352,11 @@ CREATE TABLE PromoCodes (
     Code            NVARCHAR(30) NOT NULL UNIQUE,
     DiscountAmount  DECIMAL(18,2) NOT NULL DEFAULT 0,
     DiscountPercent INT NOT NULL DEFAULT 0,
-    IsActive        BIT NOT NULL DEFAULT 1
+    IsActive        BIT NOT NULL DEFAULT 1,
+    MinimumOrderAmount DECIMAL(18,2) NOT NULL DEFAULT 0,
+    MaxUses         INT NULL,
+    UsageCount      INT NOT NULL DEFAULT 0,
+    ExpiresAt       DATETIME2 NULL,
+    IsNewCustomerOnly BIT NOT NULL DEFAULT 0
 );
 GO

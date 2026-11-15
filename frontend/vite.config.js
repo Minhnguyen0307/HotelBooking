@@ -6,9 +6,9 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/api': 'http://127.0.0.1:5190',
-      '/images': 'http://127.0.0.1:5190',
-      '/uploads': 'http://127.0.0.1:5190'
+      '/api': 'http://127.0.0.1:5191',
+      '/images': 'http://127.0.0.1:5191',
+      '/uploads': 'http://127.0.0.1:5191'
     }
   }
 });

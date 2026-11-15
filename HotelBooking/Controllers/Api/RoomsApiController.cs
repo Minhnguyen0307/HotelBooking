@@ -1,5 +1,6 @@
 using HotelBooking.Application.DTOs;
 using HotelBooking.Application.Interfaces;
+using HotelBooking.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,6 +58,12 @@ public class RoomsApiController : ControllerBase
         return Ok(await _roomService.GetPropertiesAsync());
     }
 
+    [HttpGet("add-ons")]
+    public IActionResult AddOns()
+    {
+        return Ok(BookingAddOnPricing.GetOptions());
+    }
+
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] RoomSearchDto criteria)
     {
@@ -84,15 +91,15 @@ public class RoomsApiController : ControllerBase
 
         room.ReviewsSummary = await _reviewService.GetRoomReviewsSummaryAsync(id);
         var authenticated = User.Identity?.IsAuthenticated == true;
-        var hasStayed = false;
+        var canReview = false;
         if (authenticated)
-            hasStayed = await _reviewService.CanUserReviewAsync(ApiUser.Id(User), id);
+            canReview = await _reviewService.CanUserReviewAsync(ApiUser.Id(User), id);
 
         return Ok(new
         {
             room,
-            canReview = authenticated,
-            hasStayed
+            canReview,
+            hasStayed = authenticated && canReview
         });
     }
 

@@ -31,8 +31,7 @@ namespace HotelBooking.Application.Services
                 .ToListAsync();
 
             var verifiedUserIds = await _context.BookingRooms
-                .Where(br => br.RoomId == roomId && 
-                    (br.Booking.Status == "CheckedOut" || br.Booking.Status == "CheckedIn" || br.Booking.Status == "Confirmed"))
+                .Where(br => br.RoomId == roomId && br.Booking.Status == "CheckedOut")
                 .Select(br => br.Booking.CustomerId)
                 .Distinct()
                 .ToListAsync();
@@ -74,6 +73,12 @@ namespace HotelBooking.Application.Services
         {
             if (dto.Rating < 1 || dto.Rating > 5)
                 return (false, "Vui lòng chọn số sao đánh giá từ 1 đến 5 sao.");
+
+            if (!await CanUserReviewAsync(userId, dto.RoomId))
+                return (false, "Chỉ khách đã hoàn tất check-out mới có thể đánh giá phòng này.");
+
+            if (dto.Images?.Any(file => file.Length > 5 * 1024 * 1024) == true)
+                return (false, "Mỗi ảnh đánh giá tối đa 5 MB.");
 
             var roomExists = await _context.Rooms.AnyAsync(r => r.RoomId == dto.RoomId);
             if (!roomExists)
@@ -133,8 +138,11 @@ namespace HotelBooking.Application.Services
 
         public async Task<bool> CanUserReviewAsync(int userId, int roomId)
         {
-            return await _context.BookingRooms
-                .AnyAsync(br => br.RoomId == roomId && br.Booking.CustomerId == userId);
+            var hasCompletedStay = await _context.BookingRooms
+                .AnyAsync(br => br.RoomId == roomId && br.Booking.CustomerId == userId && br.Booking.Status == "CheckedOut");
+            if (!hasCompletedStay) return false;
+
+            return !await _context.Reviews.AnyAsync(review => review.RoomId == roomId && review.UserId == userId);
         }
 
         public async Task<(bool Success, string? Error)> ReplyReviewAsync(int staffUserId, int reviewId, string response)

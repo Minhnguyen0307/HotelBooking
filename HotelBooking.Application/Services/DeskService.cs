@@ -192,18 +192,19 @@ namespace HotelBooking.Application.Services
             var quote = OccupancyPricing.Price(room.RoomType.TypeName, room.RoomType.MaxGuests, room.RoomType.BasePrice, dto.NumberOfGuests, nights);
             if (!quote.Success) return (false, quote.ErrorMessage, null);
 
-            var discount = await DiscountAmount(dto.PromoCode, quote.TotalPrice);
+            var customer = await FindOrCreateGuest(name, phone, dto.Email);
+            var discount = await DiscountAmount(dto.PromoCode, quote.TotalPrice, customer.UserId);
             if (discount.Error != null) return (false, discount.Error, null);
             if (dto.Deposit > quote.TotalPrice - discount.Amount)
                 return (false, "Tiền cọc lớn hơn số tiền còn lại.", null);
-
-            var customer = await FindOrCreateGuest(name, phone, dto.Email);
             var booking = new Booking
             {
                 CustomerId = customer.UserId,
                 CheckInDate = dto.CheckInDate,
                 CheckOutDate = dto.CheckOutDate,
                 NumberOfGuests = dto.NumberOfGuests,
+                AdultCount = dto.NumberOfGuests,
+                ChildCount = 0,
                 GuestName = name,
                 GuestPhone = phone,
                 GuestNote = CleanNote(dto.GuestNote),
@@ -229,6 +230,7 @@ namespace HotelBooking.Application.Services
             await _context.SaveChangesAsync();
             if (discount.Amount > 0)
             {
+                if (discount.PromoCode != null) discount.PromoCode.UsageCount++;
                 _context.FolioItems.Add(new FolioItem
                 {
                     BookingId = booking.BookingId,
@@ -450,6 +452,9 @@ namespace HotelBooking.Application.Services
 
         private async Task SyncPending(Booking booking)
         {
+            var services = await _context.FolioItems
+                .Where(f => f.BookingId == booking.BookingId && f.Category == "Service")
+                .SumAsync(f => f.UnitPrice * f.Quantity);
             var discounts = await _context.FolioItems
                 .Where(f => f.BookingId == booking.BookingId && f.Category == "Discount")
                 .SumAsync(f => f.UnitPrice * f.Quantity);
@@ -459,7 +464,7 @@ namespace HotelBooking.Application.Services
             var pending = await _context.Payments
                 .FirstOrDefaultAsync(p => p.BookingId == booking.BookingId && p.PaymentMethod == "Cash" && p.PaymentStatus == "Pending");
             if (pending == null) return;
-            var due = booking.TotalPrice - discounts - paid;
+            var due = booking.TotalPrice + services - discounts - paid;
             if (due <= 0) pending.PaymentStatus = "Failed";
             else pending.Amount = due;
         }
@@ -469,9 +474,10 @@ namespace HotelBooking.Application.Services
             if (string.IsNullOrWhiteSpace(code)) return null;
             if (await _context.FolioItems.AnyAsync(f => f.BookingId == booking.BookingId && f.Category == "Discount"))
                 return null;
-            var discount = await DiscountAmount(code, booking.TotalPrice);
+            var discount = await DiscountAmount(code, booking.TotalPrice, booking.CustomerId);
             if (discount.Error != null) return discount.Error;
             if (discount.Amount <= 0) return null;
+            if (discount.PromoCode != null) discount.PromoCode.UsageCount++;
             _context.FolioItems.Add(new FolioItem
             {
                 BookingId = booking.BookingId,
@@ -484,15 +490,23 @@ namespace HotelBooking.Application.Services
             return null;
         }
 
-        private async Task<(decimal Amount, string? Error)> DiscountAmount(string? code, decimal roomTotal)
+        private async Task<(decimal Amount, string? Error, PromoCode? PromoCode)> DiscountAmount(string? code, decimal roomTotal, int customerId)
         {
-            if (string.IsNullOrWhiteSpace(code)) return (0, null);
+            if (string.IsNullOrWhiteSpace(code)) return (0, null, null);
             var promo = await _context.PromoCodes.FirstOrDefaultAsync(p => p.Code == code.Trim().ToUpperInvariant() && p.IsActive);
-            if (promo == null) return (0, "Mã giảm giá không dùng được.");
+            if (promo == null) return (0, "Mã giảm giá không dùng được.", null);
+            if (promo.IsNewCustomerOnly && await _context.Bookings.AnyAsync(booking => booking.CustomerId == customerId))
+                return (0, "Mã này chỉ áp dụng cho khách hàng đặt phòng lần đầu.", null);
+            if (promo.ExpiresAt.HasValue && promo.ExpiresAt.Value <= DateTime.UtcNow)
+                return (0, "Mã giảm giá đã hết hạn.", null);
+            if (promo.MaxUses.HasValue && promo.UsageCount >= promo.MaxUses.Value)
+                return (0, "Mã giảm giá đã hết lượt sử dụng.", null);
+            if (roomTotal < promo.MinimumOrderAmount)
+                return (0, $"Mã này áp dụng cho đơn từ {OccupancyPricing.Money(promo.MinimumOrderAmount)}.", null);
             var amount = promo.DiscountPercent > 0
                 ? Math.Round(roomTotal * promo.DiscountPercent / 100m, 0)
                 : promo.DiscountAmount;
-            return (Math.Min(amount, roomTotal), null);
+            return (Math.Min(amount, roomTotal), null, promo);
         }
 
         private async Task<FolioDto> BuildFolio(Booking booking)

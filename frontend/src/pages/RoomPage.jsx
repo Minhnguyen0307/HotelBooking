@@ -5,6 +5,25 @@ import { useAuth } from '../auth';
 import { money, today, tomorrow } from '../format';
 import { AsyncView, Photo, StarPicker, StarRow, StayDates, useLoad } from '../ui';
 
+function bookingPayload(data, roomId) {
+  return {
+    roomId: Number(roomId),
+    checkInDate: data.checkInDate,
+    checkOutDate: data.checkOutDate,
+    adultCount: Number(data.adultCount || 0),
+    childCount: Number(data.childCount || 0),
+    numberOfGuests: Number(data.adultCount || 0) + Number(data.childCount || 0),
+    guestName: data.guestName || '',
+    guestPhone: data.guestPhone || '',
+    guestNote: data.guestNote || '',
+    paymentChoice: data.paymentChoice || 'Now',
+    promoCode: data.promoCode || '',
+    addOns: Object.entries(data)
+      .filter(([key, value]) => key.startsWith('addon_') && Number(value) > 0)
+      .map(([key, value]) => ({ code: key.slice('addon_'.length), quantity: Number(value) }))
+  };
+}
+
 export function RoomPage() {
   const { id } = useParams();
   const { user, hasRole } = useAuth();
@@ -13,14 +32,33 @@ export function RoomPage() {
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState('');
   const saved = JSON.parse(sessionStorage.getItem('search') || '{}');
-  const state = useLoad(() => api(`/api/rooms/${id}`), [id, tick]);
+  const state = useLoad(async () => {
+    const [detail, addOnsResult, promoResult] = await Promise.all([
+      api(`/api/rooms/${id}`),
+      api('/api/rooms/add-ons')
+        .then((data) => ({ data }))
+        .catch((error) => ({ error })),
+      user
+        ? api('/api/bookings/promos')
+            .then((data) => ({ data }))
+            .catch((error) => ({ error }))
+        : Promise.resolve({ data: [] })
+    ]);
+    return {
+      ...detail,
+      addOns: addOnsResult.data || [],
+      addOnsLoadError: addOnsResult.error,
+      promoCodes: promoResult.data || [],
+      promoLoadError: promoResult.error
+    };
+  }, [id, tick, user]);
 
   async function onPreview(event) {
     const form = event.target.form;
     const data = Object.fromEntries(new FormData(form));
     setError('');
     try {
-      const result = await api(`/api/bookings/preview?roomId=${id}&checkInDate=${data.checkInDate}&checkOutDate=${data.checkOutDate}&numberOfGuests=${data.numberOfGuests}`);
+      const result = await api('/api/bookings/preview', { method: 'POST', body: bookingPayload(data, id) });
       setPreview(result);
     } catch (err) {
       setError(err.message);
@@ -35,14 +73,7 @@ export function RoomPage() {
       const result = await api('/api/bookings', {
         method: 'POST',
         body: {
-          roomId: Number(id),
-          checkInDate: data.checkInDate,
-          checkOutDate: data.checkOutDate,
-          numberOfGuests: Number(data.numberOfGuests),
-          guestName: data.guestName,
-          guestPhone: data.guestPhone,
-          guestNote: data.guestNote,
-          paymentChoice: data.paymentChoice
+          ...bookingPayload(data, id)
         }
       });
       if (result.requiresPayment) {
@@ -107,10 +138,37 @@ export function RoomPage() {
               <form className="panel stack" onSubmit={onBook}>
                 <h2>Mời bạn lưu trú</h2>
                 <StayDates checkIn={saved.checkInDate || today()} checkOut={saved.checkOutDate || tomorrow()} />
-                <label>Số khách<input name="numberOfGuests" type="number" min="1" max={room.maxGuests} defaultValue={saved.guests || 1} required /></label>
+                <div className="form-grid guest-counts">
+                  <label>Người lớn<input name="adultCount" type="number" min="1" max={room.maxGuests} defaultValue={saved.adults || saved.guests || 1} required /></label>
+                  <label>Trẻ em<input name="childCount" type="number" min="0" max={room.maxGuests - 1} defaultValue={saved.children || 0} /></label>
+                </div>
+                <p className="muted">Tổng số người lớn và trẻ em dùng để kiểm tra sức chứa và phụ thu phòng.</p>
+                {data.addOnsLoadError && <p className="muted">Dịch vụ cộng thêm tạm thời chưa tải được; bạn vẫn có thể xem giá phòng.</p>}
                 <label>Người nhận phòng<input name="guestName" defaultValue={user?.fullName || ''} required /></label>
                 <label>Số điện thoại<input name="guestPhone" inputMode="tel" pattern="0[0-9]{9}" defaultValue={user?.phoneNumber || ''} required /></label>
                 <label>Lời nhắn<textarea name="guestNote" maxLength="500" placeholder="Giờ đến, yêu cầu phòng..."></textarea></label>
+                <fieldset className="stack add-on-picker">
+                  <legend>Dịch vụ cộng thêm</legend>
+                  {(data.addOns || []).map((option) => (
+                    <label className="add-on-option" key={option.code}>
+                      <span><strong>{option.name}</strong><small>{option.description} {money(option.unitPrice)} / {option.unitLabel}</small></span>
+                      <input name={`addon_${option.code}`} type="number" min="0" max={option.code === 'breakfast' ? '8' : option.maxQuantity} defaultValue="0" aria-label={`Số lượng ${option.name}`} />
+                    </label>
+                  ))}
+                </fieldset>
+                <label>Mã ưu đãi
+                  <select name="promoCode" defaultValue="">
+                    <option value="">Không áp dụng mã</option>
+                    {(data.promoCodes || []).map((promo) => (
+                      <option value={promo.code} key={promo.code}>
+                        {promo.code} · {promo.discountPercent > 0 ? `giảm ${promo.discountPercent}%` : `giảm ${money(promo.discountAmount)}`} · đơn từ {money(promo.minimumOrderAmount)}{promo.isNewCustomerOnly ? ' · khách mới' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {!user && <p className="muted">Đăng nhập để xem các mã ưu đãi phù hợp với tài khoản.</p>}
+                {user && data.promoLoadError && <p className="muted">Kho mã ưu đãi tạm thời chưa tải được; bạn vẫn có thể tiếp tục đặt phòng.</p>}
+                {user && !data.promoLoadError && (data.promoCodes || []).length === 0 && <p className="muted">Hiện không có mã ưu đãi nào khả dụng cho tài khoản.</p>}
                 <fieldset className="pay-choice">
                   <legend>Thanh toán</legend>
                   <label className="choice"><input type="radio" name="paymentChoice" value="Now" defaultChecked /> Thanh toán ngay</label>
@@ -118,9 +176,11 @@ export function RoomPage() {
                 </fieldset>
                 {preview && (
                   <div className="fare">
-                    <span>{preview.stayLabel} · {preview.nights} đêm · {preview.numberOfGuests} khách</span>
+                    <span>{preview.stayLabel} · {preview.nights} đêm · {preview.adultCount} người lớn, {preview.childCount} trẻ em</span>
                     <span>Giá phòng {money(preview.roomCharge)}</span>
                     <span>Phụ thu {money(preview.surcharge)}</span>
+                    {(preview.addOns || []).map((item) => <span key={item.code}>{item.name} · {item.quantity} {item.unitLabel}: {money(item.totalPrice)}</span>)}
+                    {preview.discountTotal > 0 && <span>Ưu đãi {preview.promoCode}: −{money(preview.discountTotal)}</span>}
                     <strong>Tổng {money(preview.totalPrice)}</strong>
                     <span>{preview.summary}</span>
                   </div>
@@ -139,6 +199,11 @@ export function RoomPage() {
                     <StarRow value={review.rating} />
                   </div>
                   <p>{review.comment}</p>
+                  {(review.imageUrls || []).length > 0 && (
+                    <div className="review-images">
+                      {review.imageUrls.map((url) => <img key={url} src={url} alt="Ảnh khách gửi kèm đánh giá" loading="lazy" />)}
+                    </div>
+                  )}
                   {review.staffResponse && <p className="muted">Phản hồi: {review.staffResponse}</p>}
                   {hasRole('Receptionist', 'Manager', 'Admin') && (
                     <form className="row" onSubmit={(event) => onReply(event, review.reviewId)}>
@@ -148,15 +213,15 @@ export function RoomPage() {
                   )}
                 </article>
               ))}
-              {user ? (
+              {user && data.canReview ? (
                 <form className="panel stack" onSubmit={onReview}>
-                  <h3>Chia sẻ trải nghiệm</h3>
+                  <h3>Chia sẻ trải nghiệm sau check-out</h3>
                   <StarPicker />
                   <label>Nhận xét<textarea name="comment"></textarea></label>
                   <label>Ảnh<input name="images" type="file" accept="image/*" multiple /></label>
                   <button className="btn" type="submit">Gửi đánh giá</button>
                 </form>
-              ) : <p className="muted">Mời bạn <Link to="/login">đăng nhập</Link> để chia sẻ trải nghiệm.</p>}
+              ) : user ? <p className="muted">Chỉ khách đã hoàn tất check-out mới được gửi đánh giá. Mỗi khách chỉ đánh giá một lần cho mỗi phòng.</p> : <p className="muted">Mời bạn <Link to="/login">đăng nhập</Link>. Chỉ khách đã hoàn tất check-out mới được đánh giá.</p>}
             </section>
           </>
         );
