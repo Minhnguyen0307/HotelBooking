@@ -44,11 +44,12 @@ export function AdminRoomsPage() {
           <div className="table-wrap">
             <table>
               <thead>
-                <tr><th>Số</th><th>Loại</th><th>Tầng</th><th>Trạng thái</th><th></th></tr>
+                <tr><th>Cơ sở</th><th>Số</th><th>Loại</th><th>Tầng</th><th>Trạng thái</th><th></th></tr>
               </thead>
               <tbody>
                 {rooms.map((room) => (
                   <tr key={room.roomId}>
+                    <td>{room.propertyName}</td>
                     <td>{room.roomNumber}</td>
                     <td>{room.typeName}</td>
                     <td>{room.floor ?? ''}</td>

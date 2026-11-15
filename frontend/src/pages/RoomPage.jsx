@@ -87,23 +87,28 @@ export function RoomPage() {
               <article className="card">
                 <Photo url={(room.imageUrls || [])[0]} />
                 <div className="pad">
-                  <p className="pill">{room.typeName}</p>
+                  <p className="pill">{room.propertyName} · {room.area}</p>
                   <h1>Phòng {room.roomNumber}</h1>
                   <p>{room.description}</p>
-                  <p className="muted">{room.address} · Tối đa {room.maxGuests} khách</p>
+                  <p className="muted">{room.address} · {room.typeName}</p>
                   <p>{(room.amenities || []).map((item) => <span className="pill" key={item}>{item}</span>)}</p>
                   <p className="price">{money(room.basePrice)} / đêm</p>
+                  <p className="fare">{room.occupancyRule}</p>
                 </div>
               </article>
               <form className="panel stack" onSubmit={onBook}>
-                <h2>Đặt phòng</h2>
+                <h2>Mời bạn lưu trú</h2>
                 <StayDates checkIn={saved.checkInDate || today()} checkOut={saved.checkOutDate || tomorrow()} />
-                <label>Số khách<input name="numberOfGuests" type="number" min="1" defaultValue={saved.guests || 1} required /></label>
-                <div className="muted">
-                  {preview
-                    ? `${preview.nights} đêm · ${money(preview.pricePerNight)} / đêm · ${money(preview.totalPrice)}`
-                    : 'Chọn ngày để xem tổng tiền.'}
-                </div>
+                <label>Số khách<input name="numberOfGuests" type="number" min="1" max={room.maxGuests} defaultValue={saved.guests || 1} required /></label>
+                {preview && (
+                  <div className="fare">
+                    <span>{preview.stayLabel} · {preview.nights} đêm · {preview.numberOfGuests} khách</span>
+                    <span>Giá phòng {money(preview.roomCharge)}</span>
+                    <span>Phụ thu {money(preview.surcharge)}</span>
+                    <strong>Tổng {money(preview.totalPrice)}</strong>
+                    <span>{preview.summary}</span>
+                  </div>
+                )}
                 <button className="btn secondary" type="button" onClick={onPreview}>Xem giá</button>
                 <button className="btn" type="submit">Xác nhận đặt</button>
               </form>
@@ -129,14 +134,13 @@ export function RoomPage() {
               ))}
               {user ? (
                 <form className="panel stack" onSubmit={onReview}>
-                  <h3>Viết đánh giá</h3>
-                  {!data.hasStayed && <p className="muted">Bạn có thể gửi đánh giá. Huy hiệu đã ở chỉ hiện khi có đơn phòng này.</p>}
+                  <h3>Chia sẻ trải nghiệm</h3>
                   <StarPicker />
                   <label>Nhận xét<textarea name="comment"></textarea></label>
                   <label>Ảnh<input name="images" type="file" accept="image/*" multiple /></label>
                   <button className="btn" type="submit">Gửi đánh giá</button>
                 </form>
-              ) : <p><Link to="/login">Đăng nhập</Link> để đánh giá phòng.</p>}
+              ) : <p className="muted">Mời bạn <Link to="/login">đăng nhập</Link> để chia sẻ trải nghiệm.</p>}
             </section>
           </>
         );

@@ -19,6 +19,20 @@ namespace HotelBooking.Application.DTOs
         public int Nights { get; set; }
         public decimal PricePerNight { get; set; }
         public decimal TotalPrice { get; set; }
+        public string StayLabel { get; set; } = string.Empty;
+        public int IncludedGuests { get; set; }
+        public int ExtraGuests { get; set; }
+        public decimal ExtraGuestFee { get; set; }
+        public decimal RoomCharge { get; set; }
+        public decimal Surcharge { get; set; }
+        public string Summary { get; set; } = string.Empty;
+    }
+
+    public class BookingPreviewResult
+    {
+        public bool Success { get; set; }
+        public string? ErrorMessage { get; set; }
+        public BookingConfirmDto? Preview { get; set; }
     }
 
     public class BookingListItemDto
@@ -26,6 +40,7 @@ namespace HotelBooking.Application.DTOs
         public int BookingId { get; set; }
         public string RoomNumber { get; set; } = string.Empty;
         public string TypeName { get; set; } = string.Empty;
+        public string PropertyName { get; set; } = string.Empty;
         public DateOnly CheckInDate { get; set; }
         public DateOnly CheckOutDate { get; set; }
         public string Status { get; set; } = string.Empty;

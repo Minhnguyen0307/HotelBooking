@@ -67,9 +67,19 @@ CREATE TABLE RoomTypes (
 );
 GO
 
+CREATE TABLE Properties (
+    PropertyId      INT IDENTITY(1,1) PRIMARY KEY,
+    Name            NVARCHAR(120) NOT NULL UNIQUE,
+    Area            NVARCHAR(80) NOT NULL,
+    Address         NVARCHAR(255) NOT NULL,
+    Description     NVARCHAR(MAX) NULL
+);
+GO
+
 CREATE TABLE Rooms (
     RoomId          INT IDENTITY(1,1) PRIMARY KEY,
     RoomTypeId      INT NOT NULL,
+    PropertyId      INT NOT NULL,
     RoomNumber      NVARCHAR(20) NOT NULL UNIQUE,
     Floor           INT NULL,
     Status          NVARCHAR(20) NOT NULL DEFAULT 'Available',
@@ -79,6 +89,7 @@ CREATE TABLE Rooms (
     CreatedAt       DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
     UpdatedAt       DATETIME2 NULL,
     CONSTRAINT FK_Rooms_RoomTypes FOREIGN KEY (RoomTypeId) REFERENCES RoomTypes(RoomTypeId),
+    CONSTRAINT FK_Rooms_Properties FOREIGN KEY (PropertyId) REFERENCES Properties(PropertyId),
     CONSTRAINT CK_Rooms_Status CHECK (Status IN ('Available','Booked','Maintenance'))
 );
 GO

@@ -50,7 +50,8 @@ public class AdminRoomsApiController : ControllerBase
             room.Floor,
             room.Status,
             room.Description,
-            room.Address
+            room.Address,
+            room.PropertyId
         });
     }
 

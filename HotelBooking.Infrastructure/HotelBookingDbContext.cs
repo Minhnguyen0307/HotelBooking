@@ -27,6 +27,8 @@ public partial class HotelBookingDbContext : DbContext
 
     public virtual DbSet<Payment> Payments { get; set; }
 
+    public virtual DbSet<Property> Properties { get; set; }
+
     public virtual DbSet<Refund> Refunds { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
@@ -177,11 +179,22 @@ public partial class HotelBookingDbContext : DbContext
             entity.Property(e => e.RoleName).HasMaxLength(50);
         });
 
+        modelBuilder.Entity<Property>(entity =>
+        {
+            entity.HasKey(e => e.PropertyId).HasName("PK_Properties");
+            entity.HasIndex(e => e.Name, "UQ_Properties_Name").IsUnique();
+            entity.Property(e => e.Name).HasMaxLength(120);
+            entity.Property(e => e.Area).HasMaxLength(80);
+            entity.Property(e => e.Address).HasMaxLength(255);
+        });
+
         modelBuilder.Entity<Room>(entity =>
         {
             entity.HasKey(e => e.RoomId).HasName("PK__Rooms__32863939798A594B");
 
             entity.HasIndex(e => e.RoomTypeId, "IX_Rooms_RoomTypeId");
+
+            entity.HasIndex(e => e.PropertyId, "IX_Rooms_PropertyId");
 
             entity.HasIndex(e => e.Status, "IX_Rooms_Status");
 
@@ -199,6 +212,11 @@ public partial class HotelBookingDbContext : DbContext
                 .HasForeignKey(d => d.RoomTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Rooms_RoomTypes");
+
+            entity.HasOne(d => d.Property).WithMany(p => p.Rooms)
+                .HasForeignKey(d => d.PropertyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Rooms_Properties");
 
             entity.HasMany(d => d.Amenities).WithMany(p => p.Rooms)
                 .UsingEntity<Dictionary<string, object>>(

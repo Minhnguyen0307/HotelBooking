@@ -15,7 +15,7 @@ export default function App() {
   return (
     <div className="shell">
       <div className="topbar">
-        <span>HBS Luxury Hotel · 123 Võ Nguyên Giáp, Sơn Trà, Đà Nẵng</span>
+        <span>Chào mừng quý khách đến HBS</span>
         <span>Check-in 14:00 · Check-out 12:00</span>
       </div>
       <nav className="nav">
@@ -51,7 +51,8 @@ export default function App() {
         <Outlet />
       </main>
       <footer className="footer">
-        HBS Luxury Hotel · React + Web API · <NavLink to="/privacy">Bảo mật</NavLink>
+        <span>HBS Luxury Hotel · Đà Nẵng</span>
+        <NavLink to="/privacy">Bảo mật</NavLink>
       </footer>
     </div>
   );

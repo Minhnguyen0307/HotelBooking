@@ -21,9 +21,9 @@ public class BookingsApiController : ControllerBase
     public async Task<IActionResult> Preview([FromQuery] BookingCreateDto dto)
     {
         var preview = await _bookingService.GetBookingPreviewAsync(dto);
-        if (preview == null)
-            return NotFound(new { message = "Không tạo được xem trước đơn đặt phòng." });
-        return Ok(preview);
+        if (!preview.Success || preview.Preview == null)
+            return BadRequest(new { message = preview.ErrorMessage ?? "Không tạo được xem trước đơn đặt phòng." });
+        return Ok(preview.Preview);
     }
 
     [HttpPost]

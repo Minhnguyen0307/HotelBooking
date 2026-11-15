@@ -29,20 +29,39 @@ namespace HotelBooking.Application.Services
             return !isOverlapping;
         }
 
-        public async Task<BookingConfirmDto?> GetBookingPreviewAsync(BookingCreateDto dto)
+        public async Task<BookingPreviewResult> GetBookingPreviewAsync(BookingCreateDto dto)
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
-            if (dto.CheckInDate < today) return null;
+            if (dto.CheckInDate < today)
+                return FailPreview("Ngày nhận phòng không được là ngày trong quá khứ.");
+
             var room = await _context.Rooms
                 .Include(r => r.RoomType)
                 .FirstOrDefaultAsync(r => r.RoomId == dto.RoomId);
 
-            if (room == null) return null;
+            if (room == null)
+                return FailPreview("Phòng không tồn tại.");
 
             int nights = dto.CheckOutDate.DayNumber - dto.CheckInDate.DayNumber;
-            if (nights <= 0) return null;
+            if (nights <= 0)
+                return FailPreview("Ngày trả phòng phải sau ngày nhận phòng.");
 
-            return new BookingConfirmDto
+            var quote = OccupancyPricing.Price(room.RoomType.TypeName, room.RoomType.MaxGuests, room.RoomType.BasePrice, dto.NumberOfGuests, nights);
+            if (!quote.Success)
+                return FailPreview(quote.ErrorMessage ?? quote.Plan.Rule);
+
+            return new BookingPreviewResult
+            {
+                Success = true,
+                Preview = ToConfirm(room, dto, nights, quote)
+            };
+        }
+
+        private static BookingPreviewResult FailPreview(string message) =>
+            new() { Success = false, ErrorMessage = message };
+
+        private static BookingConfirmDto ToConfirm(Room room, BookingCreateDto dto, int nights, OccupancyPricing.Quote quote) =>
+            new()
             {
                 RoomId = room.RoomId,
                 RoomNumber = room.RoomNumber,
@@ -51,10 +70,16 @@ namespace HotelBooking.Application.Services
                 CheckOutDate = dto.CheckOutDate,
                 NumberOfGuests = dto.NumberOfGuests,
                 Nights = nights,
-                PricePerNight = room.RoomType.BasePrice,
-                TotalPrice = room.RoomType.BasePrice * nights
+                PricePerNight = quote.PricePerNight,
+                TotalPrice = quote.TotalPrice,
+                StayLabel = quote.Plan.Label,
+                IncludedGuests = quote.Plan.IncludedGuests,
+                ExtraGuests = quote.ExtraGuests,
+                ExtraGuestFee = quote.Plan.ExtraGuestFeePerNight,
+                RoomCharge = quote.RoomCharge,
+                Surcharge = quote.Surcharge,
+                Summary = quote.Summary
             };
-        }
 
         public async Task<BookingResult> CreateBookingAsync(int customerId, BookingCreateDto dto)
         {
@@ -73,16 +98,16 @@ namespace HotelBooking.Application.Services
             if (room == null)
                 return new BookingResult { Success = false, ErrorMessage = "Phòng không tồn tại." };
 
-            if (dto.NumberOfGuests > room.RoomType.MaxGuests)
-                return new BookingResult { Success = false, ErrorMessage = $"Phòng này chỉ chứa tối đa {room.RoomType.MaxGuests} khách." };
+            int nights = dto.CheckOutDate.DayNumber - dto.CheckInDate.DayNumber;
+            var quote = OccupancyPricing.Price(room.RoomType.TypeName, room.RoomType.MaxGuests, room.RoomType.BasePrice, dto.NumberOfGuests, nights);
+            if (!quote.Success)
+                return new BookingResult { Success = false, ErrorMessage = quote.ErrorMessage };
 
-  
             bool available = await IsRoomAvailableAsync(dto.RoomId, dto.CheckInDate, dto.CheckOutDate);
             if (!available)
                 return new BookingResult { Success = false, ErrorMessage = "Rất tiếc, phòng vừa được người khác đặt trước. Vui lòng chọn phòng khác." };
 
-            int nights = dto.CheckOutDate.DayNumber - dto.CheckInDate.DayNumber;
-            decimal totalPrice = room.RoomType.BasePrice * nights;
+            decimal totalPrice = quote.TotalPrice;
 
             var booking = new Booking
             {
@@ -98,7 +123,7 @@ namespace HotelBooking.Application.Services
             booking.BookingRooms.Add(new BookingRoom
             {
                 RoomId = dto.RoomId,
-                PricePerNight = room.RoomType.BasePrice
+                PricePerNight = quote.PricePerNight
             });
 
             _context.Bookings.Add(booking);
@@ -122,6 +147,7 @@ namespace HotelBooking.Application.Services
                     BookingId = b.BookingId,
                     RoomNumber = b.BookingRooms.Select(br => br.Room.RoomNumber).FirstOrDefault() ?? "",
                     TypeName = b.BookingRooms.Select(br => br.Room.RoomType.TypeName).FirstOrDefault() ?? "",
+                    PropertyName = b.BookingRooms.Select(br => br.Room.Property.Name).FirstOrDefault() ?? "",
                     CheckInDate = b.CheckInDate,
                     CheckOutDate = b.CheckOutDate,
                     Status = b.Status,

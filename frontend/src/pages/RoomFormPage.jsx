@@ -12,8 +12,9 @@ export function RoomFormPage() {
   const [error, setError] = useState('');
   const state = useLoad(async () => {
     const types = await api('/api/admin/rooms/types');
-    const room = isNew ? { status: 'Available' } : await api(`/api/admin/rooms/${id}`);
-    return { types, room };
+    const properties = await api('/api/rooms/properties');
+    const room = isNew ? { status: 'Available', propertyId: properties[0]?.propertyId } : await api(`/api/admin/rooms/${id}`);
+    return { types, properties, room };
   }, [id]);
 
   async function onSubmit(event) {
@@ -32,7 +33,7 @@ export function RoomFormPage() {
 
   return (
     <AsyncView state={state}>
-      {({ types, room }) => (
+      {({ types, properties, room }) => (
         <form className="panel stack" onSubmit={onSubmit}>
           <h1>{isNew ? 'Thêm phòng' : `Sửa phòng ${room.roomNumber}`}</h1>
           {error && <div className="banner">{error}</div>}
@@ -50,8 +51,15 @@ export function RoomFormPage() {
               {ROOM_STATUSES.map((status) => <option key={status}>{status}</option>)}
             </select>
           </label>
+          <label>
+            Cơ sở
+            <select name="propertyId" defaultValue={room.propertyId || properties[0]?.propertyId} required>
+              {properties.map((property) => (
+                <option value={property.propertyId} key={property.propertyId}>{property.name} · {property.area}</option>
+              ))}
+            </select>
+          </label>
           <label>Mô tả<textarea name="description" defaultValue={room.description || ''}></textarea></label>
-          <label>Địa chỉ<input name="address" defaultValue={room.address || ''} /></label>
           <label>Ảnh<input name="imageFile" type="file" accept="image/*" /></label>
           <button className="btn" type="submit">Lưu</button>
         </form>

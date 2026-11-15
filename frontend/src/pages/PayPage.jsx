@@ -49,7 +49,13 @@ export function PayPage() {
             <h1>Thanh toán #{booking.bookingId}</h1>
             {error && <div className="banner">{error}</div>}
             <p>{booking.checkInDate} → {booking.checkOutDate} · {booking.numberOfGuests} khách</p>
-            <p className="price">{money(booking.totalPrice)}</p>
+            <div className="fare">
+              {booking.stayLabel && <span>{booking.stayLabel}</span>}
+              {booking.roomCharge != null && <span>Giá phòng {money(booking.roomCharge)}</span>}
+              {booking.surcharge > 0 && <span>Phụ thu {money(booking.surcharge)}</span>}
+              {booking.summary && <span>{booking.summary}</span>}
+              <strong>Tổng {money(booking.totalPrice)}</strong>
+            </div>
             <label>
               Phương thức
               <select name="paymentMethod" defaultValue="Card">
