@@ -7,8 +7,8 @@ import { dateTime, money, statusLabel } from '../format';
 function paymentMethodLabel(item) {
   const method = (item.paymentMethod || '').toLowerCase();
   if (method === 'cash') return 'Tiền mặt khi nhận phòng';
-  if (method.includes('vietqr')) return 'VietQR chuyển khoản';
-  if (method === 'now') return 'VietQR chuyển khoản';
+  if (method.includes('vietqr')) return 'VietQR';
+  if (method === 'now') return 'VietQR';
   return item.paymentMethod || 'Chưa chọn';
 }
 
@@ -86,7 +86,7 @@ function BookingDetails({ item }) {
         {item.refundStatus && (
           <div className="booking-detail-field">
             <span>Hoàn tiền</span>
-            <strong>{item.refundStatus === 'Pending' ? 'Đang chờ xử lý (mô phỏng)' : item.refundStatus === 'Completed' ? 'Đã hoàn tất (mô phỏng)' : item.refundStatus}</strong>
+            <strong>{item.refundStatus === 'Pending' ? 'Đang chờ xử lý' : item.refundStatus === 'Completed' ? 'Đã hoàn tất' : item.refundStatus}</strong>
           </div>
         )}
         {item.guestNote && (
@@ -186,7 +186,7 @@ export function BookingsPage() {
                     <p className="muted">Chỉ hủy được trước 00:00 ngày nhận phòng.</p>
                     <p className="banner info">
                       {item.refundAmount > 0
-                        ? `Đã thanh toán ${money(item.refundAmount)}. Khi hủy, hệ thống sẽ ghi nhận yêu cầu hoàn tiền (mô phỏng), dự kiến 3–5 ngày làm việc.`
+                        ? `Đã thanh toán ${money(item.refundAmount)}. Khi hủy, hệ thống sẽ ghi nhận yêu cầu hoàn tiền, dự kiến 3–5 ngày làm việc.`
                         : 'Đơn chưa thanh toán thành công nên sẽ không phát sinh hoàn tiền.'}
                     </p>
                     <div className="row">

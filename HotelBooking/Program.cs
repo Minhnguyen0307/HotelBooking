@@ -32,7 +32,6 @@ builder.Services.AddSingleton<HotelBookingAutomationWorker>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<HotelBookingAutomationWorker>());
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<HotelPolicies>(builder.Configuration.GetSection("HotelPolicies"));
-builder.Services.Configure<VietQrSettings>(builder.Configuration.GetSection("VietQR"));
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

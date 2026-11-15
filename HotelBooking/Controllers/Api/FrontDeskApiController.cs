@@ -2,8 +2,6 @@ using HotelBooking.Application.DTOs;
 using HotelBooking.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using HotelBooking.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Controllers.Api;
 
@@ -15,14 +13,12 @@ public class FrontDeskApiController : ControllerBase
     private readonly IFrontDeskService _frontDeskService;
     private readonly IDeskService _deskService;
     private readonly IReviewService _reviewService;
-    private readonly HotelBookingDbContext _context;
 
-    public FrontDeskApiController(IFrontDeskService frontDeskService, IDeskService deskService, IReviewService reviewService, HotelBookingDbContext context)
+    public FrontDeskApiController(IFrontDeskService frontDeskService, IDeskService deskService, IReviewService reviewService)
     {
         _frontDeskService = frontDeskService;
         _deskService = deskService;
         _reviewService = reviewService;
-        _context = context;
     }
 
     [HttpGet]
@@ -37,22 +33,7 @@ public class FrontDeskApiController : ControllerBase
             reviews = await _reviewService.GetAllReviewsAsync(),
             rooms = await _deskService.GetRoomsAsync(),
             services = await _deskService.GetServicesAsync(),
-            issues = await _deskService.OpenIssuesAsync(),
-            pendingPayments = await _context.Payments
-                .Where(p => p.PaymentMethod == "VietQR" && p.PaymentStatus == "Pending" && (p.Booking.Status == "Pending" || p.Booking.Status == "Cancelled"))
-                .OrderBy(p => p.CreatedAt)
-                .Select(p => new
-                {
-                    p.BookingId,
-                    p.Amount,
-                    p.Booking.GuestName,
-                    CustomerName = p.Booking.Customer.FullName,
-                    p.Booking.CheckInDate,
-                    p.Booking.CheckOutDate,
-                    BookingStatus = p.Booking.Status,
-                    RoomNumber = p.Booking.BookingRooms.Select(br => br.Room.RoomNumber).FirstOrDefault() ?? ""
-                })
-                .ToListAsync()
+            issues = await _deskService.OpenIssuesAsync()
         });
     }
 

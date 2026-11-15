@@ -73,13 +73,7 @@ export function FrontDeskPage() {
           {(data) => (
             <>
               {view === 'board' && (
-                <Board
-                  data={data}
-                  selectedId={selectedId}
-                  onOpen={setSelectedId}
-                  onCancel={(id) => api(`/api/frontdesk/confirm-cancel/${id}`, { method: 'POST' }).then((result) => refresh(result.message)).catch((err) => setError(err.message))}
-                  onConfirmPayment={(id) => api(`/api/payments/${id}/confirm-manual`, { method: 'POST' }).then((result) => refresh(result.message)).catch((err) => setError(err.message))}
-                />
+                <Board data={data} selectedId={selectedId} onOpen={setSelectedId} onCancel={(id) => api(`/api/frontdesk/confirm-cancel/${id}`, { method: 'POST' }).then((result) => refresh(result.message)).catch((err) => setError(err.message))} />
               )}
               {view === 'phone' && (
                 <PhoneBook
@@ -104,25 +98,9 @@ export function FrontDeskPage() {
   );
 }
 
-function Board({ data, selectedId, onOpen, onCancel, onConfirmPayment }) {
+function Board({ data, selectedId, onOpen, onCancel }) {
   return (
     <div className="desk-board">
-      {(data.pendingPayments || []).length > 0 && (
-        <section>
-          <h2>Chờ đối chiếu chuyển khoản VietQR</h2>
-          <p>Chỉ xác nhận sau khi kiểm tra giao dịch đã vào đúng tài khoản và đúng số tiền trên ứng dụng ngân hàng.</p>
-          {(data.pendingPayments || []).map((item) => (
-            <article className="stay-card" key={item.bookingId}>
-              <div>
-                <strong>Đơn #{item.bookingId} · {item.guestName || item.customerName}</strong>
-                <p>{item.roomNumber} · {item.checkInDate} → {item.checkOutDate} · {statusLabel(item.bookingStatus)}</p>
-                <p>Nội dung cần khớp: BOOKING_{item.bookingId} · Số tiền: {money(item.amount)}</p>
-              </div>
-              <button className="btn small" type="button" onClick={() => onConfirmPayment(item.bookingId)}>{item.bookingStatus === 'Cancelled' ? 'Đối chiếu tiền đã về' : 'Đã nhận tiền'}</button>
-            </article>
-          ))}
-        </section>
-      )}
       <section>
         <h2>Check-in · khách đến</h2>
         <StayList rows={data.arrivals} selectedId={selectedId} action="Check-in" onOpen={onOpen} />

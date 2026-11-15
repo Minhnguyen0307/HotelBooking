@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { money } from '../format';
@@ -8,17 +8,24 @@ import { AsyncView, useLoad } from '../ui';
 export function PayPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [error, setError] = useState('');
   const state = useLoad(() => api(`/api/payments/${id}`), [id]);
 
-  useEffect(() => {
-    const timer = window.setInterval(() => state.retry(), 5000);
-    return () => window.clearInterval(timer);
-  }, [id]);
-
-  const paid = state.data?.alreadyPaid || state.data?.booking?.status === 'Confirmed';
-  useEffect(() => {
-    if (paid) navigate('/bookings', { replace: true, state: { message: `Đơn #${id} đã được nhân viên xác nhận thanh toán.`, kind: 'ok' } });
-  }, [paid, id, navigate]);
+  async function onSubmit(event) {
+    event.preventDefault();
+    setError('');
+    try {
+      const result = await api('/api/payments/process', {
+        method: 'POST',
+        body: { bookingId: Number(id) }
+      });
+      navigate('/bookings', {
+        state: { message: `${result.message} Mã giao dịch ${result.transactionId}`, kind: 'ok' }
+      });
+    } catch (err) {
+      setError(err.message);
+    }
+  }
 
   return (
     <div className="lux lux-page">
@@ -38,9 +45,10 @@ export function PayPage() {
           );
         }
         return (
-          <section className="lux-book-page lux-book-card lux-reserve real-payment">
+          <form className="lux-book-page lux-book-card lux-reserve" onSubmit={onSubmit}>
             <p className="lux-kicker dark">HBS Reservation</p>
             <h1>Thanh toán đơn #{booking.bookingId}</h1>
+            {error && <div className="banner">{error}</div>}
             <p>{booking.guestName} · {booking.guestPhone}</p>
             {booking.guestNote && <p className="muted">{booking.guestNote}</p>}
             <p>{booking.checkInDate} → {booking.checkOutDate} · {booking.numberOfGuests} khách</p>
@@ -58,20 +66,8 @@ export function PayPage() {
               {booking.discount > 0 && <span>Giảm giá −{money(booking.discount)}</span>}
               <strong>Tổng {money(booking.payable ?? booking.totalPrice)}</strong>
             </div>
-            <div className="qr-transfer-panel">
-              {data.paymentQrUrl && <img src={data.paymentQrUrl} alt={`VietQR thanh toán đơn ${booking.bookingId}`} />}
-              <div>
-                <strong>Quét VietQR bằng ứng dụng ngân hàng</strong>
-                <p>Nội dung chuyển khoản: <b>BOOKING_{booking.bookingId}</b></p>
-                {data.beneficiary && <p>{data.beneficiary.bankId} · {data.beneficiary.accountNumber}<br />{data.beneficiary.accountName}</p>}
-                <p>Số tiền: <b>{money(booking.amountDue)}</b></p>
-                <p className="muted">Trang sẽ tự chuyển về đơn của bạn sau khi nhân viên kiểm tra giao dịch vào tài khoản và xác nhận.</p>
-              </div>
-            </div>
-            {!data.bankConfigured && <div className="banner">Chưa cấu hình tài khoản nhận VietQR. Hãy kiểm tra cấu hình VietQR của máy chủ.</div>}
-            <p role="status" className="lux-note">Đang chờ xác nhận thanh toán… Trang kiểm tra trạng thái tự động mỗi 5 giây.</p>
-            <Link to="/bookings" className="lux-line">Quay lại đơn của tôi</Link>
-          </section>
+            <button className="lux-gold" type="submit">Thanh toán thành công</button>
+          </form>
         );
       }}
       </AsyncView>
