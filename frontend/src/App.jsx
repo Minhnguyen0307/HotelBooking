@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './auth';
 import { AccountMarks } from './lux';
+import ChatBot from './ChatBot';
 
 export default function App() {
   const { user, logout, hasRole } = useAuth();
@@ -23,9 +24,10 @@ export default function App() {
 
   useEffect(() => {
     if (location.pathname !== '/' || !user) return;
-    if (manager) navigate('/reports', { replace: true });
+    if (hasRole('Admin')) navigate('/admin/rooms', { replace: true });
+    else if (manager) navigate('/reports', { replace: true });
     else if (staff) navigate('/frontdesk', { replace: true });
-  }, [location.pathname, user, manager, staff, navigate]);
+  }, [location.pathname, user, manager, staff, hasRole, navigate]);
 
   return (
     <div className={`shell${home ? ' is-home' : ''}`}>
@@ -72,6 +74,7 @@ export default function App() {
         <span>{staff ? 'HBS Desk · Đà Nẵng' : 'HBS Luxury Hotel · Đà Nẵng'}</span>
         {!staff && <NavLink to="/privacy">Bảo mật</NavLink>}
       </footer>}
+      {!hasRole('Admin') && <ChatBot />}
     </div>
   );
 }

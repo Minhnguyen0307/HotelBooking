@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
 builder.Services.AddSignalR();
 builder.Services.AddDbContext<HotelBookingDbContext>(options =>
@@ -30,6 +31,7 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddSingleton<HotelBookingAutomationWorker>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<HotelBookingAutomationWorker>());
+builder.Services.AddScoped<IChatBotService, ChatBotService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<HotelPolicies>(builder.Configuration.GetSection("HotelPolicies"));
 

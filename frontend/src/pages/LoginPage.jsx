@@ -7,7 +7,8 @@ const HERO = 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=for
 
 function deskFor(account) {
   if (account?.role === 'Receptionist') return '/frontdesk';
-  if (account?.role === 'Admin' || account?.role === 'Manager') return '/reports';
+  if (account?.role === 'Admin') return '/admin/rooms';
+  if (account?.role === 'Manager') return '/reports';
   return '';
 }
 

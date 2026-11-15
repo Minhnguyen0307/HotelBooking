@@ -43,3 +43,7 @@ publish/
 **/obj/
 _build/
 *.log
+
+# Local settings
+**/appsettings.Local.json
+appsettings.Local.json
