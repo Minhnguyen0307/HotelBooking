@@ -15,7 +15,10 @@ namespace HotelBooking.Application.Services
         private readonly IHubContext<RoomHub> _hubContext;
         private readonly HotelPolicies _policy;
 
-        public BookingService(HotelBookingDbContext context, IHubContext<RoomHub> hubContext, IOptions<HotelPolicies> policyOptions)
+        public BookingService(
+            HotelBookingDbContext context,
+            IHubContext<RoomHub> hubContext,
+            IOptions<HotelPolicies> policyOptions)
         {
             _context = context;
             _hubContext = hubContext;
@@ -35,49 +38,36 @@ namespace HotelBooking.Application.Services
             return !isOverlapping;
         }
 
-        private (decimal totalPrice, decimal weekendSurcharge, decimal extraGuestSurcharge, string breakdown)
-            CalculatePriceDetails(DateOnly checkIn, DateOnly checkOut, int adults, int children, decimal basePrice)
+        private decimal CalculateDynamicDateMarkup(DateOnly checkIn, DateOnly checkOut, decimal basePrice, out string breakdown)
         {
             int nights = checkOut.DayNumber - checkIn.DayNumber;
-            decimal baseRoomTotal = 0;
-            decimal weekendSurcharge = 0;
-            var breakdownLines = new List<string>();
+            if (nights <= 0) { breakdown = string.Empty; return 0; }
+
+            decimal totalMarkup = 0;
+            var holidaySet = _policy.Holidays != null ? new HashSet<string>(_policy.Holidays) : new HashSet<string>();
+            var lines = new List<string>();
 
             for (int i = 0; i < nights; i++)
             {
-                var date = checkIn.AddDays(i);
-                string ddMM = date.ToString("dd-MM");
-                decimal nightPrice = basePrice;
+                var d = checkIn.AddDays(i);
+                var ddMM = d.ToString("dd-MM");
 
-                if (_policy.Holidays.Contains(ddMM))
+                if (holidaySet.Contains(ddMM) && _policy.HolidayMarkupPercent > 0)
                 {
                     decimal markup = basePrice * (decimal)(_policy.HolidayMarkupPercent / 100.0);
-                    nightPrice += markup;
-                    weekendSurcharge += markup;
-                    breakdownLines.Add($"{date:dd/MM}: Holiday +{_policy.HolidayMarkupPercent}% = +{markup:N0}đ");
+                    totalMarkup += markup;
+                    lines.Add($"{d:dd/MM} (Lễ +{_policy.HolidayMarkupPercent}%: +{markup:N0}đ)");
                 }
-                else if (date.DayOfWeek == DayOfWeek.Friday || date.DayOfWeek == DayOfWeek.Saturday)
+                else if ((d.DayOfWeek == DayOfWeek.Friday || d.DayOfWeek == DayOfWeek.Saturday) && _policy.WeekendMarkupPercent > 0)
                 {
                     decimal markup = basePrice * (decimal)(_policy.WeekendMarkupPercent / 100.0);
-                    nightPrice += markup;
-                    weekendSurcharge += markup;
-                    breakdownLines.Add($"{date:dd/MM}: Weekend +{_policy.WeekendMarkupPercent}% = +{markup:N0}đ");
+                    totalMarkup += markup;
+                    lines.Add($"{d:dd/MM} (Cuối tuần +{_policy.WeekendMarkupPercent}%: +{markup:N0}đ)");
                 }
-
-                baseRoomTotal += nightPrice;
             }
 
-            decimal extraGuestSurcharge =
-                Math.Max(0, adults - _policy.StandardGuestsPerRoom) * _policy.ExtraAdultFeePerNight * nights
-                + children * _policy.ExtraChildFeePerNight * nights;
-
-            if (extraGuestSurcharge > 0)
-                breakdownLines.Add($"Extra guests: +{extraGuestSurcharge:N0}đ");
-
-            decimal totalPrice = baseRoomTotal + extraGuestSurcharge;
-            string breakdown = string.Join("; ", breakdownLines);
-
-            return (totalPrice, weekendSurcharge, extraGuestSurcharge, breakdown);
+            breakdown = lines.Count > 0 ? string.Join("; ", lines) : string.Empty;
+            return totalMarkup;
         }
 
         public async Task<BookingPreviewResult> GetBookingPreviewAsync(BookingCreateDto dto)
@@ -99,16 +89,16 @@ namespace HotelBooking.Application.Services
             if (nights <= 0)
                 return FailPreview("Ngày trả phòng phải sau ngày nhận phòng.");
 
-            int adults = dto.Adults > 0 ? dto.Adults : (dto.NumberOfGuests > 0 ? dto.NumberOfGuests : 1);
-            int children = dto.Children;
-            int totalGuests = adults + children;
-
-            var quote = OccupancyPricing.Price(room.RoomType.TypeName, room.RoomType.MaxGuests, room.RoomType.BasePrice, totalGuests, nights);
+            var quote = OccupancyPricing.Price(room.RoomType.TypeName, room.RoomType.MaxGuests, room.RoomType.BasePrice, dto.NumberOfGuests, nights);
             if (!quote.Success)
                 return FailPreview(quote.ErrorMessage ?? quote.Plan.Rule);
 
-            var (_, weekendSurcharge, extraGuestSurcharge, breakdown) =
-                CalculatePriceDetails(dto.CheckInDate, dto.CheckOutDate, adults, children, room.RoomType.BasePrice);
+            var dateMarkup = CalculateDynamicDateMarkup(dto.CheckInDate, dto.CheckOutDate, room.RoomType.BasePrice, out string markupBreakdown);
+            var totalPrice = quote.TotalPrice + dateMarkup;
+            var surcharge = quote.Surcharge + dateMarkup;
+            var summary = string.IsNullOrEmpty(markupBreakdown)
+                ? quote.Summary
+                : $"{quote.Summary} · Phụ thu cuối tuần / lễ: +{OccupancyPricing.Money(dateMarkup)} ({markupBreakdown})";
 
             return new BookingPreviewResult
             {
@@ -120,22 +110,17 @@ namespace HotelBooking.Application.Services
                     TypeName = room.RoomType.TypeName,
                     CheckInDate = dto.CheckInDate,
                     CheckOutDate = dto.CheckOutDate,
-                    NumberOfGuests = totalGuests,
+                    NumberOfGuests = dto.NumberOfGuests,
                     Nights = nights,
                     PricePerNight = quote.PricePerNight,
-                    TotalPrice = quote.TotalPrice + weekendSurcharge,
-                    Adults = adults,
-                    Children = children,
-                    ExtraGuestSurcharge = quote.Surcharge > 0 ? quote.Surcharge : extraGuestSurcharge,
-                    WeekendSurcharge = weekendSurcharge,
-                    PriceBreakdown = string.IsNullOrEmpty(breakdown) ? quote.Summary : $"{breakdown}; {quote.Summary}",
+                    TotalPrice = totalPrice,
                     StayLabel = quote.Plan.Label,
                     IncludedGuests = quote.Plan.IncludedGuests,
                     ExtraGuests = quote.ExtraGuests,
                     ExtraGuestFee = quote.Plan.ExtraGuestFeePerNight,
                     RoomCharge = quote.RoomCharge,
-                    Surcharge = quote.Surcharge + weekendSurcharge,
-                    Summary = quote.Summary
+                    Surcharge = surcharge,
+                    Summary = summary
                 }
             };
         }
@@ -162,25 +147,13 @@ namespace HotelBooking.Application.Services
             if (room.Status == "Maintenance" || room.HousekeepingStatus == "Maintenance")
                 return new BookingResult { Success = false, ErrorMessage = "Phòng đang bảo trì, chưa nhận đặt." };
 
-            int adults = dto.Adults > 0 ? dto.Adults : (dto.NumberOfGuests > 0 ? dto.NumberOfGuests : 1);
-            int children = dto.Children;
-            int totalGuests = adults + children;
             int nights = dto.CheckOutDate.DayNumber - dto.CheckInDate.DayNumber;
-
-            var quote = OccupancyPricing.Price(room.RoomType.TypeName, room.RoomType.MaxGuests, room.RoomType.BasePrice, totalGuests, nights);
+            var quote = OccupancyPricing.Price(room.RoomType.TypeName, room.RoomType.MaxGuests, room.RoomType.BasePrice, dto.NumberOfGuests, nights);
             if (!quote.Success)
                 return new BookingResult { Success = false, ErrorMessage = quote.ErrorMessage };
 
             var guestName = (dto.GuestName ?? string.Empty).Trim();
             var guestPhone = new string((dto.GuestPhone ?? string.Empty).Where(char.IsDigit).ToArray());
-
-            if (string.IsNullOrWhiteSpace(guestName) || string.IsNullOrWhiteSpace(guestPhone))
-            {
-                var cust = await _context.Users.FindAsync(customerId);
-                if (string.IsNullOrWhiteSpace(guestName)) guestName = cust?.FullName ?? "Khách đặt";
-                if (string.IsNullOrWhiteSpace(guestPhone)) guestPhone = cust?.PhoneNumber ?? "0900000000";
-            }
-
             var guestNote = string.IsNullOrWhiteSpace(dto.GuestNote) ? null : dto.GuestNote.Trim();
             var payNow = !string.Equals(dto.PaymentChoice, "Cash", StringComparison.OrdinalIgnoreCase);
 
@@ -195,15 +168,15 @@ namespace HotelBooking.Application.Services
             if (!available)
                 return new BookingResult { Success = false, ErrorMessage = "Rất tiếc, phòng vừa được người khác đặt trước. Vui lòng chọn phòng khác." };
 
-            var (_, weekendSurcharge, _, _) = CalculatePriceDetails(dto.CheckInDate, dto.CheckOutDate, adults, children, room.RoomType.BasePrice);
-            decimal totalPrice = quote.TotalPrice + weekendSurcharge;
+            var dateMarkup = CalculateDynamicDateMarkup(dto.CheckInDate, dto.CheckOutDate, room.RoomType.BasePrice, out _);
+            decimal totalPrice = quote.TotalPrice + dateMarkup;
 
             var booking = new Booking
             {
                 CustomerId = customerId,
                 CheckInDate = dto.CheckInDate,
                 CheckOutDate = dto.CheckOutDate,
-                NumberOfGuests = totalGuests,
+                NumberOfGuests = dto.NumberOfGuests,
                 GuestName = guestName,
                 GuestPhone = guestPhone,
                 GuestNote = guestNote,
@@ -233,12 +206,24 @@ namespace HotelBooking.Application.Services
 
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
+
+            // Real-time SignalR notifications
             await _hubContext.Clients.All.SendAsync("RoomBooked", new
             {
                 RoomId = dto.RoomId,
                 CheckInDate = dto.CheckInDate.ToString("yyyy-MM-dd"),
                 CheckOutDate = dto.CheckOutDate.ToString("yyyy-MM-dd")
             });
+
+            await _hubContext.Clients.All.SendAsync("NewBookingCreated", new
+            {
+                BookingId = booking.BookingId,
+                GuestName = booking.GuestName,
+                RoomNumber = room.RoomNumber,
+                TotalPrice = booking.TotalPrice,
+                CreatedAt = DateTime.UtcNow
+            });
+
             return new BookingResult { Success = true, BookingId = booking.BookingId, RequiresPayment = payNow };
         }
 
@@ -258,9 +243,6 @@ namespace HotelBooking.Application.Services
                     Status = b.Status,
                     TotalPrice = b.TotalPrice,
                     CreatedAt = b.CreatedAt,
-                    CustomerName = b.Customer.FullName,
-                    CustomerPhone = b.Customer.PhoneNumber,
-                    NumberOfGuests = b.NumberOfGuests,
                     GuestName = b.GuestName,
                     GuestPhone = b.GuestPhone,
                     GuestNote = b.GuestNote,

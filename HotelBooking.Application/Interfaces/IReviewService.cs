@@ -10,6 +10,7 @@ namespace HotelBooking.Application.Interfaces
         Task<bool> CanUserReviewAsync(int userId, int roomId);
         Task<(bool Success, string? Error)> ReplyReviewAsync(int staffUserId, int reviewId, string response);
         Task<List<ReviewItemDto>> GetAllReviewsAsync();
+        Task<(bool Success, string? Error)> DeleteReviewAsync(int reviewId);
     }
 }
 

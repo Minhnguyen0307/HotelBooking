@@ -7,5 +7,6 @@ namespace HotelBooking.Application.Interfaces
         Task<List<MonthlyRevenueDto>> GetMonthlyRevenueAsync();
         Task<List<RoomOccupancyDto>> GetRoomOccupancyAsync();
         Task<ReportChartDto> GetChartDataAsync();
+        Task<ExecutiveSummaryDto> GetExecutiveSummaryAsync();
     }
 }

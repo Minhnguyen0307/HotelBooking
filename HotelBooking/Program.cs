@@ -28,6 +28,8 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddSingleton<HotelBookingAutomationWorker>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<HotelBookingAutomationWorker>());
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<HotelPolicies>(builder.Configuration.GetSection("HotelPolicies"));
 

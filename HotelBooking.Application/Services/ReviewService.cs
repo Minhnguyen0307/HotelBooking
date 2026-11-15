@@ -201,5 +201,22 @@ namespace HotelBooking.Application.Services
                 return new List<ReviewItemDto>();
             }
         }
+
+        public async Task<(bool Success, string? Error)> DeleteReviewAsync(int reviewId)
+        {
+            var review = await _context.Reviews
+                .Include(r => r.ReviewImages)
+                .FirstOrDefaultAsync(r => r.ReviewId == reviewId);
+
+            if (review == null)
+                return (false, "Không tìm thấy bài đánh giá.");
+
+            if (review.ReviewImages != null && review.ReviewImages.Count > 0)
+                _context.ReviewImages.RemoveRange(review.ReviewImages);
+
+            _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+            return (true, null);
+        }
     }
 }

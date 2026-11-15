@@ -20,10 +20,7 @@ export function RoomPage() {
     const data = Object.fromEntries(new FormData(form));
     setError('');
     try {
-      const adults = Number(data.adults || 1);
-      const children = Number(data.children || 0);
-      const totalGuests = adults + children;
-      const result = await api(`/api/bookings/preview?roomId=${id}&checkInDate=${data.checkInDate}&checkOutDate=${data.checkOutDate}&numberOfGuests=${totalGuests}&adults=${adults}&children=${children}`);
+      const result = await api(`/api/bookings/preview?roomId=${id}&checkInDate=${data.checkInDate}&checkOutDate=${data.checkOutDate}&numberOfGuests=${data.numberOfGuests}`);
       setPreview(result);
     } catch (err) {
       setError(err.message);
@@ -35,18 +32,13 @@ export function RoomPage() {
     const data = Object.fromEntries(new FormData(event.target));
     setError('');
     try {
-      const adults = Number(data.adults || 1);
-      const children = Number(data.children || 0);
-      const totalGuests = adults + children;
       const result = await api('/api/bookings', {
         method: 'POST',
         body: {
           roomId: Number(id),
           checkInDate: data.checkInDate,
           checkOutDate: data.checkOutDate,
-          numberOfGuests: totalGuests || Number(data.numberOfGuests || 1),
-          adults,
-          children,
+          numberOfGuests: Number(data.numberOfGuests),
           guestName: data.guestName,
           guestPhone: data.guestPhone,
           guestNote: data.guestNote,
@@ -115,16 +107,7 @@ export function RoomPage() {
               <form className="panel stack" onSubmit={onBook}>
                 <h2>Mời bạn lưu trú</h2>
                 <StayDates checkIn={saved.checkInDate || today()} checkOut={saved.checkOutDate || tomorrow()} />
-                <div className="form-grid">
-                  <label>
-                    Người lớn
-                    <input name="adults" type="number" min="1" defaultValue={saved.adults || 1} onChange={() => setPreview(null)} required />
-                  </label>
-                  <label>
-                    Trẻ em
-                    <input name="children" type="number" min="0" defaultValue={saved.children || 0} onChange={() => setPreview(null)} required />
-                  </label>
-                </div>
+                <label>Số khách<input name="numberOfGuests" type="number" min="1" max={room.maxGuests} defaultValue={saved.guests || 1} required /></label>
                 <label>Người nhận phòng<input name="guestName" defaultValue={user?.fullName || ''} required /></label>
                 <label>Số điện thoại<input name="guestPhone" inputMode="tel" pattern="0[0-9]{9}" defaultValue={user?.phoneNumber || ''} required /></label>
                 <label>Lời nhắn<textarea name="guestNote" maxLength="500" placeholder="Giờ đến, yêu cầu phòng..."></textarea></label>
@@ -133,43 +116,17 @@ export function RoomPage() {
                   <label className="choice"><input type="radio" name="paymentChoice" value="Now" defaultChecked /> Thanh toán ngay</label>
                   <label className="choice"><input type="radio" name="paymentChoice" value="Cash" /> Tiền mặt khi nhận phòng</label>
                 </fieldset>
-                {preview ? (
-                  <div className="panel stack" style={{ background: 'var(--paper)', fontSize: '0.9rem', padding: '0.8rem' }}>
-                    <div className="spread">
-                      <span>Thời gian:</span>
-                      <strong>{preview.nights} đêm · {preview.numberOfGuests} khách</strong>
-                    </div>
-                    <div className="spread">
-                      <span>Giá gốc/đêm:</span>
-                      <span>{money(preview.pricePerNight)}</span>
-                    </div>
-                    {preview.weekendSurcharge > 0 && (
-                      <div className="spread" style={{ color: 'var(--sand)' }}>
-                        <span>Phụ thu cuối tuần / lễ:</span>
-                        <span>+{money(preview.weekendSurcharge)}</span>
-                      </div>
-                    )}
-                    {preview.extraGuestSurcharge > 0 && (
-                      <div className="spread" style={{ color: 'var(--sand)' }}>
-                        <span>Phụ thu người phát sinh:</span>
-                        <span>+{money(preview.extraGuestSurcharge)}</span>
-                      </div>
-                    )}
-                    <hr style={{ border: 'none', borderTop: '1px solid var(--line)', margin: '0.3rem 0' }} />
-                    <div className="spread" style={{ fontSize: '1.1rem' }}>
-                      <strong>Tổng tiền:</strong>
-                      <span className="price">{money(preview.totalPrice)}</span>
-                    </div>
-                    {preview.summary && <small className="muted">{preview.summary}</small>}
-                    {preview.priceBreakdown && <small className="muted">{preview.priceBreakdown}</small>}
-                  </div>
-                ) : (
-                  <div className="muted" style={{ fontSize: '0.88rem' }}>
-                    💡 Bấm "Xem chi tiết giá" để tính tiền theo ngày thường / cuối tuần & phụ thu khách.
+                {preview && (
+                  <div className="fare">
+                    <span>{preview.stayLabel} · {preview.nights} đêm · {preview.numberOfGuests} khách</span>
+                    <span>Giá phòng {money(preview.roomCharge)}</span>
+                    <span>Phụ thu {money(preview.surcharge)}</span>
+                    <strong>Tổng {money(preview.totalPrice)}</strong>
+                    <span>{preview.summary}</span>
                   </div>
                 )}
-                <button className="btn secondary" type="button" onClick={onPreview}>Xem chi tiết giá</button>
-                <button className="btn" type="submit">Xác nhận đặt phòng</button>
+                <button className="btn secondary" type="button" onClick={onPreview}>Xem giá</button>
+                <button className="btn" type="submit">Xác nhận đặt</button>
               </form>
             </div>
             <section>
@@ -192,23 +149,14 @@ export function RoomPage() {
                 </article>
               ))}
               {user ? (
-                data.hasStayed ? (
-                  <form className="panel stack" onSubmit={onReview}>
-                    <h3>Viết đánh giá</h3>
-                    <p className="pill ok" style={{ alignSelf: 'flex-start' }}>✓ Bạn đã hoàn tất kỳ lưu trú tại phòng này</p>
-                    <StarPicker />
-                    <label>Nhận xét<textarea name="comment" placeholder="Chia sẻ trải nghiệm của bạn về phòng này..." required></textarea></label>
-                    <label>Ảnh đính kèm<input name="images" type="file" accept="image/*" multiple /></label>
-                    <button className="btn" type="submit">Gửi đánh giá</button>
-                  </form>
-                ) : (
-                  <div className="panel" style={{ background: '#fdf9f3', border: '1px dashed #d7c2a5' }}>
-                    <p style={{ margin: 0, color: 'var(--muted)' }}>
-                      🔒 <strong>Chính sách đánh giá:</strong> Bạn chỉ có thể đánh giá và chấm điểm phòng sau khi đã hoàn tất lưu trú (Check-out) tại phòng này.
-                    </p>
-                  </div>
-                )
-              ) : <p><Link to="/login">Đăng nhập</Link> để đánh giá phòng.</p>}
+                <form className="panel stack" onSubmit={onReview}>
+                  <h3>Chia sẻ trải nghiệm</h3>
+                  <StarPicker />
+                  <label>Nhận xét<textarea name="comment"></textarea></label>
+                  <label>Ảnh<input name="images" type="file" accept="image/*" multiple /></label>
+                  <button className="btn" type="submit">Gửi đánh giá</button>
+                </form>
+              ) : <p className="muted">Mời bạn <Link to="/login">đăng nhập</Link> để chia sẻ trải nghiệm.</p>}
             </section>
           </>
         );

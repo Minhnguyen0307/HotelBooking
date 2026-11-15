@@ -75,5 +75,78 @@ namespace HotelBooking.Application.Services
                 OccupancyRatePercent = occupancyRate
             };
         }
+
+        public async Task<ExecutiveSummaryDto> GetExecutiveSummaryAsync()
+        {
+            var now = DateTime.UtcNow;
+            var today = now.Date;
+            var startOfMonth = new DateTime(now.Year, now.Month, 1);
+
+            int totalRooms = await _context.Rooms.CountAsync();
+            int occupiedRooms = await _context.Bookings.Where(b => b.Status == "CheckedIn").CountAsync();
+            int availableRooms = await _context.Rooms
+                .Where(r => r.Status == "Available" && r.HousekeepingStatus != "Maintenance")
+                .CountAsync();
+
+            int totalBookings = await _context.Bookings.CountAsync();
+            int pendingCancels = await _context.Bookings.Where(b => b.Status == "CancelRequested").CountAsync();
+
+            decimal todayRevenue = await _context.Payments
+                .Where(p => p.PaymentStatus == "Success" && ((p.PaymentDate.HasValue && p.PaymentDate.Value.Date == today) || (p.CreatedAt.Date == today)))
+                .SumAsync(p => (decimal?)p.Amount) ?? 0m;
+
+            decimal monthRevenue = await _context.Payments
+                .Where(p => p.PaymentStatus == "Success" && (p.PaymentDate ?? p.CreatedAt) >= startOfMonth)
+                .SumAsync(p => (decimal?)p.Amount) ?? 0m;
+
+            decimal totalRevenue = await _context.Payments
+                .Where(p => p.PaymentStatus == "Success")
+                .SumAsync(p => (decimal?)p.Amount) ?? 0m;
+
+            double occupancyPercent = totalRooms > 0
+                ? Math.Round((double)occupiedRooms / totalRooms * 100, 1)
+                : 0;
+
+            var propertyRevenues = await _context.BookingRooms
+                .Where(br => br.Booking.Status != "Cancelled")
+                .GroupBy(br => new { br.Room.PropertyId, br.Room.Property.Name })
+                .Select(g => new PropertyRevenueDto
+                {
+                    PropertyId = g.Key.PropertyId,
+                    PropertyName = g.Key.Name,
+                    Revenue = g.Sum(x => x.Booking.TotalPrice),
+                    BookingCount = g.Select(x => x.BookingId).Distinct().Count()
+                })
+                .OrderByDescending(x => x.Revenue)
+                .ToListAsync();
+
+            var paymentMethods = await _context.Payments
+                .Where(p => p.PaymentStatus == "Success")
+                .GroupBy(p => p.PaymentMethod)
+                .Select(g => new PaymentMethodStatDto
+                {
+                    Method = string.IsNullOrEmpty(g.Key) ? "Khác" : g.Key,
+                    TotalAmount = g.Sum(x => x.Amount),
+                    Count = g.Count()
+                })
+                .OrderByDescending(x => x.TotalAmount)
+                .ToListAsync();
+
+            return new ExecutiveSummaryDto
+            {
+                TotalRooms = totalRooms,
+                AvailableRooms = availableRooms,
+                OccupiedRooms = occupiedRooms,
+                TotalBookings = totalBookings,
+                ActiveStays = occupiedRooms,
+                PendingCancels = pendingCancels,
+                TodayRevenue = todayRevenue,
+                MonthRevenue = monthRevenue,
+                TotalRevenue = totalRevenue,
+                OccupancyPercent = occupancyPercent,
+                PropertyRevenues = propertyRevenues,
+                PaymentMethodStats = paymentMethods
+            };
+        }
     }
 }

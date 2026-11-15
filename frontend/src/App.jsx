@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './auth';
+import { SignalRNotification } from './SignalRNotification';
 
 export default function App() {
   const { user, logout, hasRole } = useAuth();
@@ -29,7 +30,10 @@ export default function App() {
             <>
               <NavLink to="/admin/rooms">Phòng</NavLink>
               <NavLink to="/admin/types">Loại phòng</NavLink>
-              <NavLink to="/admin/customers">Khách</NavLink>
+              <NavLink to="/admin/customers">Người dùng</NavLink>
+              <NavLink to="/admin/promos">Khuyến mãi</NavLink>
+              <NavLink to="/admin/reviews">Đánh giá</NavLink>
+              <NavLink to="/admin/settings">Cài đặt</NavLink>
               <NavLink to="/reports">Báo cáo</NavLink>
             </>
           )}
@@ -54,6 +58,7 @@ export default function App() {
         <span>HBS Luxury Hotel · Đà Nẵng</span>
         <NavLink to="/privacy">Bảo mật</NavLink>
       </footer>
+      <SignalRNotification />
     </div>
   );
 }

@@ -128,6 +128,65 @@ public class FrontDeskApiController : ControllerBase
         return Result(success, error, "Đã nhận phòng.");
     }
 
+    [HttpPost("fast-checkin")]
+    public async Task<IActionResult> FastCheckIn([FromBody] FastCheckInRequest request)
+    {
+        var raw = (request.Code ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(raw))
+            return BadRequest(new { message = "Vui lòng nhập hoặc quét mã QR đơn đặt phòng." });
+
+        int bookingId = 0;
+        if (raw.StartsWith("HBS-", StringComparison.OrdinalIgnoreCase))
+            int.TryParse(raw[4..], out bookingId);
+        else if (raw.StartsWith('#'))
+            int.TryParse(raw[1..], out bookingId);
+        else if (raw.StartsWith('{') && raw.Contains("bookingId"))
+        {
+            try
+            {
+                var doc = System.Text.Json.JsonDocument.Parse(raw);
+                if (doc.RootElement.TryGetProperty("bookingId", out var prop))
+                    bookingId = prop.GetInt32();
+            }
+            catch { }
+        }
+        else
+            int.TryParse(raw, out bookingId);
+
+        if (bookingId <= 0)
+            return BadRequest(new { message = $"Mã '{raw}' không hợp lệ. Vui lòng quét mã QR hoặc nhập mã đơn (VD: HBS-102 hoặc 102)." });
+
+        var folio = await _deskService.GetFolioAsync(bookingId);
+        if (folio == null)
+            return NotFound(new { message = $"Không tìm thấy đơn đặt phòng #{bookingId}." });
+
+        if (folio.Status == "CheckedIn")
+            return Ok(new { message = $"Đơn #{bookingId} của khách '{folio.GuestName}' đã hoàn tất check-in trước đó.", bookingId, roomNumber = folio.RoomNumber });
+
+        if (folio.Status == "Cancelled")
+            return BadRequest(new { message = $"Đơn #{bookingId} đã bị hủy." });
+
+        var (success, error) = await _deskService.CheckInConfirmAsync(bookingId, new CheckInDto
+        {
+            GuestName = folio.GuestName,
+            GuestPhone = folio.GuestPhone
+        });
+
+        if (!success) return BadRequest(new { message = error });
+        return Ok(new
+        {
+            message = $"⚡ Fast Check-in thành công trong 3s! Khách: {folio.GuestName} · Phòng {folio.RoomNumber} ({folio.PropertyName})",
+            bookingId,
+            roomNumber = folio.RoomNumber,
+            guestName = folio.GuestName
+        });
+    }
+
+    public class FastCheckInRequest
+    {
+        public string Code { get; set; } = string.Empty;
+    }
+
     [HttpPost("check-out/{bookingId:int}")]
     public async Task<IActionResult> CheckOut(int bookingId, CheckoutDto dto)
     {
@@ -147,52 +206,6 @@ public class FrontDeskApiController : ControllerBase
     {
         var (success, error) = await _reviewService.ReplyReviewAsync(ApiUser.Id(User), reviewId, dto.Response);
         return Result(success, error, "Đã gửi phản hồi đánh giá.");
-    }
-
-    // ── New Endpoints ──────────────────────────────────────────────────────────
-
-    [HttpGet("room-matrix")]
-    public async Task<IActionResult> GetRoomMatrix()
-    {
-        var matrix = await _frontDeskService.GetRoomMatrixAsync();
-        return Ok(matrix);
-    }
-
-    [HttpPost("rooms/{roomId:int}/clean")]
-    public async Task<IActionResult> MarkRoomClean(int roomId)
-    {
-        var (success, error) = await _frontDeskService.MarkRoomCleanAsync(roomId);
-        return Result(success, error, "Phòng đã được đánh dấu sạch.");
-    }
-
-    [HttpPost("walk-in")]
-    public async Task<IActionResult> CreateWalkIn([FromBody] WalkInBookingDto dto)
-    {
-        var (success, error, bookingId) = await _frontDeskService.CreateWalkInBookingAsync(dto);
-        if (!success) return BadRequest(new { message = error });
-        return Ok(new { message = "Walk-in check-in thành công.", bookingId });
-    }
-
-    [HttpPost("bookings/{id:int}/transfer-room")]
-    public async Task<IActionResult> TransferRoom(int id, [FromBody] TransferRoomDto dto)
-    {
-        var (success, error) = await _frontDeskService.TransferRoomAsync(id, dto.NewRoomId);
-        return Result(success, error, "Chuyển phòng thành công.");
-    }
-
-    [HttpPost("bookings/{id:int}/extend-stay")]
-    public async Task<IActionResult> ExtendStay(int id, [FromBody] ExtendStayDto dto)
-    {
-        var (success, error) = await _frontDeskService.ExtendStayAsync(id, dto.NewCheckOutDate);
-        return Result(success, error, "Gia hạn lưu trú thành công.");
-    }
-
-    [HttpGet("bookings/{id:int}/invoice")]
-    public async Task<IActionResult> GetInvoice(int id)
-    {
-        var invoice = await _frontDeskService.GetInvoiceAsync(id);
-        if (invoice == null) return NotFound(new { message = "Không tìm thấy đơn đặt phòng." });
-        return Ok(invoice);
     }
 
     private IActionResult Result(bool success, string? error, string okMessage)

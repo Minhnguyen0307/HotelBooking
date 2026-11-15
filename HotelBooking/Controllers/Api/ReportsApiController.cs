@@ -27,6 +27,12 @@ public class ReportsApiController : ControllerBase
         });
     }
 
+    [HttpGet("summary")]
+    public async Task<IActionResult> Summary()
+    {
+        return Ok(await _reportService.GetExecutiveSummaryAsync());
+    }
+
     [HttpGet("charts")]
     public async Task<IActionResult> GetCharts()
     {
