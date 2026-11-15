@@ -30,7 +30,7 @@ namespace HotelBooking.Application.Services
             var query = _context.Rooms
                 .Include(r => r.RoomType)
                 .Include(r => r.RoomImages)
-                .Where(r => r.Status != "Maintenance");
+                .Where(r => r.Status != "Maintenance" && r.HousekeepingStatus != "Maintenance");
 
             if (criteria.RoomTypeId.HasValue)
                 query = query.Where(r => r.RoomTypeId == criteria.RoomTypeId.Value);
@@ -122,7 +122,7 @@ namespace HotelBooking.Application.Services
                 .Include(r => r.RoomType)
                 .Include(r => r.Property)
                 .Include(r => r.RoomImages)
-                .Where(r => r.Status != "Maintenance");
+                .Where(r => r.Status != "Maintenance" && r.HousekeepingStatus != "Maintenance");
         }
 
         private async Task<HashSet<int>> BookedRoomIdsAsync(DateOnly checkIn, DateOnly checkOut)
@@ -187,7 +187,7 @@ namespace HotelBooking.Application.Services
                 .Include(r => r.Property)
                 .Include(r => r.RoomImages)
                 .Include(r => r.Amenities)
-                .FirstOrDefaultAsync(r => r.RoomId == roomId);
+                .FirstOrDefaultAsync(r => r.RoomId == roomId && r.Status != "Maintenance" && r.HousekeepingStatus != "Maintenance");
 
             if (room == null) return null;
 
@@ -224,7 +224,7 @@ namespace HotelBooking.Application.Services
                     Area = p.Area,
                     Address = p.Address,
                     Description = p.Description,
-                    RoomCount = p.Rooms.Count()
+                    RoomCount = p.Rooms.Count(r => r.Status != "Maintenance" && r.HousekeepingStatus != "Maintenance")
                 })
                 .ToListAsync();
         }

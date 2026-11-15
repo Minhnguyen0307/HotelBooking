@@ -45,6 +45,12 @@ public partial class HotelBookingDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<FolioItem> FolioItems { get; set; }
+
+    public virtual DbSet<RoomIssue> RoomIssues { get; set; }
+
+    public virtual DbSet<PromoCode> PromoCodes { get; set; }
+
     public virtual DbSet<VwMonthlyRevenue> VwMonthlyRevenues { get; set; }
 
     public virtual DbSet<VwRoomOccupancy> VwRoomOccupancies { get; set; }
@@ -88,6 +94,10 @@ public partial class HotelBookingDbContext : DbContext
             entity.HasIndex(e => new { e.CheckInDate, e.CheckOutDate }, "IX_Bookings_Dates");
 
             entity.Property(e => e.CancelReason).HasMaxLength(300);
+            entity.Property(e => e.GuestName).HasMaxLength(150);
+            entity.Property(e => e.GuestPhone).HasMaxLength(20);
+            entity.Property(e => e.GuestNote).HasMaxLength(500);
+            entity.Property(e => e.PaymentChoice).HasMaxLength(20).HasDefaultValue("Now");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
@@ -205,6 +215,9 @@ public partial class HotelBookingDbContext : DbContext
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .HasDefaultValue("Available");
+            entity.Property(e => e.HousekeepingStatus)
+                .HasMaxLength(20)
+                .HasDefaultValue("Clean");
 
             entity.Property(e => e.Address).HasMaxLength(255);
 
@@ -321,6 +334,38 @@ public partial class HotelBookingDbContext : DbContext
             entity.HasOne(d => d.Review).WithMany(p => p.ReviewImages)
                 .HasForeignKey(d => d.ReviewId)
                 .HasConstraintName("FK_ReviewImages_Reviews");
+        });
+
+        modelBuilder.Entity<FolioItem>(entity =>
+        {
+            entity.HasKey(e => e.FolioItemId);
+            entity.Property(e => e.Category).HasMaxLength(30);
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.HasOne(d => d.Booking).WithMany()
+                .HasForeignKey(d => d.BookingId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<RoomIssue>(entity =>
+        {
+            entity.HasKey(e => e.IssueId);
+            entity.Property(e => e.Description).HasMaxLength(300);
+            entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Open");
+            entity.Property(e => e.ReportedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.HasOne(d => d.Room).WithMany()
+                .HasForeignKey(d => d.RoomId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<PromoCode>(entity =>
+        {
+            entity.HasKey(e => e.PromoCodeId);
+            entity.HasIndex(e => e.Code).IsUnique();
+            entity.Property(e => e.Code).HasMaxLength(30);
+            entity.Property(e => e.DiscountAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
         });
 
         OnModelCreatingPartial(modelBuilder);

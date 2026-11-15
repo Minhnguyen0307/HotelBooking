@@ -6,6 +6,10 @@ namespace HotelBooking.Application.DTOs
         public DateOnly CheckInDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
         public DateOnly CheckOutDate { get; set; } = DateOnly.FromDateTime(DateTime.Today.AddDays(1));
         public int NumberOfGuests { get; set; } = 1;
+        public string GuestName { get; set; } = string.Empty;
+        public string GuestPhone { get; set; } = string.Empty;
+        public string? GuestNote { get; set; }
+        public string PaymentChoice { get; set; } = "Now";
     }
 
     public class BookingConfirmDto
@@ -48,6 +52,10 @@ namespace HotelBooking.Application.DTOs
         public DateTime CreatedAt { get; set; }
         public string? CustomerName { get; set; }
         public string? CancelReason { get; set; }
+        public string? GuestName { get; set; }
+        public string? GuestPhone { get; set; }
+        public string? GuestNote { get; set; }
+        public string PaymentChoice { get; set; } = "Now";
     }
 
     public class BookingResult
@@ -55,5 +63,6 @@ namespace HotelBooking.Application.DTOs
         public bool Success { get; set; }
         public string? ErrorMessage { get; set; }
         public int? BookingId { get; set; }
+        public bool RequiresPayment { get; set; }
     }
 }

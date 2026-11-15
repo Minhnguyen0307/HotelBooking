@@ -17,6 +17,8 @@ public partial class Room
 
     public string Status { get; set; } = null!;
 
+    public string HousekeepingStatus { get; set; } = "Clean";
+
     public string? Description { get; set; }
 
     public DateTime CreatedAt { get; set; }

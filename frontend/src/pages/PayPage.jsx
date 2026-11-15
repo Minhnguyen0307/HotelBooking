@@ -48,6 +48,8 @@ export function PayPage() {
           <form className="panel stack account-card" onSubmit={onSubmit}>
             <h1>Thanh toán #{booking.bookingId}</h1>
             {error && <div className="banner">{error}</div>}
+            <p>{booking.guestName} · {booking.guestPhone}</p>
+            {booking.guestNote && <p className="muted">{booking.guestNote}</p>}
             <p>{booking.checkInDate} → {booking.checkOutDate} · {booking.numberOfGuests} khách</p>
             <div className="fare">
               {booking.stayLabel && <span>{booking.stayLabel}</span>}

@@ -54,6 +54,55 @@ namespace HotelBooking.Application.Data
 
             await context.SaveChangesAsync();
 
+            await context.Database.ExecuteSqlRawAsync("""
+                IF COL_LENGTH('Bookings', 'GuestName') IS NULL
+                    ALTER TABLE Bookings ADD GuestName NVARCHAR(150) NULL;
+                IF COL_LENGTH('Bookings', 'GuestPhone') IS NULL
+                    ALTER TABLE Bookings ADD GuestPhone NVARCHAR(20) NULL;
+                IF COL_LENGTH('Bookings', 'GuestNote') IS NULL
+                    ALTER TABLE Bookings ADD GuestNote NVARCHAR(500) NULL;
+                IF COL_LENGTH('Bookings', 'PaymentChoice') IS NULL
+                    ALTER TABLE Bookings ADD PaymentChoice NVARCHAR(20) NOT NULL CONSTRAINT DF_Bookings_PaymentChoice DEFAULT 'Now';
+                IF COL_LENGTH('Rooms', 'HousekeepingStatus') IS NULL
+                    ALTER TABLE Rooms ADD HousekeepingStatus NVARCHAR(20) NOT NULL CONSTRAINT DF_Rooms_Housekeeping DEFAULT 'Clean';
+                IF OBJECT_ID('FolioItems') IS NULL
+                    CREATE TABLE FolioItems (
+                        FolioItemId INT IDENTITY(1,1) PRIMARY KEY,
+                        BookingId INT NOT NULL,
+                        Category NVARCHAR(30) NOT NULL,
+                        Description NVARCHAR(200) NOT NULL,
+                        Quantity INT NOT NULL,
+                        UnitPrice DECIMAL(18,2) NOT NULL,
+                        CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+                        CONSTRAINT FK_Folio_Bookings FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId) ON DELETE CASCADE
+                    );
+                IF OBJECT_ID('RoomIssues') IS NULL
+                    CREATE TABLE RoomIssues (
+                        IssueId INT IDENTITY(1,1) PRIMARY KEY,
+                        RoomId INT NOT NULL,
+                        Description NVARCHAR(300) NOT NULL,
+                        Status NVARCHAR(20) NOT NULL DEFAULT 'Open',
+                        ReportedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+                        CONSTRAINT FK_Issues_Rooms FOREIGN KEY (RoomId) REFERENCES Rooms(RoomId) ON DELETE CASCADE
+                    );
+                IF OBJECT_ID('PromoCodes') IS NULL
+                    CREATE TABLE PromoCodes (
+                        PromoCodeId INT IDENTITY(1,1) PRIMARY KEY,
+                        Code NVARCHAR(30) NOT NULL UNIQUE,
+                        DiscountAmount DECIMAL(18,2) NOT NULL DEFAULT 0,
+                        DiscountPercent INT NOT NULL DEFAULT 0,
+                        IsActive BIT NOT NULL DEFAULT 1
+                    );
+                """);
+
+            if (!await context.PromoCodes.AnyAsync())
+            {
+                context.PromoCodes.AddRange(
+                    new PromoCode { Code = "WELCOME10", DiscountPercent = 10, IsActive = true },
+                    new PromoCode { Code = "GIAM100", DiscountAmount = 100_000m, IsActive = true });
+                await context.SaveChangesAsync();
+            }
+
             await EnsureChainAsync(context);
             await EnsureOccupancyAsync(context);
         }

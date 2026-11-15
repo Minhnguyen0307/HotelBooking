@@ -41,6 +41,8 @@ namespace HotelBooking.Application.Services
 
             if (room == null)
                 return FailPreview("Phòng không tồn tại.");
+            if (room.Status == "Maintenance" || room.HousekeepingStatus == "Maintenance")
+                return FailPreview("Phòng đang bảo trì, chưa nhận đặt.");
 
             int nights = dto.CheckOutDate.DayNumber - dto.CheckInDate.DayNumber;
             if (nights <= 0)
@@ -97,11 +99,25 @@ namespace HotelBooking.Application.Services
 
             if (room == null)
                 return new BookingResult { Success = false, ErrorMessage = "Phòng không tồn tại." };
+            if (room.Status == "Maintenance" || room.HousekeepingStatus == "Maintenance")
+                return new BookingResult { Success = false, ErrorMessage = "Phòng đang bảo trì, chưa nhận đặt." };
 
             int nights = dto.CheckOutDate.DayNumber - dto.CheckInDate.DayNumber;
             var quote = OccupancyPricing.Price(room.RoomType.TypeName, room.RoomType.MaxGuests, room.RoomType.BasePrice, dto.NumberOfGuests, nights);
             if (!quote.Success)
                 return new BookingResult { Success = false, ErrorMessage = quote.ErrorMessage };
+
+            var guestName = (dto.GuestName ?? string.Empty).Trim();
+            var guestPhone = new string((dto.GuestPhone ?? string.Empty).Where(char.IsDigit).ToArray());
+            var guestNote = string.IsNullOrWhiteSpace(dto.GuestNote) ? null : dto.GuestNote.Trim();
+            var payNow = !string.Equals(dto.PaymentChoice, "Cash", StringComparison.OrdinalIgnoreCase);
+
+            if (guestName.Length < 2 || guestName.Length > 150)
+                return new BookingResult { Success = false, ErrorMessage = "Vui lòng nhập tên người nhận phòng." };
+            if (guestPhone.Length != 10 || !guestPhone.StartsWith('0'))
+                return new BookingResult { Success = false, ErrorMessage = "Số điện thoại cần 10 số và bắt đầu bằng 0." };
+            if (guestNote?.Length > 500)
+                return new BookingResult { Success = false, ErrorMessage = "Lời nhắn tối đa 500 ký tự." };
 
             bool available = await IsRoomAvailableAsync(dto.RoomId, dto.CheckInDate, dto.CheckOutDate);
             if (!available)
@@ -115,7 +131,11 @@ namespace HotelBooking.Application.Services
                 CheckInDate = dto.CheckInDate,
                 CheckOutDate = dto.CheckOutDate,
                 NumberOfGuests = dto.NumberOfGuests,
-                Status = "Pending",
+                GuestName = guestName,
+                GuestPhone = guestPhone,
+                GuestNote = guestNote,
+                PaymentChoice = payNow ? "Now" : "Cash",
+                Status = payNow ? "Pending" : "Confirmed",
                 TotalPrice = totalPrice,
                 CreatedAt = DateTime.UtcNow
             };
@@ -126,6 +146,18 @@ namespace HotelBooking.Application.Services
                 PricePerNight = quote.PricePerNight
             });
 
+            if (!payNow)
+            {
+                booking.Payments.Add(new Payment
+                {
+                    Amount = totalPrice,
+                    PaymentMethod = "Cash",
+                    PaymentStatus = "Pending",
+                    TransactionId = null,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
             await _hubContext.Clients.All.SendAsync("RoomBooked", new
@@ -134,7 +166,7 @@ namespace HotelBooking.Application.Services
                 CheckInDate = dto.CheckInDate.ToString("yyyy-MM-dd"),
                 CheckOutDate = dto.CheckOutDate.ToString("yyyy-MM-dd")
             });
-            return new BookingResult { Success = true, BookingId = booking.BookingId };
+            return new BookingResult { Success = true, BookingId = booking.BookingId, RequiresPayment = payNow };
         }
 
         public async Task<List<BookingListItemDto>> GetCustomerBookingsAsync(int customerId)
@@ -152,7 +184,11 @@ namespace HotelBooking.Application.Services
                     CheckOutDate = b.CheckOutDate,
                     Status = b.Status,
                     TotalPrice = b.TotalPrice,
-                    CreatedAt = b.CreatedAt
+                    CreatedAt = b.CreatedAt,
+                    GuestName = b.GuestName,
+                    GuestPhone = b.GuestPhone,
+                    GuestNote = b.GuestNote,
+                    PaymentChoice = b.PaymentChoice
                 })
                 .ToListAsync();
         }

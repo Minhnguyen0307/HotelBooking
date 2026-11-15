@@ -29,6 +29,7 @@ createRoot(document.getElementById('root')).render(
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="frontdesk" element={<RequireAuth roles={['Receptionist', 'Manager', 'Admin']}><FrontDeskPage /></RequireAuth>} />
           <Route element={<App />}>
             <Route index element={<HomePage />} />
             <Route path="search" element={<SearchPage />} />
@@ -42,7 +43,6 @@ createRoot(document.getElementById('root')).render(
             <Route path="password" element={<RequireAuth><ChangePasswordPage /></RequireAuth>} />
             <Route path="bookings" element={<RequireAuth><BookingsPage /></RequireAuth>} />
             <Route path="pay/:id" element={<RequireAuth><PayPage /></RequireAuth>} />
-            <Route path="frontdesk" element={<RequireAuth roles={['Receptionist', 'Manager', 'Admin']}><FrontDeskPage /></RequireAuth>} />
             <Route path="admin/rooms" element={<RequireAuth roles={['Manager', 'Admin']}><AdminRoomsPage /></RequireAuth>} />
             <Route path="admin/rooms/new" element={<RequireAuth roles={['Manager', 'Admin']}><RoomFormPage /></RequireAuth>} />
             <Route path="admin/rooms/:id" element={<RequireAuth roles={['Manager', 'Admin']}><RoomFormPage /></RequireAuth>} />

@@ -35,8 +35,11 @@ public class BookingsApiController : ControllerBase
 
         return Ok(new
         {
-            message = "Đơn đặt phòng đã được tạo. Vui lòng thanh toán.",
-            bookingId = result.BookingId
+            message = result.RequiresPayment
+                ? "Đơn đã được giữ. Mời bạn thanh toán ngay."
+                : "Đã giữ phòng. Quý khách thanh toán tiền mặt khi nhận phòng.",
+            bookingId = result.BookingId,
+            requiresPayment = result.RequiresPayment
         });
     }
 

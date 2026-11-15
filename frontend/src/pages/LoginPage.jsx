@@ -45,8 +45,8 @@ export function LoginPage() {
         callback: async (response) => {
           setError('');
           try {
-            await loginWithGoogle(response.credential);
-            navigate(fromRef.current, { replace: true });
+            const account = await loginWithGoogle(response.credential);
+            navigate(fromRef.current !== '/' ? fromRef.current : account?.role === 'Receptionist' ? '/frontdesk' : '/', { replace: true });
           } catch (err) {
             setError(err.message);
           }
@@ -74,8 +74,9 @@ export function LoginPage() {
     const data = Object.fromEntries(new FormData(event.target));
     setError('');
     try {
-      await login(data.email, data.password);
-      navigate(location.state?.from || '/', { replace: true });
+      const account = await login(data.email, data.password);
+      const requested = location.state?.from;
+      navigate(requested || (account?.role === 'Receptionist' ? '/frontdesk' : '/'), { replace: true });
     } catch (err) {
       setError(err.message);
     }

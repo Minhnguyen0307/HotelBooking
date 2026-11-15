@@ -38,10 +38,18 @@ export function RoomPage() {
           roomId: Number(id),
           checkInDate: data.checkInDate,
           checkOutDate: data.checkOutDate,
-          numberOfGuests: Number(data.numberOfGuests)
+          numberOfGuests: Number(data.numberOfGuests),
+          guestName: data.guestName,
+          guestPhone: data.guestPhone,
+          guestNote: data.guestNote,
+          paymentChoice: data.paymentChoice
         }
       });
-      navigate(`/pay/${result.bookingId}`, { state: { message: result.message, kind: 'ok' } });
+      if (result.requiresPayment) {
+        navigate(`/pay/${result.bookingId}`, { state: { message: result.message, kind: 'ok' } });
+      } else {
+        navigate('/bookings', { state: { message: result.message, kind: 'ok' } });
+      }
     } catch (err) {
       if (err.status === 401) navigate('/login', { state: { from: `/rooms/${id}` } });
       else setError(err.message);
@@ -100,6 +108,14 @@ export function RoomPage() {
                 <h2>Mời bạn lưu trú</h2>
                 <StayDates checkIn={saved.checkInDate || today()} checkOut={saved.checkOutDate || tomorrow()} />
                 <label>Số khách<input name="numberOfGuests" type="number" min="1" max={room.maxGuests} defaultValue={saved.guests || 1} required /></label>
+                <label>Người nhận phòng<input name="guestName" defaultValue={user?.fullName || ''} required /></label>
+                <label>Số điện thoại<input name="guestPhone" inputMode="tel" pattern="0[0-9]{9}" defaultValue={user?.phoneNumber || ''} required /></label>
+                <label>Lời nhắn<textarea name="guestNote" maxLength="500" placeholder="Giờ đến, yêu cầu phòng..."></textarea></label>
+                <fieldset className="pay-choice">
+                  <legend>Thanh toán</legend>
+                  <label className="choice"><input type="radio" name="paymentChoice" value="Now" defaultChecked /> Thanh toán ngay</label>
+                  <label className="choice"><input type="radio" name="paymentChoice" value="Cash" /> Tiền mặt khi nhận phòng</label>
+                </fieldset>
                 {preview && (
                   <div className="fare">
                     <span>{preview.stayLabel} · {preview.nights} đêm · {preview.numberOfGuests} khách</span>

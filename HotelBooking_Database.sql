@@ -84,6 +84,8 @@ CREATE TABLE Rooms (
     Floor           INT NULL,
     Status          NVARCHAR(20) NOT NULL DEFAULT 'Available',
                     -- 'Available', 'Booked', 'Maintenance'  (UC-27, FE-10)
+    HousekeepingStatus NVARCHAR(20) NOT NULL DEFAULT 'Clean',
+                    -- 'Clean', 'Cleaning', 'Dirty', 'Maintenance'
     Description     NVARCHAR(MAX) NULL,
     Address         NVARCHAR(255) NULL,
     CreatedAt       DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
@@ -131,6 +133,10 @@ CREATE TABLE Bookings (
     CheckInDate     DATE NOT NULL,
     CheckOutDate    DATE NOT NULL,
     NumberOfGuests  INT NOT NULL,
+    GuestName       NVARCHAR(150) NULL,
+    GuestPhone      NVARCHAR(20) NULL,
+    GuestNote       NVARCHAR(500) NULL,
+    PaymentChoice   NVARCHAR(20) NOT NULL DEFAULT 'Now', -- Now: thanh toan ngay, Cash: tien mat khi nhan phong
     Status          NVARCHAR(20) NOT NULL DEFAULT 'Pending',
                     -- 'Pending','Confirmed','CheckedIn','CheckedOut','Cancelled'
     TotalPrice      DECIMAL(18,2) NOT NULL DEFAULT 0,
@@ -290,4 +296,35 @@ BEGIN
               AND b.CheckOutDate > @CheckIn
       );
 END
+GO
+
+CREATE TABLE FolioItems (
+    FolioItemId INT IDENTITY(1,1) PRIMARY KEY,
+    BookingId   INT NOT NULL,
+    Category    NVARCHAR(30) NOT NULL,
+    Description NVARCHAR(200) NOT NULL,
+    Quantity    INT NOT NULL,
+    UnitPrice   DECIMAL(18,2) NOT NULL,
+    CreatedAt   DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    CONSTRAINT FK_Folio_Bookings FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId) ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE RoomIssues (
+    IssueId     INT IDENTITY(1,1) PRIMARY KEY,
+    RoomId      INT NOT NULL,
+    Description NVARCHAR(300) NOT NULL,
+    Status      NVARCHAR(20) NOT NULL DEFAULT 'Open',
+    ReportedAt  DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    CONSTRAINT FK_Issues_Rooms FOREIGN KEY (RoomId) REFERENCES Rooms(RoomId) ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE PromoCodes (
+    PromoCodeId     INT IDENTITY(1,1) PRIMARY KEY,
+    Code            NVARCHAR(30) NOT NULL UNIQUE,
+    DiscountAmount  DECIMAL(18,2) NOT NULL DEFAULT 0,
+    DiscountPercent INT NOT NULL DEFAULT 0,
+    IsActive        BIT NOT NULL DEFAULT 1
+);
 GO

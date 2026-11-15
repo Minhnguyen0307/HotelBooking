@@ -260,10 +260,19 @@ export function BookingTable({ rows, actions }) {
             <tr key={item.bookingId}>
               <td>#{item.bookingId}</td>
               <td>{item.propertyName ? `${item.propertyName} · ` : ''}{item.roomNumber} · {item.typeName}</td>
-              <td>{item.customerName || ''}</td>
+              <td>
+                {item.guestName || item.customerName || ''}
+                {item.guestPhone && <div className="muted">{item.guestPhone}</div>}
+                {item.guestNote && <div className="muted">{item.guestNote}</div>}
+              </td>
               <td>{item.checkInDate} → {item.checkOutDate}</td>
               <td><span className="pill">{statusLabel(item.status)}</span></td>
-              <td>{money(item.totalPrice)}</td>
+              <td>
+                {money(item.totalPrice)}
+                {item.paymentChoice && (
+                  <div className="muted">{item.paymentChoice === 'Cash' ? 'Tiền mặt khi nhận phòng' : 'Thanh toán ngay'}</div>
+                )}
+              </td>
               <td>{actions ? actions(item) : null}</td>
             </tr>
           ))}
