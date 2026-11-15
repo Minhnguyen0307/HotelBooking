@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './auth';
+import ChatBot from './ChatBot';
 
 export default function App() {
   const { user, logout, hasRole } = useAuth();
@@ -54,6 +55,7 @@ export default function App() {
         <span>HBS Luxury Hotel · Đà Nẵng</span>
         <NavLink to="/privacy">Bảo mật</NavLink>
       </footer>
+      <ChatBot />
     </div>
   );
 }
