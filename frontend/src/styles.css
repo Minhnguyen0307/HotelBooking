@@ -888,3 +888,6 @@ form.lux-book-page { max-width: 560px; }
   .lux-story-photos img:last-child { display: none; }
   .lux-story-photos img:first-child { width: 100%; height: 280px; }
 }
+.qr-payment-panel { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; padding: 0.9rem; border: 1px dashed var(--sand); border-radius: 16px; background: #fbf7f0; }
+.qr-payment-panel img { width: 240px; height: 240px; }
+.qr-payment-panel p { margin: 0.25rem 0; }

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import QRCode from 'qrcode';
 import { api } from '../api';
 import { money } from '../format';
 import { LuxBar } from '../lux';
@@ -9,7 +10,18 @@ export function PayPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [qrImage, setQrImage] = useState('');
   const state = useLoad(() => api(`/api/payments/${id}`), [id]);
+
+  useEffect(() => {
+    const amount = state.data?.booking?.amountDue;
+    if (!amount) return;
+    QRCode.toDataURL(`HBS|BOOKING_${id}|AMOUNT_${amount}`, {
+      width: 240,
+      margin: 1,
+      errorCorrectionLevel: 'M'
+    }).then(setQrImage).catch(() => setQrImage(''));
+  }, [id, state.data?.booking?.amountDue]);
 
   async function onSubmit(event) {
     event.preventDefault();
@@ -66,7 +78,16 @@ export function PayPage() {
               {booking.discount > 0 && <span>Giảm giá −{money(booking.discount)}</span>}
               <strong>Tổng {money(booking.payable ?? booking.totalPrice)}</strong>
             </div>
+            <div className="qr-payment-panel">
+              {qrImage && <img src={qrImage} alt={`Mã QR cho đơn ${booking.bookingId}`} />}
+              <div>
+                <strong>Mã QR thanh toán</strong>
+                <p>Nội dung: BOOKING_{booking.bookingId}</p>
+                <p>Số tiền: {money(booking.amountDue)}</p>
+              </div>
+            </div>
             <button className="lux-gold" type="submit">Thanh toán thành công</button>
+            <Link to="/bookings" className="lux-line">Quay lại</Link>
           </form>
         );
       }}
