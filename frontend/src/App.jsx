@@ -1,11 +1,19 @@
+import { useEffect } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './auth';
+import ChatBot from './ChatBot';
 
 export default function App() {
   const { user, logout, hasRole } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const flash = location.state?.message;
+
+  useEffect(() => {
+    if (hasRole('Admin') && location.pathname === '/') {
+      navigate('/admin/rooms', { replace: true });
+    }
+  }, [hasRole, location.pathname, navigate]);
 
   function onLogout() {
     logout();
@@ -19,12 +27,16 @@ export default function App() {
         <span>Check-in 14:00 · Check-out 12:00</span>
       </div>
       <nav className="nav">
-        <NavLink className="brand" to="/">HBS <span>Hotel</span></NavLink>
+        <NavLink className="brand" to={hasRole('Admin') ? '/admin/rooms' : '/'}>HBS <span>Hotel</span></NavLink>
         <div className="menu">
-          <NavLink to="/" end>Trang chủ</NavLink>
-          <NavLink to="/search">Tìm phòng</NavLink>
-          {user && <NavLink to="/bookings">Đơn của tôi</NavLink>}
-          {hasRole('Receptionist', 'Manager', 'Admin') && <NavLink to="/frontdesk">Lễ tân</NavLink>}
+          {!hasRole('Admin') && (
+            <>
+              <NavLink to="/" end>Trang chủ</NavLink>
+              <NavLink to="/search">Tìm phòng</NavLink>
+              {user && <NavLink to="/bookings">Đơn của tôi</NavLink>}
+            </>
+          )}
+          {hasRole('Receptionist', 'Manager') && <NavLink to="/frontdesk">Lễ tân</NavLink>}
           {hasRole('Manager', 'Admin') && (
             <>
               <NavLink to="/admin/rooms">Phòng</NavLink>
@@ -35,7 +47,7 @@ export default function App() {
           )}
           {user ? (
             <>
-              <NavLink to="/profile">{user.fullName}</NavLink>
+              {!hasRole('Admin') && <NavLink to="/profile">{user.fullName}</NavLink>}
               <button className="text-btn" type="button" onClick={onLogout}>Đăng xuất</button>
             </>
           ) : (
@@ -54,6 +66,7 @@ export default function App() {
         <span>HBS Luxury Hotel · Đà Nẵng</span>
         <NavLink to="/privacy">Bảo mật</NavLink>
       </footer>
+      {!hasRole('Admin') && <ChatBot />}
     </div>
   );
 }
