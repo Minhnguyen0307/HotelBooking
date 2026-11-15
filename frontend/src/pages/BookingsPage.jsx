@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { AsyncView, BookingTable, useLoad } from '../ui';
 
+const INVOICE_STATUSES = ['CheckedOut', 'Confirmed', 'CheckedIn'];
+
 export function BookingsPage() {
   const navigate = useNavigate();
   const [tick, setTick] = useState(0);
@@ -34,6 +36,9 @@ export function BookingsPage() {
                 {item.status === 'Pending' && <Link className="btn small" to={`/pay/${item.bookingId}`}>Thanh toán</Link>}
                 {['Pending', 'Confirmed'].includes(item.status) && (
                   <button className="btn small danger" type="button" onClick={() => cancel(item.bookingId)}>Hủy</button>
+                )}
+                {INVOICE_STATUSES.includes(item.status) && (
+                  <Link className="btn small secondary" to={`/invoice/${item.bookingId}`}>🖨 Hóa đơn</Link>
                 )}
               </div>
             )}

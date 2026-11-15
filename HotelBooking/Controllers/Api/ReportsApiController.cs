@@ -27,6 +27,13 @@ public class ReportsApiController : ControllerBase
         });
     }
 
+    [HttpGet("charts")]
+    public async Task<IActionResult> GetCharts()
+    {
+        var data = await _reportService.GetChartDataAsync();
+        return Ok(data);
+    }
+
     [HttpGet("revenue.csv")]
     public async Task<IActionResult> RevenueCsv()
     {

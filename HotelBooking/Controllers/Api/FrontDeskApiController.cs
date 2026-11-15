@@ -60,6 +60,52 @@ public class FrontDeskApiController : ControllerBase
         return Result(success, error, "Đã gửi phản hồi đánh giá.");
     }
 
+    // ── New Endpoints ──────────────────────────────────────────────────────────
+
+    [HttpGet("room-matrix")]
+    public async Task<IActionResult> GetRoomMatrix()
+    {
+        var matrix = await _frontDeskService.GetRoomMatrixAsync();
+        return Ok(matrix);
+    }
+
+    [HttpPost("rooms/{roomId:int}/clean")]
+    public async Task<IActionResult> MarkRoomClean(int roomId)
+    {
+        var (success, error) = await _frontDeskService.MarkRoomCleanAsync(roomId);
+        return Result(success, error, "Phòng đã được đánh dấu sạch.");
+    }
+
+    [HttpPost("walk-in")]
+    public async Task<IActionResult> CreateWalkIn([FromBody] WalkInBookingDto dto)
+    {
+        var (success, error, bookingId) = await _frontDeskService.CreateWalkInBookingAsync(dto);
+        if (!success) return BadRequest(new { message = error });
+        return Ok(new { message = "Walk-in check-in thành công.", bookingId });
+    }
+
+    [HttpPost("bookings/{id:int}/transfer-room")]
+    public async Task<IActionResult> TransferRoom(int id, [FromBody] TransferRoomDto dto)
+    {
+        var (success, error) = await _frontDeskService.TransferRoomAsync(id, dto.NewRoomId);
+        return Result(success, error, "Chuyển phòng thành công.");
+    }
+
+    [HttpPost("bookings/{id:int}/extend-stay")]
+    public async Task<IActionResult> ExtendStay(int id, [FromBody] ExtendStayDto dto)
+    {
+        var (success, error) = await _frontDeskService.ExtendStayAsync(id, dto.NewCheckOutDate);
+        return Result(success, error, "Gia hạn lưu trú thành công.");
+    }
+
+    [HttpGet("bookings/{id:int}/invoice")]
+    public async Task<IActionResult> GetInvoice(int id)
+    {
+        var invoice = await _frontDeskService.GetInvoiceAsync(id);
+        if (invoice == null) return NotFound(new { message = "Không tìm thấy đơn đặt phòng." });
+        return Ok(invoice);
+    }
+
     private IActionResult Result(bool success, string? error, string okMessage)
     {
         if (!success) return BadRequest(new { message = error });

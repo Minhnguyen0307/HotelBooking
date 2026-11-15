@@ -28,6 +28,7 @@ builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<HotelPolicies>(builder.Configuration.GetSection("HotelPolicies"));
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

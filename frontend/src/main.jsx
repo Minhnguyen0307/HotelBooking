@@ -22,6 +22,7 @@ import { RoomFormPage } from './pages/RoomFormPage';
 import { RoomTypesPage } from './pages/RoomTypesPage';
 import { CustomersPage } from './pages/CustomersPage';
 import { ReportsPage } from './pages/ReportsPage';
+import { InvoicePrintPage } from './pages/InvoicePrintPage';
 import './styles.css';
 
 createRoot(document.getElementById('root')).render(
@@ -49,6 +50,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="admin/types" element={<RequireAuth roles={['Manager', 'Admin']}><RoomTypesPage /></RequireAuth>} />
             <Route path="admin/customers" element={<RequireAuth roles={['Manager', 'Admin']}><CustomersPage /></RequireAuth>} />
             <Route path="reports" element={<RequireAuth roles={['Manager', 'Admin']}><ReportsPage /></RequireAuth>} />
+            <Route path="invoice/:id" element={<RequireAuth><InvoicePrintPage /></RequireAuth>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

@@ -51,7 +51,7 @@ public partial class HotelBookingDbContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=HotelBookingDB;Trusted_Connection=True;TrustServerCertificate=True;");
+            optionsBuilder.UseSqlServer("Server=localhost;Database=HotelBookingDB;Trusted_Connection=True;TrustServerCertificate=True;");
         }
     }
 

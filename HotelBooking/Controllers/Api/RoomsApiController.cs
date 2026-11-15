@@ -72,7 +72,7 @@ public class RoomsApiController : ControllerBase
         return Ok(new
         {
             room,
-            canReview = authenticated,
+            canReview = authenticated && hasStayed,
             hasStayed
         });
     }
