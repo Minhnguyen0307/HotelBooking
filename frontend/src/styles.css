@@ -891,3 +891,27 @@ form.lux-book-page { max-width: 560px; }
 .qr-payment-panel { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; padding: 0.9rem; border: 1px dashed var(--sand); border-radius: 16px; background: #fbf7f0; }
 .qr-payment-panel img { width: 240px; height: 240px; }
 .qr-payment-panel p { margin: 0.25rem 0; }
+
+.customer-promos-page { padding-top: 2.4rem; padding-bottom: 4rem; }
+.customer-promos-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; margin-bottom: 2rem; }
+.customer-promos-heading h1 { margin: 0.25rem 0 0.6rem; }
+.customer-promos-heading p { margin-bottom: 0; }
+.customer-promo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 1rem; }
+.customer-promo-card { position: relative; overflow: hidden; padding: 1.35rem; border: 1px solid #e5ddd0; border-radius: 20px; background: #fffdfa; box-shadow: 0 12px 32px rgba(43, 37, 29, 0.06); }
+.customer-promo-card::before, .customer-promo-card::after { position: absolute; top: 4.7rem; width: 18px; height: 18px; border: 1px solid #e5ddd0; border-radius: 50%; background: #f7f3ec; content: ''; }
+.customer-promo-card::before { left: -10px; }
+.customer-promo-card::after { right: -10px; }
+.customer-promo-topline, .customer-promo-code-row { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; }
+.customer-promo-discount { color: #27544b; font-size: 1.3rem; font-weight: 800; }
+.customer-promo-badge { padding: 0.35rem 0.65rem; border-radius: 999px; background: #f4ead0; color: #795a20; font-size: 0.78rem; font-weight: 700; }
+.customer-promo-code-row { margin-top: 1.1rem; padding-top: 1rem; border-top: 1px dashed #d8cfbf; }
+.customer-promo-code-row strong { font-size: 1.1rem; letter-spacing: 0.08em; }
+.customer-promo-condition, .customer-promo-expiry { margin: 0.65rem 0 0; color: #6f685f; }
+.customer-promo-cta { display: flex; justify-content: space-between; margin-top: 1.2rem; padding-top: 0.9rem; border-top: 1px solid #eee8dd; color: #27544b; font-weight: 700; }
+.customer-promos-empty { max-width: 560px; margin: 2rem auto; padding: 3rem 1.5rem; border: 1px dashed #d8cfbf; border-radius: 24px; text-align: center; }
+.customer-promos-empty > span { color: #c5a059; font-size: 2rem; }
+.customer-promos-empty h2 { margin: 0.7rem 0; }
+@media (max-width: 800px) {
+  .customer-promos-heading { align-items: flex-start; flex-direction: column; }
+  .customer-promo-code-row { align-items: flex-start; flex-direction: column; }
+}

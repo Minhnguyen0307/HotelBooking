@@ -55,6 +55,7 @@ export function ProfilePage() {
             <button className="btn" type="submit">Lưu</button>
           </form>
           <div className="profile-links">
+            {user?.role === 'Customer' && <Link to="/offers">Ưu đãi của tôi</Link>}
             <Link to="/password">Đổi mật khẩu</Link>
             <button className="text-btn" type="button" onClick={onLogout}>Đăng xuất</button>
           </div>

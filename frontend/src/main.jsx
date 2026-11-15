@@ -15,6 +15,7 @@ import { PrivacyPage } from './pages/PrivacyPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { ChangePasswordPage } from './pages/ChangePasswordPage';
 import { BookingsPage } from './pages/BookingsPage';
+import { CustomerPromosPage } from './pages/CustomerPromosPage';
 import { PayPage } from './pages/PayPage';
 import { FrontDeskPage } from './pages/FrontDeskPage';
 import { AdminRoomsPage } from './pages/AdminRoomsPage';
@@ -45,6 +46,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
             <Route path="password" element={<RequireAuth><ChangePasswordPage /></RequireAuth>} />
             <Route path="bookings" element={<RequireAuth><BookingsPage /></RequireAuth>} />
+            <Route path="offers" element={<RequireAuth roles={['Customer']}><CustomerPromosPage /></RequireAuth>} />
             <Route path="pay/:id" element={<RequireAuth><PayPage /></RequireAuth>} />
             <Route path="admin/rooms" element={<RequireAuth roles={['Manager', 'Admin']}><AdminRoomsPage /></RequireAuth>} />
             <Route path="admin/rooms/new" element={<RequireAuth roles={['Manager', 'Admin']}><RoomFormPage /></RequireAuth>} />
