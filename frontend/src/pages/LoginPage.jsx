@@ -27,7 +27,6 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState('');
-  const [googleReady, setGoogleReady] = useState(false);
   const buttonRef = useRef(null);
   const fromRef = useRef('/');
   fromRef.current = location.state?.from || '/';
@@ -46,8 +45,8 @@ export function LoginPage() {
         callback: async (response) => {
           setError('');
           try {
-            await loginWithGoogle(response.credential);
-            navigate(fromRef.current, { replace: true });
+            const account = await loginWithGoogle(response.credential);
+            navigate(fromRef.current !== '/' ? fromRef.current : account?.role === 'Receptionist' ? '/frontdesk' : '/', { replace: true });
           } catch (err) {
             setError(err.message);
           }
@@ -61,7 +60,6 @@ export function LoginPage() {
         shape: 'pill',
         width: 320
       });
-      if (!cancelled) setGoogleReady(true);
     }
 
     setup().catch(() => {});
@@ -76,8 +74,9 @@ export function LoginPage() {
     const data = Object.fromEntries(new FormData(event.target));
     setError('');
     try {
-      await login(data.email, data.password);
-      navigate(location.state?.from || '/', { replace: true });
+      const account = await login(data.email, data.password);
+      const requested = location.state?.from;
+      navigate(requested || (account?.role === 'Receptionist' ? '/frontdesk' : '/'), { replace: true });
     } catch (err) {
       setError(err.message);
     }
@@ -85,16 +84,16 @@ export function LoginPage() {
 
   return (
     <form className="panel stack account-card" onSubmit={onSubmit}>
-      <h1>Đăng nhập</h1>
+      <p className="eyebrow">HBS</p>
+      <h1>Chào mừng trở lại</h1>
+      <p className="lede">Mời bạn đăng nhập để tiếp tục kỳ nghỉ.</p>
       {error && <div className="banner">{error}</div>}
       <label>Email<input name="email" type="email" required /></label>
       <label>Mật khẩu<input name="password" type="password" required /></label>
-      <button className="btn" type="submit">Vào hệ thống</button>
+      <button className="btn" type="submit">Đăng nhập</button>
       <div className="or-line">hoặc</div>
       <div className="google-login" ref={buttonRef} />
-      {!googleReady && <p className="muted">Nút Google hiện sau khi điền Client ID vào appsettings và chạy lại API.</p>}
-      <p className="muted"><Link to="/forgot">Quên mật khẩu</Link> · <Link to="/register">Tạo tài khoản</Link></p>
-      <div className="banner info">Tài khoản mẫu: customer1@hotel.com / Customer@123 · admin@hotel.com / Admin@123 · receptionist@hotel.com / Reception@123</div>
+      <p className="muted links"><Link to="/forgot">Quên mật khẩu</Link> · <Link to="/register">Tạo tài khoản</Link></p>
     </form>
   );
 }

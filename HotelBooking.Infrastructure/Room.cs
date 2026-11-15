@@ -9,11 +9,15 @@ public partial class Room
 
     public int RoomTypeId { get; set; }
 
+    public int PropertyId { get; set; }
+
     public string RoomNumber { get; set; } = null!;
 
     public int? Floor { get; set; }
 
     public string Status { get; set; } = null!;
+
+    public string HousekeepingStatus { get; set; } = "Clean";
 
     public string? Description { get; set; }
 
@@ -28,6 +32,8 @@ public partial class Room
     public virtual ICollection<RoomImage> RoomImages { get; set; } = new List<RoomImage>();
 
     public virtual RoomType RoomType { get; set; } = null!;
+
+    public virtual Property Property { get; set; } = null!;
 
     public virtual ICollection<Amenity> Amenities { get; set; } = new List<Amenity>();
 

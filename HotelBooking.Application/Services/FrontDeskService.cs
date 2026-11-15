@@ -23,11 +23,16 @@ namespace HotelBooking.Application.Services
                     BookingId = b.BookingId,
                     RoomNumber = b.BookingRooms.Select(br => br.Room.RoomNumber).FirstOrDefault() ?? "",
                     TypeName = b.BookingRooms.Select(br => br.Room.RoomType.TypeName).FirstOrDefault() ?? "",
+                    PropertyName = b.BookingRooms.Select(br => br.Room.Property.Name).FirstOrDefault() ?? "",
                     CheckInDate = b.CheckInDate,
                     CheckOutDate = b.CheckOutDate,
                     Status = b.Status,
                     TotalPrice = b.TotalPrice,
-                    CreatedAt = b.CreatedAt
+                    CreatedAt = b.CreatedAt,
+                    GuestName = b.GuestName,
+                    GuestPhone = b.GuestPhone,
+                    GuestNote = b.GuestNote,
+                    PaymentChoice = b.PaymentChoice
                 })
                 .ToListAsync();
         }
@@ -42,11 +47,16 @@ namespace HotelBooking.Application.Services
                     BookingId = b.BookingId,
                     RoomNumber = b.BookingRooms.Select(br => br.Room.RoomNumber).FirstOrDefault() ?? "",
                     TypeName = b.BookingRooms.Select(br => br.Room.RoomType.TypeName).FirstOrDefault() ?? "",
+                    PropertyName = b.BookingRooms.Select(br => br.Room.Property.Name).FirstOrDefault() ?? "",
                     CheckInDate = b.CheckInDate,
                     CheckOutDate = b.CheckOutDate,
                     Status = b.Status,
                     TotalPrice = b.TotalPrice,
-                    CreatedAt = b.CreatedAt
+                    CreatedAt = b.CreatedAt,
+                    GuestName = b.GuestName,
+                    GuestPhone = b.GuestPhone,
+                    GuestNote = b.GuestNote,
+                    PaymentChoice = b.PaymentChoice
                 })
                 .ToListAsync();
         }
@@ -63,11 +73,16 @@ namespace HotelBooking.Application.Services
                     BookingId = b.BookingId,
                     RoomNumber = b.BookingRooms.Select(br => br.Room.RoomNumber).FirstOrDefault() ?? "",
                     TypeName = b.BookingRooms.Select(br => br.Room.RoomType.TypeName).FirstOrDefault() ?? "",
+                    PropertyName = b.BookingRooms.Select(br => br.Room.Property.Name).FirstOrDefault() ?? "",
                     CheckInDate = b.CheckInDate,
                     CheckOutDate = b.CheckOutDate,
                     Status = b.Status,
                     TotalPrice = b.TotalPrice,
-                    CreatedAt = b.CreatedAt
+                    CreatedAt = b.CreatedAt,
+                    GuestName = b.GuestName,
+                    GuestPhone = b.GuestPhone,
+                    GuestNote = b.GuestNote,
+                    PaymentChoice = b.PaymentChoice
                 })
                 .ToListAsync();
         }
@@ -78,6 +93,16 @@ namespace HotelBooking.Application.Services
             if (booking == null) return (false, "Không tìm thấy đơn đặt phòng.");
             if (booking.Status != "Confirmed")
                 return (false, $"Đơn đang ở trạng thái '{booking.Status}', không thể check-in.");
+
+            var cash = await _context.Payments
+                .FirstOrDefaultAsync(p => p.BookingId == bookingId && p.PaymentMethod == "Cash" && p.PaymentStatus == "Pending");
+            if (cash != null)
+            {
+                cash.PaymentStatus = "Success";
+                cash.PaymentDate = DateTime.UtcNow;
+                cash.TransactionId ??= "CASH-" + bookingId;
+            }
+
             booking.Status = "CheckedIn";
             await _context.SaveChangesAsync();
             return (true, null);
@@ -110,13 +135,18 @@ namespace HotelBooking.Application.Services
                     BookingId = b.BookingId,
                     RoomNumber = b.BookingRooms.Select(br => br.Room.RoomNumber).FirstOrDefault() ?? "",
                     TypeName = b.BookingRooms.Select(br => br.Room.RoomType.TypeName).FirstOrDefault() ?? "",
+                    PropertyName = b.BookingRooms.Select(br => br.Room.Property.Name).FirstOrDefault() ?? "",
                     CheckInDate = b.CheckInDate,
                     CheckOutDate = b.CheckOutDate,
                     Status = b.Status,
                     TotalPrice = b.TotalPrice,
                     CreatedAt = b.CreatedAt,
                     CustomerName = b.Customer.FullName,
-                    CancelReason = b.CancelReason
+                    CancelReason = b.CancelReason,
+                    GuestName = b.GuestName,
+                    GuestPhone = b.GuestPhone,
+                    GuestNote = b.GuestNote,
+                    PaymentChoice = b.PaymentChoice
                 })
                 .ToListAsync();
         }

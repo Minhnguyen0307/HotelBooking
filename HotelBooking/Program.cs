@@ -22,6 +22,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IRoomManageService, RoomManageService>();
 builder.Services.AddScoped<IFrontDeskService, FrontDeskService>();
+builder.Services.AddScoped<IDeskService, DeskService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
