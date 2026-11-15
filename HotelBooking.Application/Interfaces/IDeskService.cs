@@ -20,6 +20,6 @@ namespace HotelBooking.Application.Interfaces
         Task<(bool Success, string? Error)> AddChargeAsync(int bookingId, ChargeDto dto);
         Task<(bool Success, string? Error)> AddDepositAsync(int bookingId, DepositDto dto);
         Task<(bool Success, string? Error)> CheckInConfirmAsync(int bookingId, CheckInDto dto);
-        Task<(bool Success, string? Error)> CheckOutWithBillAsync(int bookingId, CheckoutDto dto);
+        Task<(bool Success, string? Error)> CheckOutWithBillAsync(int bookingId, CheckoutDto dto, int staffUserId);
     }
 }

@@ -8,5 +8,7 @@ namespace HotelBooking.Application.Interfaces
         Task<List<RoomOccupancyDto>> GetRoomOccupancyAsync();
         Task<ReportChartDto> GetChartDataAsync();
         Task<ExecutiveSummaryDto> GetExecutiveSummaryAsync();
+        Task<RevenuePeriodDto> GetRevenuePeriodAsync(string? period, DateOnly? anchor);
+        Task<List<ConfirmedBillDto>> GetConfirmedBillsAsync();
     }
 }

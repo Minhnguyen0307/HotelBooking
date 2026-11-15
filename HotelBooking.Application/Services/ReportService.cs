@@ -148,5 +148,112 @@ namespace HotelBooking.Application.Services
                 PaymentMethodStats = paymentMethods
             };
         }
+
+        public async Task<RevenuePeriodDto> GetRevenuePeriodAsync(string? period, DateOnly? anchor)
+        {
+            var zone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zone));
+            var day = anchor ?? today;
+            var kind = period?.ToLowerInvariant() switch
+            {
+                "week" => "week",
+                "month" => "month",
+                _ => "day"
+            };
+            DateOnly start = day;
+            DateOnly endExclusive = day.AddDays(1);
+            if (kind == "week")
+            {
+                var offset = ((int)day.DayOfWeek + 6) % 7;
+                start = day.AddDays(-offset);
+                endExclusive = start.AddDays(7);
+            }
+            else if (kind == "month")
+            {
+                start = new DateOnly(day.Year, day.Month, 1);
+                endExclusive = start.AddMonths(1);
+            }
+
+            var fromUtc = TimeZoneInfo.ConvertTimeToUtc(start.ToDateTime(TimeOnly.MinValue), zone);
+            var toUtc = TimeZoneInfo.ConvertTimeToUtc(endExclusive.ToDateTime(TimeOnly.MinValue), zone);
+            var payments = await _context.Payments
+                .Where(p => p.PaymentStatus == "Success" && (p.PaymentDate ?? p.CreatedAt) >= fromUtc && (p.PaymentDate ?? p.CreatedAt) < toUtc)
+                .Select(p => new { p.Amount, When = p.PaymentDate ?? p.CreatedAt, p.PaymentMethod, p.BookingId })
+                .ToListAsync();
+
+            List<RevenueBucketDto> buckets;
+            if (kind == "day")
+            {
+                buckets = payments
+                    .OrderBy(p => p.When)
+                    .Select(p => new RevenueBucketDto
+                    {
+                        Label = $"{TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(p.When, DateTimeKind.Utc), zone):HH:mm} · đơn #{p.BookingId} · {p.PaymentMethod}",
+                        Amount = p.Amount,
+                        Count = 1
+                    })
+                    .ToList();
+            }
+            else
+            {
+                var byDay = payments
+                    .GroupBy(p => DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(p.When, DateTimeKind.Utc), zone)))
+                    .ToDictionary(g => g.Key, g => (Amount: g.Sum(x => x.Amount), Count: g.Count()));
+                buckets = new List<RevenueBucketDto>();
+                for (var cursor = start; cursor < endExclusive; cursor = cursor.AddDays(1))
+                {
+                    byDay.TryGetValue(cursor, out var item);
+                    buckets.Add(new RevenueBucketDto
+                    {
+                        Label = cursor.ToString("dd/MM"),
+                        Amount = item.Amount,
+                        Count = item.Count
+                    });
+                }
+            }
+
+            return new RevenuePeriodDto
+            {
+                Period = kind,
+                From = start,
+                To = endExclusive.AddDays(-1),
+                Total = payments.Sum(p => p.Amount),
+                PaymentCount = payments.Count,
+                Buckets = buckets
+            };
+        }
+
+        public async Task<List<ConfirmedBillDto>> GetConfirmedBillsAsync()
+        {
+            var bills = await _context.Bookings
+                .Where(b => b.Status == "CheckedOut")
+                .OrderByDescending(b => b.BillConfirmedAt ?? b.CreatedAt)
+                .Take(80)
+                .Select(b => new
+                {
+                    b.BookingId,
+                    GuestName = b.GuestName ?? b.Customer.FullName,
+                    RoomNumber = b.BookingRooms.Select(br => br.Room.RoomNumber).FirstOrDefault() ?? "",
+                    Collected = b.Payments.Where(p => p.PaymentStatus == "Success").Sum(p => p.Amount),
+                    b.BillConfirmedByUserId,
+                    b.BillConfirmedAt
+                })
+                .ToListAsync();
+
+            var staffIds = bills.Where(b => b.BillConfirmedByUserId != null).Select(b => b.BillConfirmedByUserId!.Value).Distinct().ToList();
+            var names = await _context.Users
+                .Where(u => staffIds.Contains(u.UserId))
+                .ToDictionaryAsync(u => u.UserId, u => u.FullName);
+
+            return bills.Select(b => new ConfirmedBillDto
+            {
+                BookingId = b.BookingId,
+                GuestName = b.GuestName,
+                RoomNumber = b.RoomNumber,
+                Collected = b.Collected,
+                ConfirmedBy = b.BillConfirmedByUserId is int id && names.TryGetValue(id, out var name) ? name : null,
+                ConfirmedAt = b.BillConfirmedAt
+            }).ToList();
+        }
     }
 }

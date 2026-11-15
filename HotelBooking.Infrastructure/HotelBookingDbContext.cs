@@ -98,6 +98,7 @@ public partial class HotelBookingDbContext : DbContext
             entity.Property(e => e.GuestPhone).HasMaxLength(20);
             entity.Property(e => e.GuestNote).HasMaxLength(500);
             entity.Property(e => e.PaymentChoice).HasMaxLength(20).HasDefaultValue("Now");
+            entity.Property(e => e.BillConfirmedAt);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)

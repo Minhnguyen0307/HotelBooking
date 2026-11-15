@@ -7,7 +7,7 @@ export function CustomersPage() {
   const navigate = useNavigate();
   const [tick, setTick] = useState(0);
   const [error, setError] = useState('');
-  const state = useLoad(() => api('/api/admin/customers'), [tick]);
+  const state = useLoad(() => api('/api/admin/customers?role=Customer'), [tick]);
 
   async function toggle(id) {
     setError('');
@@ -24,7 +24,10 @@ export function CustomersPage() {
     <AsyncView state={state}>
       {(customers) => (
         <>
-          <h1>Khách hàng</h1>
+          <header className="page-head">
+            <p className="eyebrow">Quản trị</p>
+            <h1>Khách hàng</h1>
+          </header>
           {error && <div className="banner">{error}</div>}
           <div className="table-wrap">
             <table>

@@ -36,10 +36,16 @@ export function AdminRoomsPage() {
     <AsyncView state={state}>
       {(rooms) => (
         <>
-          <div className="spread">
-            <h1>Quản lý phòng</h1>
-            <Link className="btn" to="/admin/rooms/new">Thêm phòng</Link>
-          </div>
+          <header className="page-head">
+            <p className="eyebrow">Quản trị</p>
+            <div className="spread">
+              <h1>Phòng</h1>
+              <div className="row">
+                <Link to="/admin/types">Loại phòng</Link>
+                <Link className="btn" to="/admin/rooms/new">Thêm phòng</Link>
+              </div>
+            </div>
+          </header>
           {error && <div className="banner">{error}</div>}
           <div className="table-wrap">
             <table>

@@ -1,16 +1,24 @@
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './auth';
 import { AccountMarks } from './lux';
 
 export default function App() {
-  const { user, hasRole } = useAuth();
+  const { user, logout, hasRole } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const flash = location.state?.message;
   const home = location.pathname === '/'
     || location.pathname === '/search'
     || location.pathname.startsWith('/rooms/')
     || location.pathname.startsWith('/pay/')
     || location.pathname === '/login';
+  const staff = hasRole('Receptionist', 'Manager', 'Admin');
+  const manager = hasRole('Manager', 'Admin');
+
+  function onLogout() {
+    logout();
+    navigate('/login');
+  }
 
   return (
     <div className={`shell${home ? ' is-home' : ''}`}>
@@ -18,20 +26,27 @@ export default function App() {
         <span>Chào mừng quý khách đến HBS</span>
         <span>Check-in 14:00 · Check-out 12:00</span>
       </div>}
-      {!home && <nav className="nav">
+      {!home && staff && <nav className="nav">
+        <NavLink className="brand" to={manager ? '/reports' : '/frontdesk'}><span className="brand-mark">H</span>HBS <span>Desk</span></NavLink>
+        <div className="menu">
+          <NavLink to="/frontdesk">Lễ tân</NavLink>
+          {manager && (
+            <>
+              <NavLink to="/reports">Báo cáo</NavLink>
+              <NavLink to="/admin/rooms">Phòng</NavLink>
+              <NavLink to="/admin/customers">Khách</NavLink>
+              <NavLink to="/admin/staff">Nhân viên</NavLink>
+            </>
+          )}
+          <span className="work-name">{user?.fullName}</span>
+          <button className="text-btn" type="button" onClick={onLogout}>Đăng xuất</button>
+        </div>
+      </nav>}
+      {!home && !staff && <nav className="nav">
         <NavLink className="brand" to="/"><span className="brand-mark">H</span>HBS <span>Hotel</span></NavLink>
         <div className="menu">
           <NavLink to="/" end>Trang chủ</NavLink>
           <NavLink to="/search">Tìm phòng</NavLink>
-          {hasRole('Receptionist', 'Manager', 'Admin') && <NavLink to="/frontdesk">Lễ tân</NavLink>}
-          {hasRole('Manager', 'Admin') && (
-            <>
-              <NavLink to="/admin/rooms">Phòng</NavLink>
-              <NavLink to="/admin/types">Loại phòng</NavLink>
-              <NavLink to="/admin/customers">Khách</NavLink>
-              <NavLink to="/reports">Báo cáo</NavLink>
-            </>
-          )}
           {user ? <AccountMarks user={user} /> : (
             <>
               <NavLink className="nav-cta" to="/login">Đăng nhập</NavLink>
@@ -45,8 +60,8 @@ export default function App() {
         <Outlet />
       </main>
       {!home && <footer className="footer">
-        <span>HBS Luxury Hotel · Đà Nẵng</span>
-        <NavLink to="/privacy">Bảo mật</NavLink>
+        <span>{staff ? 'HBS Desk · Đà Nẵng' : 'HBS Luxury Hotel · Đà Nẵng'}</span>
+        {!staff && <NavLink to="/privacy">Bảo mật</NavLink>}
       </footer>}
     </div>
   );

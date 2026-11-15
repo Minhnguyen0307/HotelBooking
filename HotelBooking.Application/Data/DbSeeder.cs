@@ -63,6 +63,10 @@ namespace HotelBooking.Application.Data
                     ALTER TABLE Bookings ADD GuestNote NVARCHAR(500) NULL;
                 IF COL_LENGTH('Bookings', 'PaymentChoice') IS NULL
                     ALTER TABLE Bookings ADD PaymentChoice NVARCHAR(20) NOT NULL CONSTRAINT DF_Bookings_PaymentChoice DEFAULT 'Now';
+                IF COL_LENGTH('Bookings', 'BillConfirmedByUserId') IS NULL
+                    ALTER TABLE Bookings ADD BillConfirmedByUserId INT NULL;
+                IF COL_LENGTH('Bookings', 'BillConfirmedAt') IS NULL
+                    ALTER TABLE Bookings ADD BillConfirmedAt DATETIME2 NULL;
                 IF COL_LENGTH('Rooms', 'HousekeepingStatus') IS NULL
                     ALTER TABLE Rooms ADD HousekeepingStatus NVARCHAR(20) NOT NULL CONSTRAINT DF_Rooms_Housekeeping DEFAULT 'Clean';
                 IF OBJECT_ID('FolioItems') IS NULL

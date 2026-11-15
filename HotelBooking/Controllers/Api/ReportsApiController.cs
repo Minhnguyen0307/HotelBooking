@@ -33,6 +33,18 @@ public class ReportsApiController : ControllerBase
         return Ok(await _reportService.GetExecutiveSummaryAsync());
     }
 
+    [HttpGet("revenue")]
+    public async Task<IActionResult> Revenue([FromQuery] string? period, [FromQuery] DateOnly? date)
+    {
+        return Ok(await _reportService.GetRevenuePeriodAsync(period, date));
+    }
+
+    [HttpGet("bills")]
+    public async Task<IActionResult> Bills()
+    {
+        return Ok(await _reportService.GetConfirmedBillsAsync());
+    }
+
     [HttpGet("charts")]
     public async Task<IActionResult> GetCharts()
     {

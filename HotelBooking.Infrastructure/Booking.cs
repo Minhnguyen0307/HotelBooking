@@ -33,6 +33,10 @@ public partial class Booking
 
     public string? CancelReason { get; set; }
 
+    public int? BillConfirmedByUserId { get; set; }
+
+    public DateTime? BillConfirmedAt { get; set; }
+
     public virtual ICollection<BookingRoom> BookingRooms { get; set; } = new List<BookingRoom>();
 
     public virtual User Customer { get; set; } = null!;

@@ -278,6 +278,7 @@ function Bill({ bookingId, services, tick, onDone, onError }) {
             <p>{roomPaid ? 'Số tiền cần thanh toán thêm' : 'Số tiền khách cần thanh toán'}</p>
             <strong className="slip-amount">{money(extraDue)}</strong>
             <p className={`stamp ${settled ? 'paid' : 'unpaid'}`}>{settled ? 'ĐÃ THANH TOÁN' : 'CHƯA THANH TOÁN'}</p>
+            <p>Người xác nhận: {folio.confirmedByName || 'Chưa chốt bill'}</p>
             <button className="btn" type="button" onClick={() => setSlipOpen(false)}>Đóng phiếu</button>
           </article>
         </div>

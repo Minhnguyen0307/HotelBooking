@@ -386,7 +386,7 @@ namespace HotelBooking.Application.Services
             return (true, null);
         }
 
-        public async Task<(bool Success, string? Error)> CheckOutWithBillAsync(int bookingId, CheckoutDto dto)
+        public async Task<(bool Success, string? Error)> CheckOutWithBillAsync(int bookingId, CheckoutDto dto, int staffUserId)
         {
             var booking = await LoadStay(bookingId);
             if (booking == null) return (false, "Không tìm thấy đơn.");
@@ -444,6 +444,8 @@ namespace HotelBooking.Application.Services
                 link.Room.UpdatedAt = DateTime.UtcNow;
             }
             booking.Status = "CheckedOut";
+            booking.BillConfirmedByUserId = staffUserId;
+            booking.BillConfirmedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             return (true, null);
         }
@@ -515,6 +517,9 @@ namespace HotelBooking.Application.Services
                 .Sum(p => p.Amount);
             var roomPaid = coveredBeforeCheckout >= roomNet;
             var due = booking.TotalPrice + extras - discounts - paid;
+            string? confirmedBy = null;
+            if (booking.BillConfirmedByUserId is int staffId)
+                confirmedBy = await _context.Users.Where(u => u.UserId == staffId).Select(u => u.FullName).FirstOrDefaultAsync();
             var roomLink = booking.BookingRooms.FirstOrDefault();
             var note = roomPaid && paidAtBooking >= roomNet
                 ? "Khách đã thanh toán tiền phòng khi đặt. Dịch vụ phát sinh ghi thêm vào bill. Chỉ thu thêm số tiền bên dưới."
@@ -541,6 +546,8 @@ namespace HotelBooking.Application.Services
                 Due = due,
                 RoomPaid = roomPaid,
                 PaymentNote = note,
+                ConfirmedByName = confirmedBy,
+                ConfirmedAt = booking.BillConfirmedAt,
                 Lines = lines.Select(l => new FolioLineDto
                 {
                     Category = l.Category,

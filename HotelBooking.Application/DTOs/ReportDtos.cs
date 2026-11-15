@@ -58,4 +58,31 @@
         public decimal TotalAmount { get; set; }
         public int Count { get; set; }
     }
+
+    public class RevenuePeriodDto
+    {
+        public string Period { get; set; } = "day";
+        public DateOnly From { get; set; }
+        public DateOnly To { get; set; }
+        public decimal Total { get; set; }
+        public int PaymentCount { get; set; }
+        public List<RevenueBucketDto> Buckets { get; set; } = new();
+    }
+
+    public class RevenueBucketDto
+    {
+        public string Label { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public int Count { get; set; }
+    }
+
+    public class ConfirmedBillDto
+    {
+        public int BookingId { get; set; }
+        public string GuestName { get; set; } = string.Empty;
+        public string RoomNumber { get; set; } = string.Empty;
+        public decimal Collected { get; set; }
+        public string? ConfirmedBy { get; set; }
+        public DateTime? ConfirmedAt { get; set; }
+    }
 }

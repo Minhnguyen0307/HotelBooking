@@ -131,7 +131,7 @@ public class FrontDeskApiController : ControllerBase
     [HttpPost("check-out/{bookingId:int}")]
     public async Task<IActionResult> CheckOut(int bookingId, CheckoutDto dto)
     {
-        var (success, error) = await _deskService.CheckOutWithBillAsync(bookingId, dto);
+        var (success, error) = await _deskService.CheckOutWithBillAsync(bookingId, dto, ApiUser.Id(User));
         return Result(success, error, "Đã trả phòng và chốt hóa đơn.");
     }
 
